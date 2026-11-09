@@ -626,9 +626,8 @@ $('#bPlay').onclick=()=>{
   ctl('toggle');
 };
 /* Platte mit dem Finger anhalten und vor-/zurückdrehen (wie beim echten Plattenspieler).
-   Scratch-Ton: Die Android-App spielt dabei den Abschnitt in Fingertempo ab, auch rückwärts.
-   Eine Umdrehung = so viel Musik, wie bei normaler Drehung in einer Umdrehung läuft. Kurz antippen = Abspielen/Pause. */
-const SPIN_S=3.2, SEC_PER_TURN=SPIN_S;
+   Eine ganze Umdrehung = 8 Sekunden im Lied. Kurz antippen = Abspielen/Pause. */
+const SEC_PER_TURN=8, SPIN_S=3.2;
 let scr=null;
 function discAngle(){const m=getComputedStyle($('#disc')).transform;if(!m||m==='none')return 0;const v=m.match(/matrix\(([^)]+)\)/);if(!v)return 0;const [a,b]=v[1].split(',').map(Number);return Math.atan2(b,a)*180/Math.PI;}
 function fingerAngle(e){const r=$('#record').getBoundingClientRect();return Math.atan2(e.clientY-(r.top+r.height/2),e.clientX-(r.left+r.width/2))*180/Math.PI;}
@@ -644,19 +643,15 @@ rec.addEventListener('pointerdown',e=>{
 });
 rec.addEventListener('pointermove',e=>{
   if(!scr||scr.idle)return;
-  if(!scr.paused&&(Math.abs(e.clientX-scr.x)>6||Math.abs(e.clientY-scr.y)>6)){scr.paused=true;if(scr.was)ctl('pause');
-    if(NATIVE){const s=scr,t=curTrack();s.sc=true;
-      Music.scratchStart({id:t.id,pos:Math.round(s.pos0)}).then(r=>{if(scr===s){s.win=r;Music.scratchMove({pos:Math.round(s.np!=null?s.np:s.pos0)});}}).catch(()=>{});}}
+  if(!scr.paused&&(Math.abs(e.clientX-scr.x)>6||Math.abs(e.clientY-scr.y)>6)){scr.paused=true;if(scr.was)ctl('pause');}
   if(!scr.paused)return;
   let a=fingerAngle(e),d=a-scr.last;if(d>180)d-=360;if(d<-180)d+=360;scr.last=a;
   scr.rot+=d;scr.moved+=d;
   $('#disc').style.transform=`rotate(${scr.rot}deg)`;
   // kleines Rillen-Ruckeln beim Drehen
   scr.tick+=Math.abs(d);if(scr.tick>14){scr.tick=0;try{navigator.vibrate&&navigator.vibrate(4);}catch(err){}}
-  let np=Math.max(0,Math.min(scr.dur-500,scr.pos0+scr.moved/360*SEC_PER_TURN*1000));
-  if(scr.win)np=Math.max(scr.win.start,Math.min(scr.win.end-50,np));
+  const np=Math.max(0,Math.min(scr.dur-500,scr.pos0+scr.moved/360*SEC_PER_TURN*1000));
   scr.np=np;
-  if(scr.win)Music.scratchMove({pos:Math.round(np)});
   const off=Math.round((np-scr.pos0)/1000);
   $('#tPos').textContent=fmt(np);$('#seek').value=scr.dur?Math.round(np/scr.dur*1000):0;$('#seek').style.setProperty('--p',(scr.dur?np/scr.dur*100:0)+'%');
   const b=$('#scrub');b.textContent=(off>0?'+':off<0?'−':'±')+Math.abs(off)+' s';b.classList.add('show');
@@ -669,7 +664,6 @@ function scrEnd(){
     if(!s.idle){d.style.animation='';d.style.transform='';}
     if(Date.now()-s.t0<500)$('#bPlay').click();
     return;}
-  if(s.sc)Music.scratchStop().catch(()=>{});
   // Platte läuft an der neuen Stelle weiter
   const ang=((s.rot%360)+360)%360;
   d.style.transform='';d.style.animation='';d.style.animationDelay=(-ang/360*SPIN_S)+'s';
