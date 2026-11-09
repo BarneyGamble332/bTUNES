@@ -272,6 +272,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .pplayer .s{color:var(--mute)}
 .pplayer .prog{width:100%}
 .pplayer .ctl{width:100%;justify-content:center;gap:22px}
+.dlb{color:var(--acc);font-weight:700;white-space:nowrap}.dlb.ok{color:#7fdc8f}
+.acts button.on{color:var(--acc)}
 .pextra{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
 .pextra button{height:38px;padding:0 14px;border-radius:19px;background:var(--card);font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:6px}
 .pextra button.on{color:var(--acc)}
@@ -312,6 +314,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M8 21h8"/></symbol>
   <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></symbol>
   <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></symbol>
   <symbol id="i-queue" viewBox="0 0 24 24"><path d="M3 6h12M3 12h12M3 18h8"/><path d="M17 13l5 3-5 3z"/></symbol>
 </svg>
 
@@ -933,7 +936,7 @@ let pcCat=store.get('pcat','Alle'),pcSort=store.get('psort','neu');
 const eps=new Map();                       // Folgen-Schlüssel -> Folge
 const podById=new Map();
 const savePods=()=>{store.set('pods',pods);podById.clear();pods.forEach(p=>podById.set(p.id,p));};
-const savePst=()=>store.set('pst',pst);
+const savePst=()=>{store.set('pst',pst);if(window.dlClean)dlClean();};
 function podEps(id){return store.get('pe_'+id,[]);}
 function indexEps(p,list){for(const e of list){e.pid=p.id;eps.set(e.k,e);}}
 pods.forEach(p=>{podById.set(p.id,p);indexEps(p,podEps(p.id));});
@@ -991,7 +994,7 @@ async function subscribe(url,quiet){
 }
 function unsubscribe(p){
   pods=pods.filter(x=>x.id!==p.id);savePods();
-  for(const e of podEps(p.id))eps.delete(e.k);
+  for(const e of podEps(p.id)){dlDelete(e.k);eps.delete(e.k);}
   try{localStorage.removeItem('mp_pe_'+p.id);}catch(e){}
   plist=plist.filter(k=>!k.startsWith(p.id+'.'));store.set('plist',plist);
   pcRenderHome();
@@ -1009,7 +1012,7 @@ async function refreshAll(force){
   refreshing=true;
   let i=0;const work=async()=>{while(i<due.length){const p=due[i++];try{await refreshPod(p);}catch(e){}}};
   await Promise.all([work(),work(),work()]);
-  savePods();refreshing=false;pcRenderHome();
+  savePods();refreshing=false;pcRenderHome();dlAuto();
   if(force)toast('Podcasts aktualisiert');
 }
 
@@ -1032,7 +1035,7 @@ function epRow(e,o={}){
   return `<div class="ep${s.x?' done':''}${cur?' cur':''}" data-ep="${e.k}">
     ${o.thumb!==false?`<div class="th" style="background-image:url('${esc(e.i||p.art||'')}')"></div>`:''}
     <div class="tx">${o.pn!==false?`<div class="pn">${esc(p.title||'')}</div>`:''}<div class="n">${esc(e.t)}</div>
-      <div class="m">${prog}<span>${esc(epMeta(e))}</span>${inList&&!o.order?'<span class="q">• Liste</span>':''}</div></div>
+      <div class="m">${prog}<span>${esc(epMeta(e))}</span>${dlBadge(e.k)}${inList&&!o.order?'<span class="q">• Liste</span>':''}</div></div>
     ${o.order?`<div class="ord"><button data-up="${e.k}"><svg class="i" style="width:20px"><use href="#i-up"/></svg></button><button data-down="${e.k}"><svg class="i" style="width:20px"><use href="#i-down"/></svg></button></div>`:''}
     <div class="eb"><button class="pp" data-play="${e.k}"><svg class="i"><use href="#${playing?'i-pause':'i-play'}"/></svg></button><button class="more" data-emenu="${e.k}"><svg class="i" style="width:18px"><use href="#i-more"/></svg></button></div></div>`;
 }
@@ -1047,7 +1050,7 @@ function epClick(e,ctx){
 }
 
 /* Abspielen: gewählte Folge, danach "Meine Liste" */
-function epTrack(e){const p=podById.get(e.pid)||{};return{key:'p:'+e.k,uri:e.u,title:e.t,artist:p.title||'',album:p.title||'',art:e.i||p.art||''};}
+function epTrack(e){const p=podById.get(e.pid)||{};return{key:'p:'+e.k,uri:pdl[e.k]?'file://'+pdl[e.k].p:e.u,title:e.t,artist:p.title||'',album:p.title||'',art:e.i||p.art||''};}
 async function playEp(k,ctx){
   const e=eps.get(k);if(!e)return;
   let keys;
@@ -1084,12 +1087,12 @@ function moveInList(k,d){const i=plist.indexOf(k),j=i+d;if(i<0||j<0||j>=plist.le
 function openList(){
   openView('Meine Liste',(b,v)=>{
     const draw=()=>{const l=plist.map(k=>eps.get(k)).filter(Boolean);
-      b.innerHTML=l.length?`<div class="acts"><button class="pri" data-go="all"><svg class="i" style="fill:currentColor;stroke:none"><use href="#i-play"/></svg>Alles abspielen</button><button data-go="clear"><svg class="i"><use href="#i-trash"/></svg>Leeren</button></div>
+      b.innerHTML=l.length?`<div class="acts"><button class="pri" data-go="all"><svg class="i" style="fill:currentColor;stroke:none"><use href="#i-play"/></svg>Alles abspielen</button><button data-go="dlall"><svg class="i"><use href="#i-dl"/></svg>Alle laden</button><button data-go="clear" style="flex:.5"><svg class="i"><use href="#i-trash"/></svg></button></div>
         <div class="s" style="color:var(--mute);font-size:13px;margin:4px 0">${l.length} ${l.length===1?'Folge':'Folgen'} · ${fmtMin(l.reduce((s,e)=>s+Math.max(0,(stOf(e.k).d||e.s*1000)-(stOf(e.k).p||0))/1000,0))} · Reihenfolge mit den Pfeilen ändern</div>${l.map(e=>epRow(e,{order:true})).join('')}`
         :`<div class="hint">Noch leer.<br>Über ⋮ bei einer Folge kannst du sie hier einreihen und dir so dein eigenes Programm zusammenstellen.</div>`;};
     v._draw=draw;draw();
     b.onclick=e=>{const g=e.target.closest('[data-go]');
-      if(g){if(g.dataset.go==='all'&&plist.length){playEp(plist[0],'list');}else if(g.dataset.go==='clear'&&confirm('„Meine Liste“ leeren?')){plist=[];store.set('plist',plist);draw();}return;}
+      if(g){if(g.dataset.go==='all'&&plist.length){playEp(plist[0],'list');}else if(g.dataset.go==='dlall'){const n=plist.filter(k=>!isDl(k));n.forEach(k=>dlStart(k,true));toast(n.length?n.length+' Folgen werden geladen':'Alles schon offline');draw();}else if(g.dataset.go==='clear'&&confirm('„Meine Liste“ leeren?')){plist=[];store.set('plist',plist);draw();}return;}
       epClick(e,'list');};
   });
 }
@@ -1101,6 +1104,7 @@ function epMenu(e){
     ['i-queue','Als Nächstes abspielen',()=>addToList(e.k,true)],
     inL?['i-x','Aus „Meine Liste“ entfernen',()=>{plist=plist.filter(x=>x!==e.k);store.set('plist',plist);pcRefreshViews();}]:['i-plus','Zu „Meine Liste“',()=>addToList(e.k,false)],
     done?['i-rew','Als ungehört markieren',()=>{delete pst[e.k];savePst();pcRefreshViews();}]:['i-check','Als gehört markieren',()=>{pst[e.k]={x:true,t:Date.now()};savePst();plist=plist.filter(x=>x!==e.k);store.set('plist',plist);pcRefreshViews();}],
+    dlProg.has(e.k)?['i-x','Download abbrechen',()=>dlCancel(e.k)]:isDl(e.k)?['i-trash','Download löschen',()=>{dlDelete(e.k);pcRefreshViews();},'del']:['i-dl','Herunterladen',()=>dlStart(e.k)],
     ['i-news','Beschreibung',()=>openEpisode(e.k)],
     ['i-mic','Zum Podcast',()=>openPodcast(e.pid)]]);
 }
@@ -1111,11 +1115,12 @@ function openEpisode(k){
   openView(p.title||'Folge',(b,v)=>{
     const draw=()=>{const cur=String(S.id)==='p:'+k;
       b.innerHTML=`<div class="phero"><div class="big" style="background-image:url('${esc(e.i||p.art||'')}')"></div><div><h2>${esc(e.t)}</h2><div class="s">${esc(epMeta(e))}</div></div></div>
-      <div class="acts"><button class="pri" data-go="play"><svg class="i" style="fill:currentColor;stroke:none"><use href="#${cur&&S.playing?'i-pause':'i-play'}"/></svg>${cur&&S.playing?'Pause':stOf(k).p>15000&&!isDone(k)?'Weiterhören':'Abspielen'}</button><button data-go="list"><svg class="i"><use href="#${plist.includes(k)?'i-check':'i-plus'}"/></svg>Meine Liste</button></div>
+      <div class="acts"><button class="pri" data-go="play"><svg class="i" style="fill:currentColor;stroke:none"><use href="#${cur&&S.playing?'i-pause':'i-play'}"/></svg>${cur&&S.playing?'Pause':stOf(k).p>15000&&!isDone(k)?'Weiterhören':'Abspielen'}</button><button data-go="list"><svg class="i"><use href="#${plist.includes(k)?'i-check':'i-plus'}"/></svg>Liste</button><button data-go="dl"><svg class="i"><use href="#${isDl(k)?'i-check':'i-dl'}"/></svg>${dlProg.has(k)?'<span data-dlk="'+k+'">…</span>':isDl(k)?'Offline':'Laden'}</button></div>
       <div class="pdesc" style="margin-top:10px">${esc(e.x||'Keine Beschreibung.')}</div>`;};
     v._draw=draw;draw();
     b.onclick=ev=>{const g=ev.target.closest('[data-go]');if(!g)return;
       if(g.dataset.go==='play'){if(String(S.id)==='p:'+k)ctl('toggle');else playEp(k);}
+      else if(g.dataset.go==='dl'){if(dlProg.has(k))dlCancel(k);else if(isDl(k)){if(confirm('Download löschen?')){dlDelete(k);pcRefreshViews();}}else{dlStart(k);draw();}}
       else{if(plist.includes(k)){plist=plist.filter(x=>x!==k);store.set('plist',plist);pcRefreshViews();}else addToList(k,false);}};
   });
 }
@@ -1159,6 +1164,7 @@ function openPodcast(id,preview){
 function podMenu(p,v){
   menu(p.title,[
     ['i-folder','In Ordner einsortieren…',()=>setTimeout(()=>catMenu(p,v),260)],
+    [p.auto?'i-check':'i-dl',p.auto?'Automatisch laden: AN (im WLAN)':'Neue Folgen automatisch laden (WLAN)',()=>{p.auto=!p.auto;if(p.auto)p.autoSince=Date.now();savePods();toast(p.auto?'Die 2 neuesten Folgen werden im WLAN automatisch geladen':'Automatisch laden aus');if(p.auto)dlAuto();}],
     ['i-refresh','Jetzt aktualisieren',async()=>{try{await refreshPod(p);savePods();v._draw&&v._draw();pcRenderHome();toast('Aktualisiert');}catch(e){toast('Feed nicht erreichbar');}}],
     ['i-check','Alle als gehört markieren',()=>{for(const e of podEps(p.id))pst[e.k]={x:true,t:Date.now()};savePst();v._draw&&v._draw();pcRenderHome();}],
     ['i-link','Feed-Adresse anzeigen',()=>prompt('RSS-Adresse',p.url)],
@@ -1223,6 +1229,70 @@ $('#opmlFile').onchange=async e=>{
   toast(ok+' Podcasts importiert');pcRenderHome();
 };
 
+/* ===== Downloads zum Offline-Hören ===== */
+let pdl=store.get('pdl',{});                 // Folgen-Schlüssel -> {p:Pfad, sz:Größe, t:Zeit}
+let dlAutoDel=store.get('dlautodel',true);
+const dlProg=new Map();
+const saveDl=()=>store.set('pdl',pdl);
+const fmtSize=b=>b>=1e9?(b/1e9).toFixed(1).replace('.',',')+' GB':Math.round(b/1e6)+' MB';
+const isDl=k=>!!pdl[k];
+function dlBadge(k){
+  if(dlProg.has(k)){const p=dlProg.get(k);return `<span class="dlb" data-dlk="${k}">⬇ ${p.total>0?Math.round(p.got/p.total*100)+' %':'…'}</span>`;}
+  return pdl[k]?'<span class="dlb ok">✓ offline</span>':'';
+}
+async function dlStart(k,quiet){
+  const e=eps.get(k);if(!e||pdl[k]||dlProg.has(k))return;
+  dlProg.set(k,{got:0,total:0});pcRefreshViews();
+  if(!quiet)toast('Download gestartet');
+  try{
+    let r;
+    if(NATIVE)r=await Music.download({key:k,url:e.u});
+    else{for(let i=1;i<=10;i++){await sleep(250);if(!dlProg.has(k))throw new Error('abgebrochen');dlProg.set(k,{got:i,total:10});dlUpd(k);}r={path:'/demo/'+k,size:42e6};}
+    pdl[k]={p:r.path,sz:r.size,t:Date.now()};saveDl();
+  }catch(err){if(!/abgebrochen/.test(String(err&&err.message||err)))toast('Download fehlgeschlagen');}
+  dlProg.delete(k);pcRefreshViews();
+}
+function dlCancel(k){dlProg.delete(k);if(NATIVE)Music.cancelDownload({key:k}).catch(()=>{});pcRefreshViews();}
+function dlDelete(k){if(!pdl[k])return;if(NATIVE)Music.deleteDownload({key:k}).catch(()=>{});delete pdl[k];saveDl();}
+/* Fortschritt nur in den betroffenen Zeilen nachführen */
+function dlUpd(k){document.querySelectorAll(`[data-dlk="${k}"]`).forEach(el=>{const p=dlProg.get(k);if(p)el.textContent='⬇ '+(p.total>0?Math.round(p.got/p.total*100)+' %':'…');});}
+if(NATIVE)Music.addListener('dl',ev=>{if(!dlProg.has(ev.key))return;dlProg.set(ev.key,{got:ev.got,total:ev.total});dlUpd(ev.key);});
+/* Gehörte Downloads aufräumen */
+let dlCleanT=null;
+function dlClean(){clearTimeout(dlCleanT);dlCleanT=setTimeout(()=>{if(!dlAutoDel)return;const cur=curEp();let n=0;
+  for(const k of Object.keys(pdl))if(isDone(k)&&(!cur||cur.k!==k)){dlDelete(k);n++;}
+  if(n)pcRefreshViews();},3000);}
+/* Beim Start mit dem Speicher abgleichen */
+async function dlSync(){if(!NATIVE)return;try{const r=await Music.listDownloads();const have=new Set((r.files||[]).map(f=>f.name));
+  let ch=false;for(const k of Object.keys(pdl))if(!have.has(k)){delete pdl[k];ch=true;}
+  for(const f of r.files||[])if(!pdl[f.name]&&eps.has(f.name)){pdl[f.name]={p:f.path,sz:f.size,t:Date.now()};ch=true;}
+  if(ch){saveDl();pcRenderHome();}dlFree=r.free||0;}catch(e){}}
+let dlFree=0;
+/* Automatisch laden: neueste Folgen der markierten Podcasts, nur im WLAN */
+function onWifi(){const c=navigator.connection;return !!(c&&(c.type==='wifi'||c.type==='ethernet'));}
+function dlAuto(){
+  if(!onWifi()&&NATIVE)return;
+  for(const p of pods){if(!p.auto)continue;
+    podEps(p.id).filter(e=>e.d>(p.autoSince||p.added||0)-7*864e5&&!isDone(e.k)).slice(0,2).forEach(e=>dlStart(e.k,true));}
+}
+function openDownloads(){
+  openView('Downloads',(b,v)=>{
+    const draw=()=>{
+      const done=Object.keys(pdl).map(k=>eps.get(k)).filter(Boolean).sort((a,c)=>(pdl[c.k].t||0)-(pdl[a.k].t||0));
+      const run=[...dlProg.keys()].map(k=>eps.get(k)).filter(Boolean);
+      const size=Object.values(pdl).reduce((s,x)=>s+(x.sz||0),0);
+      b.innerHTML=`<div class="s" style="color:var(--mute);margin:4px 2px 10px">${done.length} ${done.length===1?'Folge':'Folgen'} · ${fmtSize(size)} belegt${dlFree?' · '+fmtSize(dlFree)+' frei':''}</div>
+        <div class="acts"><button data-go="auto" class="${dlAutoDel?'on':''}"><svg class="i"><use href="#${dlAutoDel?'i-check':'i-x'}"/></svg>Gehörte löschen</button>${done.length?'<button data-go="delall"><svg class="i"><use href="#i-trash"/></svg>Alle löschen</button>':''}</div>
+        <div style="color:var(--mute);font-size:12.5px;margin:2px 2px 8px">${dlAutoDel?'Fertig gehörte Folgen werden automatisch vom Handy gelöscht.':'Downloads bleiben, bis du sie selbst löschst.'} Neue Folgen automatisch laden (im WLAN) stellst du je Podcast über ⋮ ein.</div>
+        ${run.length?`<div class="sec">Wird geladen</div>${run.map(e=>epRow(e)).join('')}`:''}
+        ${done.length?`<div class="sec">Auf dem Handy</div>${done.map(e=>epRow(e)).join('')}`:'<div class="hint">Noch nichts heruntergeladen.<br>Über ⋮ bei einer Folge → „Herunterladen“.</div>'}`;};
+    v._draw=draw;draw();
+    b.onclick=e=>{const g=e.target.closest('[data-go]');
+      if(g){if(g.dataset.go==='auto'){dlAutoDel=!dlAutoDel;store.set('dlautodel',dlAutoDel);dlClean();draw();}
+        else if(g.dataset.go==='delall'&&confirm('Alle Downloads vom Handy löschen?')){Object.keys(pdl).forEach(dlDelete);pcRefreshViews();}return;}
+      epClick(e,'dl');};
+  });
+}
 /* Startseite Podcasts */
 function pcRenderHome(){
   const B=$('#pcBody');if(!B)return;
@@ -1245,6 +1315,8 @@ function pcRenderHome(){
   h+=`<div class="sec secrow"><span>Meine Liste</span><button class="lnk" data-go="list">${ll.length?ll.length+' Folgen ›':'Zusammenstellen ›'}</button></div>`;
   if(ll.length)h+=ll.slice(0,3).map(k=>epRow(eps.get(k))).join('');
   else h+=`<div style="color:var(--mute);font-size:13.5px;padding:0 2px 4px">Reihe Folgen über ⋮ ein und stell dir dein eigenes Programm zusammen.</div>`;
+  const dk=Object.keys(pdl).filter(k=>eps.has(k));
+  if(dk.length||dlProg.size)h+=`<div class="sec secrow"><span>Downloads</span><button class="lnk" data-go="dls">${dk.length} offline${dlProg.size?' · '+dlProg.size+' laden':''} · ${fmtSize(dk.reduce((s,k)=>s+(pdl[k].sz||0),0))} ›</button></div>`;
   const fresh=all.filter(e=>{const p=podById.get(e.pid);return !isDone(e.k)&&e.d>(p.added||0)-14*864e5;}).sort((a,b)=>b.d-a.d).slice(0,8);
   if(fresh.length)h+=`<div class="sec secrow"><span>Neue Folgen</span><button class="lnk" data-go="refresh">Aktualisieren ↻</button></div>${fresh.map(e=>epRow(e)).join('')}`;
   const cats=['Alle',...pcats.filter(c=>pods.some(p=>p.cat===c))];
@@ -1264,7 +1336,7 @@ function podCard(p){
 $('#pcBody').onclick=e=>{
   const g=e.target.closest('[data-go]');
   if(g){const a=g.dataset.go;
-    if(a==='add')openAdd();else if(a==='list')openList();else if(a==='refresh')refreshAll(true);
+    if(a==='add')openAdd();else if(a==='list')openList();else if(a==='dls')openDownloads();else if(a==='refresh')refreshAll(true);
     else if(a==='dir')openAdd($('#pcQ').value.trim());
     else if(a==='psort'){pcSort=pcSort==='az'?'neu':'az';store.set('psort',pcSort);pcRenderHome();}
     else if(a==='newcat'){const n=prompt('Neuer Ordner (z. B. Wissen, Comedy, Sport)');if(n&&n.trim()&&!pcats.includes(n.trim())){pcats.push(n.trim());store.set('pcats',pcats);toast('Ordner angelegt – Podcasts über ⋮ auf der Podcast-Seite einsortieren');}}
@@ -1356,6 +1428,7 @@ function setTab(t){curTab=t;store.set('tab2',t);
   if(t==='pod'){pcRenderHome();pcMini();refreshAll(false);}}
 document.querySelectorAll('.seg').forEach(s=>s.onclick=e=>{const b=e.target.closest('[data-tab]');if(b)setTab(b.dataset.tab);});
 setTab(curTab);
+dlSync();
 setInterval(()=>refreshAll(false),30*6e4);
 
 /* Vorführmodus im Browser */

@@ -289,10 +289,120 @@ public class MusicPlugin extends Plugin {
         });
     }
 
+    /* ---------- Podcast-Downloads (App-Ordner, keine Berechtigung nötig) ---------- */
+    private final ExecutorService dlPool = Executors.newFixedThreadPool(2);
+    private final java.util.Set<String> cancelled = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
+
+    private java.io.File dlDir() {
+        java.io.File d = getContext().getExternalFilesDir("Podcasts");
+        if (d == null) d = new java.io.File(getContext().getFilesDir(), "Podcasts");
+        d.mkdirs();
+        return d;
+    }
+    private static String safe(String k) { return k.replaceAll("[^A-Za-z0-9._-]", "_"); }
+
+    @PluginMethod
+    public void download(PluginCall call) {
+        final String key = call.getString("key", "");
+        final String url = call.getString("url", "");
+        if (key.isEmpty() || url.isEmpty()) { call.reject("Fehlt"); return; }
+        cancelled.remove(key);
+        dlPool.execute(() -> {
+            java.io.File out = new java.io.File(dlDir(), safe(key) + ".audio");
+            java.io.File part = new java.io.File(dlDir(), safe(key) + ".part");
+            java.net.HttpURLConnection con = null;
+            try {
+                String u = url;
+                // Weiterleitungen selbst verfolgen (auch von http nach https, das macht Android nicht automatisch)
+                for (int i = 0; i < 10; i++) {
+                    con = (java.net.HttpURLConnection) new java.net.URL(u).openConnection();
+                    con.setInstanceFollowRedirects(false);
+                    con.setConnectTimeout(15000);
+                    con.setReadTimeout(30000);
+                    con.setRequestProperty("User-Agent", "bTUNES/1.0 (Android)");
+                    int code = con.getResponseCode();
+                    if (code >= 300 && code < 400 && con.getHeaderField("Location") != null) {
+                        u = new java.net.URL(new java.net.URL(u), con.getHeaderField("Location")).toString();
+                        con.disconnect();
+                        continue;
+                    }
+                    if (code >= 400) throw new Exception("HTTP " + code);
+                    break;
+                }
+                long total = con.getContentLengthLong(), got = 0, lastSent = 0;
+                try (java.io.InputStream in = con.getInputStream(); java.io.OutputStream os = new java.io.FileOutputStream(part)) {
+                    byte[] buf = new byte[65536];
+                    int n;
+                    while ((n = in.read(buf)) > 0) {
+                        if (cancelled.contains(key)) throw new java.util.concurrent.CancellationException();
+                        os.write(buf, 0, n);
+                        got += n;
+                        long now = System.currentTimeMillis();
+                        if (now - lastSent > 400) {
+                            lastSent = now;
+                            JSObject ev = new JSObject();
+                            ev.put("key", key); ev.put("got", got); ev.put("total", total);
+                            notifyListeners("dl", ev);
+                        }
+                    }
+                }
+                if (out.exists()) out.delete();
+                if (!part.renameTo(out)) throw new Exception("Speichern fehlgeschlagen");
+                JSObject r = new JSObject();
+                r.put("path", out.getAbsolutePath());
+                r.put("size", out.length());
+                call.resolve(r);
+            } catch (java.util.concurrent.CancellationException e) {
+                part.delete();
+                call.reject("abgebrochen");
+            } catch (Exception e) {
+                part.delete();
+                call.reject("Download fehlgeschlagen: " + e.getMessage());
+            } finally {
+                if (con != null) con.disconnect();
+                cancelled.remove(key);
+            }
+        });
+    }
+
+    @PluginMethod
+    public void cancelDownload(PluginCall call) {
+        cancelled.add(call.getString("key", ""));
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void deleteDownload(PluginCall call) {
+        new java.io.File(dlDir(), safe(call.getString("key", "")) + ".audio").delete();
+        call.resolve();
+    }
+
+    /* Was liegt schon auf dem Handy? (zum Abgleich mit der App) */
+    @PluginMethod
+    public void listDownloads(PluginCall call) {
+        JSArray a = new JSArray();
+        java.io.File[] fs = dlDir().listFiles();
+        if (fs != null) for (java.io.File f : fs) {
+            if (f.getName().endsWith(".part")) { f.delete(); continue; }
+            if (!f.getName().endsWith(".audio")) continue;
+            JSObject o = new JSObject();
+            o.put("name", f.getName().substring(0, f.getName().length() - 6));
+            o.put("path", f.getAbsolutePath());
+            o.put("size", f.length());
+            a.put(o);
+        }
+        JSObject r = new JSObject();
+        r.put("files", a);
+        android.os.StatFs st = new android.os.StatFs(dlDir().getAbsolutePath());
+        r.put("free", st.getAvailableBytes());
+        call.resolve(r);
+    }
+
     @Override
     protected void handleOnDestroy() {
         if (future != null) MediaController.releaseFuture(future);
         future = null; ctl = null;
         pool.shutdown();
+        dlPool.shutdown();
     }
 }
