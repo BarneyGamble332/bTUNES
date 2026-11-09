@@ -290,6 +290,51 @@ public class MusicPlugin extends Plugin {
         });
     }
 
+    /* ---------- Scratchen ---------- */
+    private volatile Scratch scratch;
+    private final ExecutorService scPool = Executors.newSingleThreadExecutor();
+
+    @PluginMethod
+    public void scratchStart(PluginCall call) {
+        final long pos = call.getData().optLong("pos", 0L);
+        final String uri = call.getString("uri", "");
+        final long id = call.getData().optLong("id", -1L);
+        scPool.execute(() -> {
+            try {
+                Scratch old = scratch; scratch = null;
+                if (old != null) old.stop();
+                Uri u = !uri.isEmpty() ? Uri.parse(uri) : ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+                Scratch sc = new Scratch();
+                sc.load(getContext(), u, pos, 5000, 5000);
+                sc.start(pos);
+                scratch = sc;
+                JSObject r = new JSObject();
+                r.put("start", sc.windowStartMs());
+                r.put("end", sc.windowEndMs());
+                call.resolve(r);
+            } catch (Exception e) {
+                call.reject("Scratchen nicht möglich: " + e.getMessage());
+            }
+        });
+    }
+
+    @PluginMethod
+    public void scratchMove(PluginCall call) {
+        Scratch sc = scratch;
+        if (sc != null) sc.move(call.getData().optLong("pos", 0L));
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void scratchStop(PluginCall call) {
+        scPool.execute(() -> {
+            Scratch sc = scratch; scratch = null;
+            JSObject r = new JSObject();
+            if (sc != null) r.put("pos", sc.stop());
+            call.resolve(r);
+        });
+    }
+
     /* ---------- Podcast-Downloads (App-Ordner, keine Berechtigung nötig) ---------- */
     private final ExecutorService dlPool = Executors.newFixedThreadPool(2);
     private final java.util.Set<String> cancelled = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
@@ -405,5 +450,7 @@ public class MusicPlugin extends Plugin {
         future = null; ctl = null;
         pool.shutdown();
         dlPool.shutdown();
+        Scratch sc = scratch; scratch = null; if (sc != null) sc.stop();
+        scPool.shutdown();
     }
 }
