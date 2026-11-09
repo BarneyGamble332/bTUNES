@@ -84,6 +84,8 @@ jobs:
                       <meta-data android:name="android.appwidget.provider" android:resource="@xml/btunes_widget_info" />
                   </receiver>
               </application>'''
+          # Manche Podcasts liefern ihre Folgen noch ueber http statt https
+          t=t.replace('<application','<application android:usesCleartextTraffic="true"',1)
           t=t.replace('</application>',svc,1).replace('</manifest>',perms+'</manifest>',1)
           open(m,'w').write(t)
           PY

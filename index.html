@@ -192,6 +192,89 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .wlink{display:inline-block;margin-top:2px;color:var(--acc);font-weight:600}
 .src{color:#6d6359;font-size:12px;text-align:center;margin-top:22px}
 .spin{width:28px;height:28px;border:3px solid #3a332d;border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite;margin:40px auto 12px}
+
+/* ---------- Reiter Platten / Podcasts ---------- */
+.seg{display:flex;background:#ffffff12;border-radius:20px;padding:3px}
+.seg button{padding:6px 14px;border-radius:17px;font-size:13.5px;font-weight:700;color:var(--mute)}
+.seg button.on{background:var(--txt);color:var(--bg)}
+#pod{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);padding-top:calc(var(--safe-t) + 10px)}
+#pod .top{padding:0 16px}
+.psearch{margin:8px 14px 4px;flex:none!important}
+.pbody{flex:1;overflow-y:auto;padding:0 14px calc(var(--safe-b) + 96px)}
+.hscroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin:0 -14px;padding-left:14px;padding-right:14px}
+.hscroll::-webkit-scrollbar{display:none}
+.ccard{flex:none;width:150px;text-align:left}
+.ccard .cv{width:150px;height:150px;border-radius:10px;background:#2c2621 center/cover no-repeat;position:relative;box-shadow:0 4px 10px #0007}
+.ccard .cv .pb{position:absolute;left:8px;right:8px;bottom:8px;height:4px;border-radius:2px;background:#0009}
+.ccard .cv .pb i{display:block;height:100%;border-radius:2px;background:var(--acc)}
+.ccard .cv .pl{position:absolute;right:8px;top:8px;width:34px;height:34px;border-radius:50%;background:#000a;display:grid;place-items:center}
+.ccard .n{font-weight:600;font-size:13.5px;margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ccard .s{color:var(--mute);font-size:12px;margin-top:2px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:12px}
+.pgrid .pc{position:relative;text-align:left}
+.pgrid .pc .cv{aspect-ratio:1;border-radius:10px;background:#2c2621 center/cover no-repeat;box-shadow:0 4px 10px #0007;display:grid;place-items:center;color:#5d544b;font-weight:700;font-size:12px;text-align:center;padding:6px}
+.pgrid .pc .badge{position:absolute;top:-5px;right:-5px;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--acc);color:#1a120b;font-size:12px;font-weight:800;display:grid;place-items:center;box-shadow:0 2px 6px #0008}
+.pgrid .pc .n{font-size:12.5px;font-weight:600;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -14px 10px;padding:0 14px}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none;padding:6px 13px;border-radius:16px;background:var(--card);color:var(--mute);font-weight:600;font-size:13px}
+.chips button.on{background:var(--txt);color:var(--bg)}
+.secrow{display:flex;align-items:center;justify-content:space-between}
+.secrow .lnk{color:var(--acc);font-size:13px;font-weight:600;padding:6px 0}
+.ep{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid #2a241f;align-items:flex-start}
+.ep .th{width:52px;height:52px;border-radius:8px;background:#2c2621 center/cover no-repeat;flex:none}
+.ep .tx{flex:1;min-width:0}
+.ep .tx .pn{color:var(--mute);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ep .tx .n{font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ep.done .tx .n{color:var(--mute);font-weight:500}
+.ep .tx .m{color:var(--mute);font-size:12.5px;margin-top:3px;display:flex;align-items:center;gap:8px}
+.ep .tx .m .bar{flex:0 0 60px;height:3px;border-radius:2px;background:#4a423b;overflow:hidden}
+.ep .tx .m .bar i{display:block;height:100%;background:var(--acc)}
+.ep .tx .m .q{color:var(--acc)}
+.ep .eb{display:flex;flex-direction:column;align-items:center;gap:2px}
+.ep .pp{width:40px;height:40px;border-radius:50%;border:1.5px solid #5a5048;display:grid;place-items:center;color:var(--txt)}
+.ep .pp svg.i{width:18px;height:18px;fill:currentColor;stroke:none}
+.ep.cur .pp{background:var(--acc);border-color:var(--acc);color:#1a120b}
+.ep.cur .tx .n{color:var(--acc)}
+.ep .more{width:36px;height:30px;display:grid;place-items:center;color:var(--mute)}
+.ep .ord{display:flex;flex-direction:column}
+.ep .ord button{width:34px;height:28px;display:grid;place-items:center;color:var(--mute)}
+.pdesc{color:#cfc5ba;line-height:1.5;white-space:pre-line;user-select:text;-webkit-user-select:text}
+.pdesc.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.phero{display:flex;gap:14px;align-items:flex-start;padding:4px 0 6px}
+.phero .big{width:120px;height:120px;border-radius:12px;background:#2c2621 center/cover no-repeat;flex:none;box-shadow:0 8px 20px #000a}
+.phero h2{margin:0 0 4px;font-size:19px;line-height:1.25}
+.phero .s{color:var(--mute);font-size:13.5px}
+.subbtn{margin-top:10px;height:38px;padding:0 16px;border-radius:19px;background:linear-gradient(180deg,#f2b65d,var(--acc2));color:#1a120b;font-weight:700}
+.subbtn.on{background:var(--card);color:var(--txt)}
+.inp{display:flex;gap:8px;margin:6px 0}
+.inp input{flex:1;min-width:0;height:44px;border-radius:12px;border:0;background:var(--card);padding:0 12px;outline:0}
+.inp button{height:44px;padding:0 14px;border-radius:12px;background:var(--card);font-weight:700}
+.inp button.pri{background:linear-gradient(180deg,#f2b65d,var(--acc2));color:#1a120b}
+.res{display:flex;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid #2a241f}
+.res .th{width:56px;height:56px;border-radius:8px;background:#2c2621 center/cover no-repeat;flex:none}
+.res .tx{flex:1;min-width:0}.res .n{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res .s{color:var(--mute);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res .add{width:40px;height:40px;border-radius:50%;background:var(--card);display:grid;place-items:center;color:var(--acc);flex:none}
+.res .add.on{background:#1f3a24;color:#7fdc8f}
+.pmini{position:absolute;z-index:8;left:10px;right:10px;bottom:calc(var(--safe-b) + 10px);height:64px;border-radius:14px;background:#2b2520f2;
+  display:flex;align-items:center;gap:10px;padding:0 6px 0 8px;box-shadow:0 8px 20px #0009;overflow:hidden}
+.pmini .th{width:48px;height:48px;border-radius:8px;background:#444 center/cover;flex:none}
+.pmini .tx{flex:1;min-width:0}.pmini .n{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pmini .s{color:var(--mute);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pmini .pr{position:absolute;left:0;bottom:0;height:3px;background:var(--acc)}
+.pmini .ibtn svg.f{fill:currentColor;stroke:none}
+.skip{position:relative}
+.skip b{position:absolute;inset:0;display:grid;place-items:center;font-size:9.5px;font-weight:800;padding-top:2px}
+.pplayer{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:6px}
+.pplayer .big{width:min(74vw,320px);aspect-ratio:1;border-radius:14px;background:#2c2621 center/cover no-repeat;box-shadow:0 14px 34px #000b}
+.pplayer h2{font-size:19px;margin:18px 0 4px;line-height:1.3}
+.pplayer .s{color:var(--mute)}
+.pplayer .prog{width:100%}
+.pplayer .ctl{width:100%;justify-content:center;gap:22px}
+.pextra{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.pextra button{height:38px;padding:0 14px;border-radius:19px;background:var(--card);font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:6px}
+.pextra button.on{color:var(--acc)}
 .welcome{text-align:center;color:var(--mute);margin-top:18px}
 .welcome button{margin-top:12px;height:48px;padding:0 24px;border-radius:14px;background:linear-gradient(180deg,#f2b65d,var(--acc2));color:#1a120b;font-weight:700}
 </style>
@@ -221,6 +304,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
   <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></symbol>
   <symbol id="i-news" viewBox="0 0 24 24"><path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2"/><path d="M8 8h5M8 12h5M8 16h3"/></symbol>
+  <symbol id="i-rew" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></symbol>
+  <symbol id="i-fwd" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M8 21h8"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></symbol>
   <symbol id="i-queue" viewBox="0 0 24 24"><path d="M3 6h12M3 12h12M3 18h8"/><path d="M17 13l5 3-5 3z"/></symbol>
 </svg>
 
@@ -228,7 +319,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <div id="main">
   <div class="top">
     <button class="ibtn" id="btnQueue" aria-label="Warteschlange"><svg class="i"><use href="#i-queue"/></svg></button>
-    <h1>bTUNES</h1>
+    <div class="seg"><button data-tab="music">Platten</button><button data-tab="pod">Podcasts</button></div>
     <button class="ibtn" id="btnLib" aria-label="Bibliothek"><svg class="i"><use href="#i-lib"/></svg></button>
   </div>
 
@@ -290,6 +381,27 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   </div>
 </div>
 
+
+<!-- Podcasts -->
+<div id="pod" class="hidden">
+  <div class="top">
+    <button class="ibtn" id="pcListBtn" aria-label="Meine Liste"><svg class="i"><use href="#i-queue"/></svg></button>
+    <div class="seg"><button data-tab="music">Platten</button><button data-tab="pod">Podcasts</button></div>
+    <button class="ibtn" id="pcAddBtn" aria-label="Podcast hinzufügen"><svg class="i"><use href="#i-plus"/></svg></button>
+  </div>
+  <label class="search psearch"><svg class="i" style="width:20px;height:20px"><use href="#i-search"/></svg>
+    <input id="pcQ" type="search" placeholder="Meine Podcasts & Folgen durchsuchen" autocomplete="off"></label>
+  <div class="pbody" id="pcBody"></div>
+  <div class="pmini hidden" id="pcMini">
+    <div class="th" id="pcMiniArt"></div>
+    <div class="tx" id="pcMiniTx"><div class="n" id="pcMiniT"></div><div class="s" id="pcMiniA"></div></div>
+    <button class="ibtn skip" id="pcMiniBack"><svg class="i"><use href="#i-rew"/></svg><b>15</b></button>
+    <button class="ibtn" id="pcMiniPlay"><svg class="i f"><use href="#i-play" id="pcMiniIco"/></svg></button>
+    <button class="ibtn skip" id="pcMiniFwd"><svg class="i"><use href="#i-fwd"/></svg><b>30</b></button>
+    <div class="pr" id="pcMiniPr"></div>
+  </div>
+</div>
+<input type="file" id="opmlFile" accept=".opml,.xml,text/xml,text/x-opml,application/xml,*/*" class="hidden">
 <!-- Bibliothek -->
 <div class="sheet" id="lib">
   <div class="shead">
@@ -351,7 +463,7 @@ function demoPlugin(){
     scan:async()=>({tracks:tr}),
     art:async({album})=>({url:cov(album)}),
     getState:async()=>({...st}),
-    play:async({tracks,index,shuffle})=>{q=tracks.map(t=>({id:t.id,dur:(tr.find(x=>x[0]==t.id)||[])[5]||200000}));st={...st,playing:true,index,count:q.length,id:String(q[index].id),pos:0,dur:q[index].dur};if(shuffle!=null)st.shuffle=shuffle;emit();return{...st};},
+    play:async({tracks,index,shuffle,start})=>{q=tracks.map(t=>({id:t.key||t.id,dur:(tr.find(x=>x[0]==t.id)||[])[5]||(t.key?1800000:200000)}));st={...st,playing:true,index,count:q.length,id:String(q[index].id),pos:start||0,dur:q[index].dur};if(shuffle!=null)st.shuffle=shuffle;emit();return{...st};},
     control:async({action,ms,index,on,mode})=>{if(action==='toggle')st.playing=!st.playing;if(action==='seek')st.pos=ms;if(action==='shuffle')st.shuffle=on;if(action==='repeat')st.repeat=mode;
       if((action==='next'&&st.index<q.length-1)||(action==='prev'&&st.index>0)||action==='jump'){st.index=action==='jump'?index:st.index+(action==='next'?1:-1);st.id=String(q[st.index].id);st.dur=q[st.index].dur;st.pos=0;}
       emit();return{...st};},
@@ -412,19 +524,19 @@ async function playList(list,index=0,shuffle=null){
   if(!list.length)return;
   queue=list.map(t=>t.id);store.set('queue',queue);store.set('qi',index);
   if(shuffle===true&&index===0)index=Math.floor(Math.random()*list.length);
-  try{onState(await Music.play({tracks:list.map(t=>({id:t.id,title:t.title,artist:t.artist,album:t.album})),index,shuffle}));}
+  try{onState(await Music.play({tracks:list.map(t=>({id:t.id,title:t.title,artist:t.artist,album:t.album})),index,shuffle,speed:1}));}
   catch(e){toast('Abspielen fehlgeschlagen');}
 }
 async function ctl(action,extra){try{onState(await Music.control({action,...extra}));}catch(e){}}
 
-function curTrack(){return byId.get(+S.id)||byId.get(queue[S.index])||null;}
+function curTrack(){if(String(S.id||'').startsWith('p:'))return null;return byId.get(+S.id)||byId.get(queue[S.index])||null;}
 
 function onState(s){
   if(!s||s.ready===false)return;
   s={...s};
   if(!s.count){delete s.index;s.id='';}   // Dienst hat nichts geladen: zuletzt aufgelegte Platte nur anzeigen
   Object.assign(S,s);lastPosAt=Date.now();
-  if(s.index!=null) store.set('qi',s.index);
+  if(s.index!=null&&!String(s.id||'').startsWith('p:')) store.set('qi',s.index);
   render();
 }
 
@@ -441,6 +553,7 @@ function render(){
   $('#tArtist').textContent=t?t.artist+' · '+t.album:(tracks.length?tracks.length+' Titel in '+albums.length+' Alben':' ');
   setDeck(t?t.albumId:null);
   updateBandBtn(t);
+  if(window.pcRender)pcRender();
   const mini=$('#mini');
   mini.classList.toggle('show',!!t&&$('#lib').classList.contains('open'));
   mini.classList.toggle('playing',playing);
@@ -806,6 +919,456 @@ function demoBand(name){const ended=/Polarlicht|Ensemble/.test(name);
     albums:albums.filter(a=>a.artist===name).map(a=>({title:a.name,year:a.year})).concat([{title:'Frühe Aufnahmen',year:1999}]).sort((a,b)=>a.year-b.year),
     wiki:{title:name,lang:'de',url:'https://de.wikipedia.org',img:null,text:name+' ist eine Beispielband aus dem Vorführmodus. Sie wurde 1998 gegründet und spielte über viele Jahre in kleinen Clubs, bevor das zweite Album den Durchbruch brachte.\nIn der echten App steht hier der Wikipedia-Text zur Band: Gründung, größte Erfolge, wichtigste Alben und Besetzungswechsel.\nBei aufgelösten Bands erscheint der ganze Einleitungstext als Highlights.'}};}
 function demoNews(name){const n=Date.now();return[{title:name+' kündigen Tour für nächsten Sommer an',src:'Beispiel-Musikmagazin',link:'https://example.org',date:n-2*36e5},{title:'Neues Album von '+name+' im Test',src:'Beispiel-Zeitung',link:'https://example.org',date:n-3*864e5},{title:name+' live: So war das Konzert',src:'Beispiel-Radio',link:'https://example.org',date:n-20*864e5}];}
+
+/* ===================== PODCASTS =====================
+   Abos per RSS, Suche im Apple-Podcast-Verzeichnis, Beliebt-Liste, OPML-Import,
+   Ordner, "Meine Liste" (eigene Reihenfolge), Weiterhören, Tempo, Schlaf-Timer */
+const hash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36);};
+let pods=store.get('pods',[]);             // Abos
+let pcats=store.get('pcats',[]);           // eigene Ordner
+let plist=store.get('plist',[]);           // Meine Liste: Folgen-Schlüssel
+let pst=store.get('pst',{});               // Fortschritt je Folge {p:Position ms, d:Dauer ms, x:fertig, t:zuletzt}
+let pcSpeed=store.get('pspeed',1);
+let pcCat=store.get('pcat','Alle'),pcSort=store.get('psort','neu');
+const eps=new Map();                       // Folgen-Schlüssel -> Folge
+const podById=new Map();
+const savePods=()=>{store.set('pods',pods);podById.clear();pods.forEach(p=>podById.set(p.id,p));};
+const savePst=()=>store.set('pst',pst);
+function podEps(id){return store.get('pe_'+id,[]);}
+function indexEps(p,list){for(const e of list){e.pid=p.id;eps.set(e.k,e);}}
+pods.forEach(p=>{podById.set(p.id,p);indexEps(p,podEps(p.id));});
+
+function htmlText(h){
+  if(!h)return '';
+  h=String(h).replace(/<(br|\/p|\/div|\/li|\/h\d)[^>]*>/gi,'\n').replace(/<li[^>]*>/gi,'• ');
+  const t=new DOMParser().parseFromString('<body>'+h+'</body>','text/html').body.textContent||'';
+  return t.replace(/[ \t ]+/g,' ').replace(/\n\s*\n\s*\n+/g,'\n\n').trim();
+}
+function durSec(v){if(!v)return 0;v=String(v).trim();if(/^\d+$/.test(v))return +v;const p=v.split(':').map(Number);return p.reduce((s,x)=>s*60+(x||0),0);}
+const fmtMin=sec=>{if(!sec)return '';const m=Math.round(sec/60);return m<60?m+' Min.':Math.floor(m/60)+' Std. '+(m%60?m%60+' Min.':'');};
+const fmtDate=d=>{if(!d)return '';const x=new Date(d),n=new Date();const days=Math.floor((n-x)/864e5);
+  if(days<1&&x.getDate()===n.getDate())return 'Heute';if(days<2)return 'Gestern';if(days<7)return x.toLocaleDateString('de-DE',{weekday:'long'});
+  return x.toLocaleDateString('de-DE',x.getFullYear()===n.getFullYear()?{day:'numeric',month:'short'}:{day:'numeric',month:'short',year:'numeric'});};
+
+async function fetchText(u){
+  if(!NATIVE)return demoFeed(u);
+  const r=await fetch(u,{headers:{'User-Agent':UA,Accept:'application/rss+xml, application/xml, text/xml, */*'}});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return r.text();
+}
+/* RSS-Feed lesen */
+function parseFeed(xml,url){
+  const x=new DOMParser().parseFromString(xml,'text/xml');
+  const ch=x.querySelector('channel');
+  if(!ch)throw new Error('Kein Podcast-Feed');
+  const kid=(el,name)=>{for(const c of el.children)if(c.tagName===name)return c;return null;};
+  const txt=(el,...names)=>{for(const n of names){const c=kid(el,n);if(c&&c.textContent.trim())return c.textContent.trim();}return '';};
+  const img=(el)=>{const i=kid(el,'itunes:image');if(i&&i.getAttribute('href'))return i.getAttribute('href');const j=kid(el,'image');if(j){const u=kid(j,'url');if(u)return u.textContent.trim();}return '';};
+  const id=hash(url);
+  const p={id,url,title:txt(ch,'title')||url,author:txt(ch,'itunes:author','author','managingEditor'),art:img(ch),
+    desc:htmlText(txt(ch,'itunes:summary','description')).slice(0,1500),link:txt(ch,'link')};
+  const list=[];
+  for(const it of ch.getElementsByTagName('item')){
+    const enc=kid(it,'enclosure');const u=enc&&enc.getAttribute('url');if(!u)continue;
+    const g=txt(it,'guid')||u;
+    list.push({k:id+'.'+hash(g),t:txt(it,'title')||'Ohne Titel',d:Date.parse(txt(it,'pubDate'))||0,s:durSec(txt(it,'itunes:duration')),u:u.replace(/&amp;/g,'&'),
+      i:img(it),x:htmlText(txt(it,'content:encoded','description','itunes:summary')).slice(0,2500)});
+  }
+  list.sort((a,b)=>b.d-a.d);
+  return {p,list:list.slice(0,300)};
+}
+async function loadFeed(url){return parseFeed(await fetchText(url),url);}
+
+async function subscribe(url,quiet){
+  url=url.trim();if(!/^https?:\/\//i.test(url))url='https://'+url;
+  const id=hash(url);
+  if(podById.has(id)){if(!quiet)toast('Schon abonniert');return podById.get(id);}
+  const {p,list}=await loadFeed(url);
+  p.added=Date.now();p.upd=Date.now();p.cat='';
+  pods.push(p);savePods();store.set('pe_'+p.id,list);indexEps(p,list);
+  if(!quiet)toast('„'+p.title+'“ abonniert');
+  pcRenderHome();return p;
+}
+function unsubscribe(p){
+  pods=pods.filter(x=>x.id!==p.id);savePods();
+  for(const e of podEps(p.id))eps.delete(e.k);
+  try{localStorage.removeItem('mp_pe_'+p.id);}catch(e){}
+  plist=plist.filter(k=>!k.startsWith(p.id+'.'));store.set('plist',plist);
+  pcRenderHome();
+}
+async function refreshPod(p){
+  const {p:n,list}=await loadFeed(p.url);
+  Object.assign(p,{title:n.title,author:n.author,art:n.art||p.art,desc:n.desc,upd:Date.now()});
+  store.set('pe_'+p.id,list);indexEps(p,list);
+}
+let refreshing=false;
+async function refreshAll(force){
+  if(refreshing||!pods.length)return;
+  const due=pods.filter(p=>force||Date.now()-(p.upd||0)>90*6e4);
+  if(!due.length)return;
+  refreshing=true;
+  let i=0;const work=async()=>{while(i<due.length){const p=due[i++];try{await refreshPod(p);}catch(e){}}};
+  await Promise.all([work(),work(),work()]);
+  savePods();refreshing=false;pcRenderHome();
+  if(force)toast('Podcasts aktualisiert');
+}
+
+/* Status einer Folge */
+const stOf=k=>pst[k]||{};
+const isDone=k=>!!stOf(k).x;
+function epMeta(e){
+  const s=stOf(e.k),parts=[fmtDate(e.d)];
+  const dur=(s.d||e.s*1000)||0;
+  if(s.x)parts.push('✓ gehört');
+  else if(s.p>15000&&dur)parts.push('noch '+fmtMin((dur-s.p)/1000));
+  else if(e.s)parts.push(fmtMin(e.s));
+  return parts.filter(Boolean).join(' · ');
+}
+function epRow(e,o={}){
+  const p=podById.get(e.pid)||{},s=stOf(e.k),dur=(s.d||e.s*1000)||0;
+  const cur=String(S.id)==='p:'+e.k,playing=cur&&S.playing;
+  const prog=!s.x&&s.p>15000&&dur?`<span class="bar"><i style="width:${Math.min(100,s.p/dur*100)}%"></i></span>`:'';
+  const inList=plist.includes(e.k);
+  return `<div class="ep${s.x?' done':''}${cur?' cur':''}" data-ep="${e.k}">
+    ${o.thumb!==false?`<div class="th" style="background-image:url('${esc(e.i||p.art||'')}')"></div>`:''}
+    <div class="tx">${o.pn!==false?`<div class="pn">${esc(p.title||'')}</div>`:''}<div class="n">${esc(e.t)}</div>
+      <div class="m">${prog}<span>${esc(epMeta(e))}</span>${inList&&!o.order?'<span class="q">• Liste</span>':''}</div></div>
+    ${o.order?`<div class="ord"><button data-up="${e.k}"><svg class="i" style="width:20px"><use href="#i-up"/></svg></button><button data-down="${e.k}"><svg class="i" style="width:20px"><use href="#i-down"/></svg></button></div>`:''}
+    <div class="eb"><button class="pp" data-play="${e.k}"><svg class="i"><use href="#${playing?'i-pause':'i-play'}"/></svg></button><button class="more" data-emenu="${e.k}"><svg class="i" style="width:18px"><use href="#i-more"/></svg></button></div></div>`;
+}
+/* Klicks auf Folgen (in jeder Ansicht gleich) */
+function epClick(e,ctx){
+  const pl=e.target.closest('[data-play]');if(pl){const k=pl.dataset.play;if(String(S.id)==='p:'+k)ctl('toggle');else playEp(k,ctx);return true;}
+  const m=e.target.closest('[data-emenu]');if(m){epMenu(eps.get(m.dataset.emenu));return true;}
+  const up=e.target.closest('[data-up]');if(up){moveInList(up.dataset.up,-1);return true;}
+  const dn=e.target.closest('[data-down]');if(dn){moveInList(dn.dataset.down,1);return true;}
+  const r=e.target.closest('[data-ep]');if(r){openEpisode(r.dataset.ep);return true;}
+  return false;
+}
+
+/* Abspielen: gewählte Folge, danach "Meine Liste" */
+function epTrack(e){const p=podById.get(e.pid)||{};return{key:'p:'+e.k,uri:e.u,title:e.t,artist:p.title||'',album:p.title||'',art:e.i||p.art||''};}
+async function playEp(k,ctx){
+  const e=eps.get(k);if(!e)return;
+  let keys;
+  if(ctx==='list'){const i=plist.indexOf(k);keys=plist.slice(i);}
+  else keys=[k,...plist.filter(x=>x!==k&&!isDone(x))];
+  const list=keys.map(x=>eps.get(x)).filter(Boolean);
+  const s=stOf(k);
+  if(s.x){s.x=false;s.p=0;savePst();}
+  store.set('lastMode','pod');
+  try{onState(await Music.play({tracks:list.map(epTrack),index:0,shuffle:false,start:s.p>5000?s.p-3000:0,speed:pcSpeed}));}
+  catch(err){toast('Abspielen fehlgeschlagen');}
+}
+function curEp(){const id=String(S.id||'');return id.startsWith('p:')?eps.get(id.slice(2)):null;}
+
+/* Fortschritt laufend merken; fertig gehörte Folgen fliegen aus "Meine Liste" */
+let pstSaved=0,lastEpKey='';
+function pcTrack(){
+  const e=curEp();if(!e)return;
+  let pos=S.pos||0;if(S.playing)pos+=Date.now()-lastPosAt;
+  const dur=S.dur||e.s*1000;
+  const s=pst[e.k]||(pst[e.k]={});
+  s.p=pos;if(dur)s.d=dur;s.t=Date.now();
+  if((dur&&pos>dur-25000&&dur>60000)||S.ended){s.x=true;s.p=0;
+    if(plist.includes(e.k)){plist=plist.filter(x=>x!==e.k);store.set('plist',plist);}}
+  if(Date.now()-pstSaved>5000||e.k!==lastEpKey||!S.playing){savePst();pstSaved=Date.now();}
+  if(e.k!==lastEpKey&&lastEpKey){const prev=pst[lastEpKey];if(prev&&prev.d&&prev.p>prev.d-60000){prev.x=true;prev.p=0;plist=plist.filter(x=>x!==lastEpKey);store.set('plist',plist);savePst();}}
+  lastEpKey=e.k;
+}
+setInterval(()=>{if(S.playing&&!document.hidden){pcTrack();pcMini();}},1000);
+
+/* Meine Liste */
+function addToList(k,next){plist=plist.filter(x=>x!==k);if(next)plist.unshift(k);else plist.push(k);store.set('plist',plist);toast(next?'Kommt als Nächstes':'Zu „Meine Liste“ hinzugefügt');pcRefreshViews();}
+function moveInList(k,d){const i=plist.indexOf(k),j=i+d;if(i<0||j<0||j>=plist.length)return;[plist[i],plist[j]]=[plist[j],plist[i]];store.set('plist',plist);pcRefreshViews();}
+function openList(){
+  openView('Meine Liste',(b,v)=>{
+    const draw=()=>{const l=plist.map(k=>eps.get(k)).filter(Boolean);
+      b.innerHTML=l.length?`<div class="acts"><button class="pri" data-go="all"><svg class="i" style="fill:currentColor;stroke:none"><use href="#i-play"/></svg>Alles abspielen</button><button data-go="clear"><svg class="i"><use href="#i-trash"/></svg>Leeren</button></div>
+        <div class="s" style="color:var(--mute);font-size:13px;margin:4px 0">${l.length} ${l.length===1?'Folge':'Folgen'} · ${fmtMin(l.reduce((s,e)=>s+Math.max(0,(stOf(e.k).d||e.s*1000)-(stOf(e.k).p||0))/1000,0))} · Reihenfolge mit den Pfeilen ändern</div>${l.map(e=>epRow(e,{order:true})).join('')}`
+        :`<div class="hint">Noch leer.<br>Über ⋮ bei einer Folge kannst du sie hier einreihen und dir so dein eigenes Programm zusammenstellen.</div>`;};
+    v._draw=draw;draw();
+    b.onclick=e=>{const g=e.target.closest('[data-go]');
+      if(g){if(g.dataset.go==='all'&&plist.length){playEp(plist[0],'list');}else if(g.dataset.go==='clear'&&confirm('„Meine Liste“ leeren?')){plist=[];store.set('plist',plist);draw();}return;}
+      epClick(e,'list');};
+  });
+}
+
+/* Menü einer Folge */
+function epMenu(e){
+  if(!e)return;const inL=plist.includes(e.k),done=isDone(e.k);
+  menu(e.t,[
+    ['i-queue','Als Nächstes abspielen',()=>addToList(e.k,true)],
+    inL?['i-x','Aus „Meine Liste“ entfernen',()=>{plist=plist.filter(x=>x!==e.k);store.set('plist',plist);pcRefreshViews();}]:['i-plus','Zu „Meine Liste“',()=>addToList(e.k,false)],
+    done?['i-rew','Als ungehört markieren',()=>{delete pst[e.k];savePst();pcRefreshViews();}]:['i-check','Als gehört markieren',()=>{pst[e.k]={x:true,t:Date.now()};savePst();plist=plist.filter(x=>x!==e.k);store.set('plist',plist);pcRefreshViews();}],
+    ['i-news','Beschreibung',()=>openEpisode(e.k)],
+    ['i-mic','Zum Podcast',()=>openPodcast(e.pid)]]);
+}
+
+/* Einzelne Folge mit Beschreibung */
+function openEpisode(k){
+  const e=eps.get(k);if(!e)return;const p=podById.get(e.pid)||{};
+  openView(p.title||'Folge',(b,v)=>{
+    const draw=()=>{const cur=String(S.id)==='p:'+k;
+      b.innerHTML=`<div class="phero"><div class="big" style="background-image:url('${esc(e.i||p.art||'')}')"></div><div><h2>${esc(e.t)}</h2><div class="s">${esc(epMeta(e))}</div></div></div>
+      <div class="acts"><button class="pri" data-go="play"><svg class="i" style="fill:currentColor;stroke:none"><use href="#${cur&&S.playing?'i-pause':'i-play'}"/></svg>${cur&&S.playing?'Pause':stOf(k).p>15000&&!isDone(k)?'Weiterhören':'Abspielen'}</button><button data-go="list"><svg class="i"><use href="#${plist.includes(k)?'i-check':'i-plus'}"/></svg>Meine Liste</button></div>
+      <div class="pdesc" style="margin-top:10px">${esc(e.x||'Keine Beschreibung.')}</div>`;};
+    v._draw=draw;draw();
+    b.onclick=ev=>{const g=ev.target.closest('[data-go]');if(!g)return;
+      if(g.dataset.go==='play'){if(String(S.id)==='p:'+k)ctl('toggle');else playEp(k);}
+      else{if(plist.includes(k)){plist=plist.filter(x=>x!==k);store.set('plist',plist);pcRefreshViews();}else addToList(k,false);}};
+  });
+}
+
+/* Podcast-Seite: Abo, Ordner, Folgen mit Filter */
+function openPodcast(id,preview){
+  let p=podById.get(id)||preview&&preview.p;if(!p)return;
+  let list=podById.has(id)?podEps(id):(preview?preview.list:[]);
+  if(!podById.has(id))indexEps(p,list);
+  let filter='alle',asc=false,shown=60;
+  const v=openView(p.title,(b,v)=>{
+    const draw=()=>{const sub=podById.has(p.id);
+      let l=list.slice();if(asc)l.reverse();
+      if(filter==='neu')l=l.filter(e=>!isDone(e.k));
+      if(filter==='begonnen')l=l.filter(e=>!isDone(e.k)&&stOf(e.k).p>15000);
+      b.innerHTML=`<div class="phero"><div class="big" style="background-image:url('${esc(p.art||'')}')"></div><div style="min-width:0"><h2>${esc(p.title)}</h2><div class="s">${esc(p.author||'')}</div>
+        <div class="s" style="margin-top:4px">${list.length} Folgen${sub&&p.cat?' · 📁 '+esc(p.cat):''}</div>
+        <button class="subbtn${sub?' on':''}" data-go="sub">${sub?'✓ Abonniert':'＋ Abonnieren'}</button></div></div>
+        ${p.desc?`<div class="pdesc clamp" data-go="desc">${esc(p.desc)}</div>`:''}
+        <div class="chips" style="margin-top:12px">${[['alle','Alle'],['neu','Ungehört'],['begonnen','Begonnen']].map(([k,t])=>`<button data-f="${k}" class="${filter===k?'on':''}">${t}</button>`).join('')}<button data-go="sort">${asc?'Älteste zuerst':'Neueste zuerst'} ⇅</button></div>
+        ${l.slice(0,shown).map(e=>epRow(e,{pn:false,thumb:false})).join('')||'<div class="hint">Keine Folgen.</div>'}
+        ${l.length>shown?`<div class="acts"><button data-go="more">Weitere Folgen (${l.length-shown})</button></div>`:''}`;};
+    v._draw=draw;draw();
+    b.onclick=async e=>{
+      const f=e.target.closest('[data-f]');if(f){filter=f.dataset.f;draw();return;}
+      const g=e.target.closest('[data-go]');
+      if(g){const a=g.dataset.go;
+        if(a==='sort'){asc=!asc;draw();}
+        else if(a==='more'){shown+=100;draw();}
+        else if(a==='desc'){g.classList.toggle('clamp');}
+        else if(a==='sub'){
+          if(podById.has(p.id))podMenu(p,v);
+          else{try{p=await subscribe(p.url);list=podEps(p.id);draw();}catch(err){toast('Abonnieren fehlgeschlagen');}}}
+        return;}
+      epClick(e,'pod');
+    };
+  });
+  const ex=v.querySelector('.ex');ex.innerHTML=`<button class="ibtn"><svg class="i"><use href="#i-more"/></svg></button>`;
+  ex.firstChild.onclick=()=>{if(podById.has(p.id))podMenu(p,v);else toast('Erst abonnieren');};
+}
+function podMenu(p,v){
+  menu(p.title,[
+    ['i-folder','In Ordner einsortieren…',()=>setTimeout(()=>catMenu(p,v),260)],
+    ['i-refresh','Jetzt aktualisieren',async()=>{try{await refreshPod(p);savePods();v._draw&&v._draw();pcRenderHome();toast('Aktualisiert');}catch(e){toast('Feed nicht erreichbar');}}],
+    ['i-check','Alle als gehört markieren',()=>{for(const e of podEps(p.id))pst[e.k]={x:true,t:Date.now()};savePst();v._draw&&v._draw();pcRenderHome();}],
+    ['i-link','Feed-Adresse anzeigen',()=>prompt('RSS-Adresse',p.url)],
+    ['i-trash','Abo beenden',()=>{if(confirm('„'+p.title+'“ abbestellen?')){unsubscribe(p);back();}},'del']]);
+}
+function catMenu(p,v){
+  menu('Ordner für „'+p.title+'“',[
+    ['i-plus','Neuer Ordner…',()=>{const n=prompt('Name des Ordners (z. B. Wissen, Comedy, Sport)');if(n&&n.trim()){const c=n.trim();if(!pcats.includes(c)){pcats.push(c);store.set('pcats',pcats);}p.cat=c;savePods();v&&v._draw&&v._draw();pcRenderHome();}}],
+    ...pcats.map(c=>[p.cat===c?'i-check':'i-folder',c,()=>{p.cat=c;savePods();v&&v._draw&&v._draw();pcRenderHome();}]),
+    ['i-x','Ohne Ordner',()=>{p.cat='';savePods();v&&v._draw&&v._draw();pcRenderHome();}]]);
+}
+
+/* Podcast finden: Verzeichnis-Suche, RSS-Adresse, OPML, Beliebt */
+async function itunes(path){if(!NATIVE)return demoItunes();return getJSON('https://itunes.apple.com/'+path);}
+function openAdd(q){
+  openView('Podcast hinzufügen',async b=>{
+    b.innerHTML=`<div class="sec" style="margin-top:6px">Im Verzeichnis suchen</div>
+      <div class="inp"><input id="aq" type="search" placeholder="Name, Thema oder Person" value="${esc(q||'')}"><button class="pri" id="aGo">Suchen</button></div>
+      <div id="aRes"></div>
+      <div class="sec">RSS-Adresse einfügen</div>
+      <div class="inp"><input id="aUrl" type="url" placeholder="https://…/feed.xml" autocapitalize="off" autocorrect="off"><button class="pri" id="aAdd">Hinzufügen</button></div>
+      <div class="acts" style="margin-top:4px"><button id="aPaste"><svg class="i"><use href="#i-link"/></svg>Aus Zwischenablage</button><button id="aOpml"><svg class="i"><use href="#i-upload"/></svg>OPML-Import</button></div>
+      <div class="sec">Beliebt in Deutschland</div><div id="aTop"><div class="spin" style="margin:14px auto"></div></div>`;
+    const res=b.querySelector('#aRes'),top=b.querySelector('#aTop');
+    const rowsHtml=items=>items.map((r,i)=>`<div class="res" data-i="${i}"><div class="th" style="background-image:url('${esc(r.art)}')"></div><div class="tx"><div class="n">${esc(r.title)}</div><div class="s">${esc(r.author)}${r.genre?' · '+esc(r.genre):''}</div></div><button class="add${r.feed&&podById.has(hash(r.feed))?' on':''}" data-add="${i}"><svg class="i"><use href="#${r.feed&&podById.has(hash(r.feed))?'i-check':'i-plus'}"/></svg></button></div>`).join('');
+    const wire=(box,items)=>{box.onclick=async e=>{
+      const a=e.target.closest('[data-add]'),row=e.target.closest('[data-i]');if(!row)return;
+      const r=items[+row.dataset.i];
+      try{if(!r.feed){const l=await itunes('lookup?id='+r.itid);r.feed=l.results&&l.results[0]&&l.results[0].feedUrl;if(l.results&&l.results[0]&&l.results[0].artworkUrl600)r.art=l.results[0].artworkUrl600;}
+        if(!r.feed){toast('Kein RSS-Feed verfügbar');return;}
+        if(a){if(podById.has(hash(r.feed)))return;a.innerHTML='<div class="spin" style="width:18px;height:18px;margin:0;border-width:2px"></div>';await subscribe(r.feed);a.classList.add('on');a.innerHTML='<svg class="i"><use href="#i-check"/></svg>';}
+        else{if(podById.has(hash(r.feed)))openPodcast(hash(r.feed));else{toast('Lade Podcast…');openPodcast(hash(r.feed),await loadFeed(r.feed));}}
+      }catch(err){toast('Podcast konnte nicht geladen werden');if(a)a.innerHTML='<svg class="i"><use href="#i-plus"/></svg>';}
+    };};
+    const search=async()=>{const t=b.querySelector('#aq').value.trim();if(!t)return;res.innerHTML='<div class="spin" style="margin:14px auto"></div>';
+      try{const r=await itunes('search?media=podcast&country=DE&limit=25&term='+encodeURIComponent(t));
+        const items=(r.results||[]).filter(x=>x.feedUrl).map(x=>({title:x.collectionName,author:x.artistName,art:x.artworkUrl600||x.artworkUrl100,feed:x.feedUrl,genre:x.primaryGenreName}));
+        res.innerHTML=items.length?rowsHtml(items):'<div class="hint" style="padding:16px">Nichts gefunden.</div>';wire(res,items);}
+      catch(e){res.innerHTML='<div class="hint" style="padding:16px">Suche nicht erreichbar.</div>';}};
+    b.querySelector('#aGo').onclick=search;
+    b.querySelector('#aq').onkeydown=e=>{if(e.key==='Enter'){e.target.blur();search();}};
+    const addUrl=async()=>{const u=b.querySelector('#aUrl').value.trim();if(!u)return;toast('Lade Feed…');
+      try{const p=await subscribe(u);openPodcast(p.id);}catch(e){toast('Unter dieser Adresse ist kein Podcast-Feed');}};
+    b.querySelector('#aAdd').onclick=addUrl;
+    b.querySelector('#aPaste').onclick=async()=>{try{const t=await navigator.clipboard.readText();b.querySelector('#aUrl').value=t.trim();if(/^https?:/.test(t.trim()))addUrl();}catch(e){toast('Bitte die Adresse ins Feld einfügen (lange tippen → Einfügen)');b.querySelector('#aUrl').focus();}};
+    b.querySelector('#aOpml').onclick=()=>$('#opmlFile').click();
+    if(q)search();
+    try{let items;
+      if(NATIVE){const r=await getJSON('https://rss.applemarketingtools.com/api/v2/de/podcasts/top/30/podcasts.json');
+        items=((r.feed&&r.feed.results)||[]).map(x=>({title:x.name,author:x.artistName,art:(x.artworkUrl100||'').replace('100x100','300x300'),itid:x.id,genre:(x.genres&&x.genres[0]&&x.genres[0].name)||''}));}
+      else items=(await demoItunes()).results.map(x=>({title:x.collectionName,author:x.artistName,art:x.artworkUrl600,feed:x.feedUrl,genre:x.primaryGenreName}));
+      top.innerHTML=rowsHtml(items);wire(top,items);}
+    catch(e){top.innerHTML='<div class="hint" style="padding:16px">Liste nicht erreichbar.</div>';}
+  });
+}
+$('#opmlFile').onchange=async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  const x=new DOMParser().parseFromString(await f.text(),'text/xml');
+  const urls=[...x.querySelectorAll('outline[xmlUrl],outline[xmlurl]')].map(o=>o.getAttribute('xmlUrl')||o.getAttribute('xmlurl')).filter(Boolean);
+  if(!urls.length){toast('Keine Podcasts in der Datei');return;}
+  let ok=0;for(let i=0;i<urls.length;i++){toast(`Importiere ${i+1} von ${urls.length}…`);try{await subscribe(urls[i],true);ok++;}catch(err){}}
+  toast(ok+' Podcasts importiert');pcRenderHome();
+};
+
+/* Startseite Podcasts */
+function pcRenderHome(){
+  const B=$('#pcBody');if(!B)return;
+  const q=norm($('#pcQ').value.trim());
+  if(!pods.length&&!q){B.innerHTML=`<div class="hint" style="padding-top:50px"><svg class="i" style="width:54px;height:54px;color:var(--acc)"><use href="#i-mic"/></svg><br><br><b style="color:var(--txt);font-size:17px">Noch keine Podcasts</b><br>Suche im Verzeichnis, füge eine RSS-Adresse ein oder importiere deine Abos aus einer anderen App (OPML).</div>
+    <div class="acts"><button class="pri" data-go="add"><svg class="i"><use href="#i-search"/></svg>Podcast finden</button></div>`;return;}
+  let h='';
+  if(q){
+    const ps=pods.filter(p=>norm(p.title+' '+p.author).includes(q));
+    const es=[...eps.values()].filter(e=>podById.has(e.pid)&&norm(e.t+' '+e.x).includes(q)).sort((a,b)=>b.d-a.d).slice(0,60);
+    if(ps.length)h+=`<div class="sec">Podcasts</div><div class="pgrid">${ps.map(podCard).join('')}</div>`;
+    if(es.length)h+=`<div class="sec">Folgen</div>${es.map(e=>epRow(e)).join('')}`;
+    h+=`<div class="acts"><button data-go="dir"><svg class="i"><use href="#i-search"/></svg>„${esc($('#pcQ').value.trim())}“ im Verzeichnis suchen</button></div>`;
+    B.innerHTML=h;return;
+  }
+  const all=[...eps.values()].filter(e=>podById.has(e.pid));
+  const cont=all.filter(e=>{const s=stOf(e.k);return !s.x&&s.p>30000;}).sort((a,b)=>stOf(b.k).t-stOf(a.k).t).slice(0,10);
+  if(cont.length)h+=`<div class="sec">Weiterhören</div><div class="hscroll">${cont.map(e=>{const s=stOf(e.k),p=podById.get(e.pid)||{},d=s.d||e.s*1000;return `<button class="ccard" data-play="${e.k}"><div class="cv" style="background-image:url('${esc(e.i||p.art||'')}')"><div class="pl"><svg class="i" style="width:16px;height:16px;fill:#fff;stroke:none"><use href="#i-play"/></svg></div>${d?`<div class="pb"><i style="width:${Math.min(100,s.p/d*100)}%"></i></div>`:''}</div><div class="n">${esc(e.t)}</div><div class="s">${d?'noch '+fmtMin((d-s.p)/1000):''}</div></button>`;}).join('')}</div>`;
+  const ll=plist.filter(k=>eps.has(k));
+  h+=`<div class="sec secrow"><span>Meine Liste</span><button class="lnk" data-go="list">${ll.length?ll.length+' Folgen ›':'Zusammenstellen ›'}</button></div>`;
+  if(ll.length)h+=ll.slice(0,3).map(k=>epRow(eps.get(k))).join('');
+  else h+=`<div style="color:var(--mute);font-size:13.5px;padding:0 2px 4px">Reihe Folgen über ⋮ ein und stell dir dein eigenes Programm zusammen.</div>`;
+  const fresh=all.filter(e=>{const p=podById.get(e.pid);return !isDone(e.k)&&e.d>(p.added||0)-14*864e5;}).sort((a,b)=>b.d-a.d).slice(0,8);
+  if(fresh.length)h+=`<div class="sec secrow"><span>Neue Folgen</span><button class="lnk" data-go="refresh">Aktualisieren ↻</button></div>${fresh.map(e=>epRow(e)).join('')}`;
+  const cats=['Alle',...pcats.filter(c=>pods.some(p=>p.cat===c))];
+  if(!cats.includes(pcCat))pcCat='Alle';
+  let ps=pods.filter(p=>pcCat==='Alle'||p.cat===pcCat);
+  const latest=p=>{const l=podEps(p.id);return l.length?l[0].d:0;};
+  ps.sort(pcSort==='az'?(a,b)=>a.title.localeCompare(b.title,'de'):(a,b)=>latest(b)-latest(a));
+  h+=`<div class="sec secrow"><span>Meine Podcasts</span><button class="lnk" data-go="psort">${pcSort==='az'?'A–Z':'Neueste Folge'} ⇅</button></div>
+    ${cats.length>1||pods.length>3?`<div class="chips">${cats.map(c=>`<button data-cat="${esc(c)}" class="${c===pcCat?'on':''}">${c==='Alle'?'Alle':'📁 '+esc(c)}</button>`).join('')}<button data-go="newcat">＋ Ordner</button></div>`:''}
+    <div class="pgrid">${ps.map(podCard).join('')}</div>`;
+  B.innerHTML=h;
+}
+function podCard(p){
+  const n=podEps(p.id).filter(e=>!isDone(e.k)&&!(stOf(e.k).p>0)&&e.d>(p.added||0)).length;
+  return `<button class="pc" data-pod="${p.id}"><div class="cv" style="background-image:url('${esc(p.art||'')}')">${p.art?'':esc(p.title)}</div>${n?`<div class="badge">${n>99?'99+':n}</div>`:''}<div class="n">${esc(p.title)}</div></button>`;
+}
+$('#pcBody').onclick=e=>{
+  const g=e.target.closest('[data-go]');
+  if(g){const a=g.dataset.go;
+    if(a==='add')openAdd();else if(a==='list')openList();else if(a==='refresh')refreshAll(true);
+    else if(a==='dir')openAdd($('#pcQ').value.trim());
+    else if(a==='psort'){pcSort=pcSort==='az'?'neu':'az';store.set('psort',pcSort);pcRenderHome();}
+    else if(a==='newcat'){const n=prompt('Neuer Ordner (z. B. Wissen, Comedy, Sport)');if(n&&n.trim()&&!pcats.includes(n.trim())){pcats.push(n.trim());store.set('pcats',pcats);toast('Ordner angelegt – Podcasts über ⋮ auf der Podcast-Seite einsortieren');}}
+    return;}
+  const c=e.target.closest('[data-cat]');if(c){pcCat=c.dataset.cat;store.set('pcat',pcCat);pcRenderHome();return;}
+  const p=e.target.closest('[data-pod]');if(p){openPodcast(p.dataset.pod);return;}
+  epClick(e,'home');
+};
+$('#pcQ').oninput=()=>pcRenderHome();
+$('#pcAddBtn').onclick=()=>openAdd();
+$('#pcListBtn').onclick=()=>openList();
+
+/* Mini-Player und großer Podcast-Player */
+function pcMini(){
+  const e=curEp(),m=$('#pcMini');
+  m.classList.toggle('hidden',!e);
+  if(!e)return;const p=podById.get(e.pid)||{};
+  $('#pcMiniArt').style.backgroundImage=`url("${e.i||p.art||''}")`;
+  $('#pcMiniT').textContent=e.t;$('#pcMiniA').textContent=p.title||'';
+  $('#pcMiniIco').setAttribute('href',S.playing?'#i-pause':'#i-play');
+  let pos=S.pos||0;if(S.playing)pos+=Date.now()-lastPosAt;const d=S.dur||e.s*1000;
+  $('#pcMiniPr').style.width=(d?Math.min(100,pos/d*100):0)+'%';
+}
+const skip=ms=>{let pos=S.pos||0;if(S.playing)pos+=Date.now()-lastPosAt;ctl('seek',{ms:Math.max(0,pos+ms)});};
+$('#pcMiniPlay').onclick=()=>ctl('toggle');
+$('#pcMiniBack').onclick=()=>skip(-15000);
+$('#pcMiniFwd').onclick=()=>skip(30000);
+$('#pcMiniTx').onclick=()=>openPlayer();
+$('#pcMiniArt').onclick=()=>openPlayer();
+let sleepT=null,sleepEnd=0,sleepEp=false;
+function setSleep(min){clearTimeout(sleepT);sleepT=null;sleepEnd=0;sleepEp=false;
+  if(min===-1){sleepEp=true;toast('Stoppt am Ende der Folge');}
+  else if(min>0){sleepEnd=Date.now()+min*6e4;sleepT=setTimeout(()=>{ctl('pause');sleepEnd=0;},min*6e4);toast('Schlaf-Timer: '+min+' Min.');}
+  else toast('Schlaf-Timer aus');pcRefreshViews();}
+function openPlayer(){
+  const e0=curEp();if(!e0)return;
+  openView('Läuft gerade',(b,v)=>{
+    b.innerHTML=`<div class="pplayer"><div class="big" id="ppArt"></div><h2 id="ppT"></h2><div class="s" id="ppA"></div>
+      <div class="prog"><span id="ppPos">0:00</span><input type="range" id="ppSeek" min="0" max="1000" value="0"><span id="ppDur">0:00</span></div>
+      <div class="ctl"><button class="ibtn skip" data-go="b15"><svg class="i" style="width:34px;height:34px"><use href="#i-rew"/></svg><b>15</b></button>
+        <button class="play" data-go="tog"><svg class="i"><use href="#i-play" id="ppIco"/></svg></button>
+        <button class="ibtn skip" data-go="f30"><svg class="i" style="width:34px;height:34px"><use href="#i-fwd"/></svg><b>30</b></button></div>
+      <div class="pextra"><button data-go="speed" id="ppSpeed"></button><button data-go="sleep" id="ppSleep"><svg class="i" style="width:18px"><use href="#i-moon"/></svg><span></span></button>
+        <button data-go="next"><svg class="i" style="width:18px"><use href="#i-next"/></svg>Nächste</button><button data-go="info"><svg class="i" style="width:18px"><use href="#i-news"/></svg>Infos</button></div></div>`;
+    const sk=b.querySelector('#ppSeek');let drag=false;
+    const draw=()=>{const e=curEp();if(!e){return;}const p=podById.get(e.pid)||{};
+      b.querySelector('#ppArt').style.backgroundImage=`url("${e.i||p.art||''}")`;
+      b.querySelector('#ppT').textContent=e.t;b.querySelector('#ppA').textContent=p.title||'';
+      b.querySelector('#ppIco').setAttribute('href',S.playing?'#i-pause':'#i-play');
+      let pos=S.pos||0;if(S.playing)pos+=Date.now()-lastPosAt;const d=S.dur||e.s*1000;
+      if(!drag){sk.value=d?Math.round(pos/d*1000):0;sk.style.setProperty('--p',(d?pos/d*100:0)+'%');}
+      b.querySelector('#ppPos').textContent=fmt(drag?sk.value/1000*d:pos);b.querySelector('#ppDur').textContent='-'+fmt(Math.max(0,d-pos)/pcSpeed);
+      b.querySelector('#ppSpeed').textContent=String(pcSpeed).replace('.',',')+'×';
+      const sl=b.querySelector('#ppSleep');sl.classList.toggle('on',!!(sleepEnd||sleepEp));
+      sl.querySelector('span').textContent=sleepEp?'Folgenende':sleepEnd?Math.ceil((sleepEnd-Date.now())/6e4)+' Min.':'Schlaf-Timer';};
+    v._draw=draw;draw();const iv=setInterval(()=>{if(!document.body.contains(v)){clearInterval(iv);return;}draw();},1000);
+    sk.oninput=()=>{drag=true;sk.style.setProperty('--p',sk.value/10+'%');draw();};
+    sk.onchange=()=>{const e=curEp();const d=S.dur||(e?e.s*1000:0);ctl('seek',{ms:Math.round(sk.value/1000*d)});drag=false;};
+    b.onclick=ev=>{const g=ev.target.closest('[data-go]');if(!g)return;const a=g.dataset.go;
+      if(a==='tog')ctl('toggle');else if(a==='b15')skip(-15000);else if(a==='f30')skip(30000);
+      else if(a==='next'){const e=curEp();if(e){pst[e.k]={x:true,t:Date.now()};savePst();plist=plist.filter(x=>x!==e.k);store.set('plist',plist);}ctl('next');}
+      else if(a==='info'){const e=curEp();if(e)openEpisode(e.k);}
+      else if(a==='speed'){const sp=[0.8,1,1.2,1.4,1.6,1.8,2];pcSpeed=sp[(sp.indexOf(pcSpeed)+1)%sp.length];store.set('pspeed',pcSpeed);ctl('speed',{speed:pcSpeed});draw();}
+      else if(a==='sleep')menu('Schlaf-Timer',[['i-moon','15 Minuten',()=>setSleep(15)],['i-moon','30 Minuten',()=>setSleep(30)],['i-moon','45 Minuten',()=>setSleep(45)],['i-moon','60 Minuten',()=>setSleep(60)],['i-moon','Am Ende der Folge',()=>setSleep(-1)],['i-x','Aus',()=>setSleep(0)]]);};
+  });
+}
+/* Offene Podcast-Ansichten neu zeichnen */
+function pcRefreshViews(){document.querySelectorAll('.view').forEach(v=>{if(v._draw)v._draw();});pcRenderHome();}
+let pcLastKey='',pcLastPlaying=null;
+window.pcRender=function(){
+  const e=curEp();
+  if(e){pcTrack();
+    if(sleepEp&&lastEpKey&&e.k!==pcSleepKey&&pcSleepKey){sleepEp=false;ctl('pause');}
+    pcSleepKey=e.k;}
+  pcMini();
+  const key=(e?e.k:'')+'|'+S.playing;
+  if(key!==pcLastKey){pcLastKey=key;
+    document.querySelectorAll('.ep').forEach(r=>{const k=r.dataset.ep,cur=e&&k===e.k;r.classList.toggle('cur',!!cur);const u=r.querySelector('.pp use');if(u)u.setAttribute('href',cur&&S.playing?'#i-pause':'#i-play');});
+    document.querySelectorAll('.view').forEach(v=>{if(v._draw&&!v.querySelector('#ppSeek'))v._draw();});
+  }
+};
+let pcSleepKey='';
+
+/* Reiter umschalten */
+let curTab=store.get('tab2','music');
+function setTab(t){curTab=t;store.set('tab2',t);
+  $('#main').classList.toggle('hidden',t!=='music');$('#pod').classList.toggle('hidden',t!=='pod');
+  document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  if(t==='pod'){pcRenderHome();pcMini();refreshAll(false);}}
+document.querySelectorAll('.seg').forEach(s=>s.onclick=e=>{const b=e.target.closest('[data-tab]');if(b)setTab(b.dataset.tab);});
+setTab(curTab);
+setInterval(()=>refreshAll(false),30*6e4);
+
+/* Vorführmodus im Browser */
+function demoFeed(u){
+  const names={a:['Bergfunk','Gespräche über Gipfel, Touren und Hütten','Radio Werdenfels Demo'],b:['Zeitreise','Geschichte in 30 Minuten','Demo-Verlag'],c:['Technik am Abend','Gadgets, Apps und Kurioses','Studio Demo']};
+  const k=(u.match(/demo-(\w)/)||[0,'a'])[1],n=names[k]||names.a;
+  const col={a:'#3a6ea5',b:'#a5553a',c:'#5a3aa5'}[k]||'#555';
+  const art='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"><rect width="300" height="300" fill="${col}"/><circle cx="220" cy="80" r="50" fill="#fff3"/><text x="20" y="250" font-family="sans-serif" font-size="38" font-weight="800" fill="#fff">${n[0]}</text></svg>`);
+  let items='';const now=Date.now();
+  for(let i=0;i<14;i++)items+=`<item><title>${n[0]} #${60-i}: ${['Der lange Weg','Hüttenzauber','Gewitter am Grat','Was wir lernten','Die große Frage','Unterwegs'][i%6]}</title><guid>${k}${i}</guid><pubDate>${new Date(now-i*4*864e5-36e5).toUTCString()}</pubDate><itunes:duration>${1800+i*137}</itunes:duration><enclosure url="https://example.org/${k}${i}.mp3" type="audio/mpeg"/><description>&lt;p&gt;In dieser Folge sprechen wir über ${n[1].toLowerCase()}.&lt;/p&gt;&lt;p&gt;Viel Spaß beim Hören!&lt;/p&gt;</description></item>`;
+  return `<?xml version="1.0"?><rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"><channel><title>${n[0]}</title><itunes:author>${n[2]}</itunes:author><itunes:image href="${art.replace(/"/g,'&quot;')}"/><description>${n[1]}</description>${items}</channel></rss>`;
+}
+function demoItunes(){return Promise.resolve({results:[['Bergfunk','Radio Werdenfels Demo','a','Freizeit'],['Zeitreise','Demo-Verlag','b','Geschichte'],['Technik am Abend','Studio Demo','c','Technologie']].map(x=>({collectionName:x[0],artistName:x[1],feedUrl:'https://demo-'+x[2]+'.example/feed',artworkUrl600:'',primaryGenreName:x[3]}))});}
 
 /* ===== Start ===== */
 async function loadLibrary(manual){

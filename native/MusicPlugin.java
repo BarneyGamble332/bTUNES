@@ -217,6 +217,7 @@ public class MusicPlugin extends Plugin {
         r.put("dur", d < 0 ? 0 : d);
         r.put("shuffle", ctl.getShuffleModeEnabled());
         r.put("repeat", ctl.getRepeatMode());
+        r.put("speed", ctl.getPlaybackParameters().speed);
         return r;
     }
 
@@ -239,30 +240,22 @@ public class MusicPlugin extends Plugin {
     public void play(PluginCall call) {
         JSONArray t = call.getData().optJSONArray("tracks");
         int index = call.getInt("index", 0);
+        long start = call.getData().optLong("start", 0L);
         Boolean shuffle = call.getBoolean("shuffle", null);
         if (t == null || t.length() == 0) { call.reject("Keine Titel"); return; }
         List<MediaItem> items = new ArrayList<>();
         for (int i = 0; i < t.length(); i++) {
             JSONObject o = t.optJSONObject(i);
-            if (o == null) continue;
-            long id = o.optLong("id");
-            Uri u = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
-            items.add(new MediaItem.Builder()
-                .setMediaId(String.valueOf(id))
-                .setUri(u)
-                .setRequestMetadata(new MediaItem.RequestMetadata.Builder().setMediaUri(u).build())
-                .setMediaMetadata(new MediaMetadata.Builder()
-                    .setTitle(o.optString("title"))
-                    .setArtist(o.optString("artist"))
-                    .setAlbumTitle(o.optString("album")).build())
-                .build());
+            if (o != null) items.add(PlaybackService.itemFrom(o));
         }
         // Für das Widget merken, damit es auch nach Beenden der App weiterspielen kann
         getContext().getSharedPreferences(BtunesWidget.PREFS, android.content.Context.MODE_PRIVATE).edit()
-            .putString("queue", t.toString()).putInt("index", index).apply();
+            .putString("queue", t.toString()).putInt("index", index).putLong("pos", start).apply();
         withCtl(() -> {
             if (shuffle != null) ctl.setShuffleModeEnabled(shuffle);
-            ctl.setMediaItems(items, Math.max(0, Math.min(index, items.size() - 1)), 0);
+            ctl.setMediaItems(items, Math.max(0, Math.min(index, items.size() - 1)), Math.max(0, start));
+            // Musik normal schnell, Podcasts mit dem eingestellten Tempo
+            ctl.setPlaybackSpeed((float) call.getData().optDouble("speed", 1.0));
             ctl.prepare();
             ctl.play();
             call.resolve(state());
@@ -290,6 +283,7 @@ public class MusicPlugin extends Plugin {
                 case "shuffle": ctl.setShuffleModeEnabled(call.getBoolean("on", false)); break;
                 case "repeat": ctl.setRepeatMode(call.getInt("mode", 0)); break;
                 case "stop": ctl.stop(); ctl.clearMediaItems(); break;
+                case "speed": ctl.setPlaybackSpeed((float) call.getData().optDouble("speed", 1.0)); break;
             }
             call.resolve(state());
         });

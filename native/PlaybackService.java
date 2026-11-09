@@ -71,12 +71,14 @@ public class PlaybackService extends MediaSessionService {
         String artist = m == null || m.mediaMetadata.artist == null ? "" : m.mediaMetadata.artist.toString();
         long id = -1;
         try { if (m != null) id = Long.parseLong(m.mediaId); } catch (Exception ignore) {}
+        String art = m == null || m.mediaMetadata.artworkUri == null ? "" : m.mediaMetadata.artworkUri.toString();
+        if (m != null && !p.getPlayWhenReady()) prefs().edit().putLong("pos", p.getCurrentPosition()).apply();
         boolean playing = p.getPlayWhenReady() && p.getPlaybackState() != Player.STATE_ENDED;
-        String key = title + "|" + artist + "|" + playing + "|" + id;
+        String key = title + "|" + artist + "|" + playing + "|" + id + "|" + art;
         if (key.equals(lastWidget)) return;
         lastWidget = key;
         if (m != null) prefs().edit().putInt("index", p.getCurrentMediaItemIndex()).apply();
-        BtunesWidget.save(this, title, artist, playing, id);
+        BtunesWidget.save(this, title, artist, playing, id, art);
     }
 
     private SharedPreferences prefs() { return getSharedPreferences(BtunesWidget.PREFS, MODE_PRIVATE); }
@@ -108,22 +110,38 @@ public class PlaybackService extends MediaSessionService {
         return super.onStartCommand(intent, flags, startId);
     }
 
+    /* Titel aus der App: Musik vom Handy (id) oder Podcast-Folge aus dem Internet (uri) */
+    static MediaItem itemFrom(JSONObject o) {
+        Uri u;
+        String key;
+        MediaMetadata.Builder md = new MediaMetadata.Builder()
+            .setTitle(o.optString("title")).setArtist(o.optString("artist")).setAlbumTitle(o.optString("album"));
+        if (o.has("uri")) {
+            u = Uri.parse(o.optString("uri"));
+            key = o.optString("key", o.optString("uri"));
+            String art = o.optString("art", "");
+            if (!art.isEmpty()) md.setArtworkUri(Uri.parse(art));
+        } else {
+            long id = o.optLong("id");
+            u = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+            key = String.valueOf(id);
+        }
+        return new MediaItem.Builder().setMediaId(key).setUri(u)
+            .setRequestMetadata(new MediaItem.RequestMetadata.Builder().setMediaUri(u).build())
+            .setMediaMetadata(md.build()).build();
+    }
+
     /* Zuletzt aufgelegte Titel wiederherstellen (wenn die App vorher beendet war) */
     private void restoreQueue(Player p) {
         try {
             JSONArray t = new JSONArray(prefs().getString("queue", "[]"));
             List<MediaItem> items = new ArrayList<>();
             for (int i = 0; i < t.length(); i++) {
-                JSONObject o = t.getJSONObject(i);
-                long id = o.optLong("id");
-                Uri u = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
-                items.add(new MediaItem.Builder().setMediaId(String.valueOf(id)).setUri(u)
-                    .setMediaMetadata(new MediaMetadata.Builder().setTitle(o.optString("title"))
-                        .setArtist(o.optString("artist")).setAlbumTitle(o.optString("album")).build()).build());
+                items.add(itemFrom(t.getJSONObject(i)));
             }
             if (items.isEmpty()) return;
             int idx = Math.max(0, Math.min(prefs().getInt("index", 0), items.size() - 1));
-            p.setMediaItems(items, idx, 0);
+            p.setMediaItems(items, idx, idx == prefs().getInt("index", 0) ? prefs().getLong("pos", 0L) : 0);
             p.prepare();
         } catch (Exception ignore) {}
     }
@@ -142,7 +160,7 @@ public class PlaybackService extends MediaSessionService {
 
     @Override
     public void onDestroy() {
-        BtunesWidget.save(this, prefs().getString("title", ""), prefs().getString("artist", ""), false, prefs().getLong("track", -1L));
+        BtunesWidget.save(this, prefs().getString("title", ""), prefs().getString("artist", ""), false, prefs().getLong("track", -1L), prefs().getString("art", ""));
         if (session != null) {
             session.getPlayer().release();
             session.release();

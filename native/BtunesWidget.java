@@ -29,7 +29,7 @@ public class BtunesWidget extends AppWidgetProvider {
     static final String A_NEXT = "de.bernhard.musik.NEXT";
     static final String A_PREV = "de.bernhard.musik.PREV";
 
-    private static long coverFor = Long.MIN_VALUE;
+    private static String coverFor = "";
     private static Bitmap record;
 
     @Override
@@ -38,9 +38,9 @@ public class BtunesWidget extends AppWidgetProvider {
     }
 
     /* Aktuellen Stand merken und Widget neu zeichnen (Cover wird im Hintergrund geladen) */
-    static void save(Context ctx, String title, String artist, boolean playing, long trackId) {
+    static void save(Context ctx, String title, String artist, boolean playing, long trackId, String art) {
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
-            .putString("title", title).putString("artist", artist)
+            .putString("title", title).putString("artist", artist).putString("art", art)
             .putBoolean("playing", playing).putLong("track", trackId).apply();
         refreshAsync(ctx);
     }
@@ -61,10 +61,12 @@ public class BtunesWidget extends AppWidgetProvider {
         String artist = p.getString("artist", "");
         boolean playing = p.getBoolean("playing", false);
         long track = p.getLong("track", -1L);
+        String art = p.getString("art", "");
+        String coverKey = track + "|" + art;
 
-        if (record == null || coverFor != track) {
-            record = drawRecord(ctx, track);
-            coverFor = track;
+        if (record == null || !coverKey.equals(coverFor)) {
+            record = drawRecord(ctx, track, art);
+            coverFor = coverKey;
         }
 
         RemoteViews v = new RemoteViews(ctx.getPackageName(), R.layout.btunes_widget);
@@ -109,7 +111,7 @@ public class BtunesWidget extends AppWidgetProvider {
     }
 
     /* Schallplatte zeichnen: Rillen, Glanz, rundes Cover als Etikett */
-    private static Bitmap drawRecord(Context ctx, long track) {
+    private static Bitmap drawRecord(Context ctx, long track, String artUrl) {
         int s = 300;
         float c = s / 2f, r = s / 2f - 2;
         Bitmap b = Bitmap.createBitmap(s, s, Bitmap.Config.ARGB_8888);
@@ -137,6 +139,18 @@ public class BtunesWidget extends AppWidgetProvider {
             try {
                 art = ctx.getContentResolver().loadThumbnail(
                     ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, track), new Size(300, 300), null);
+            } catch (Exception ignore) {}
+        }
+        if (art == null && artUrl != null && artUrl.startsWith("http")) {
+            // Podcast: Bild aus dem Internet
+            try {
+                java.net.HttpURLConnection con = (java.net.HttpURLConnection) new java.net.URL(artUrl).openConnection();
+                con.setConnectTimeout(8000); con.setReadTimeout(8000); con.setInstanceFollowRedirects(true);
+                try (java.io.InputStream in = con.getInputStream()) {
+                    android.graphics.BitmapFactory.Options o = new android.graphics.BitmapFactory.Options();
+                    o.inSampleSize = 2;
+                    art = android.graphics.BitmapFactory.decodeStream(in, null, o);
+                }
             } catch (Exception ignore) {}
         }
         Paint lp = new Paint(Paint.ANTI_ALIAS_FLAG);
