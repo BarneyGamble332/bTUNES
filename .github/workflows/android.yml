@@ -1,0 +1,150 @@
+name: Android-App bauen
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - index.html
+      - native/**
+      - icon/**
+      - .github/workflows/android.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Capacitor-Projekt erzeugen
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          mkdir -p www && cp index.html www/index.html
+          npm init -y >/dev/null
+          npm i --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/app@6
+          npx cap init "bTUNES" de.bernhard.musik --web-dir www
+          npx cap add android
+          npx cap sync android
+
+          APP=android/app
+          PKG=$APP/src/main/java/de/bernhard/musik
+          RES=$APP/src/main/res
+          cp native/*.java $PKG/
+
+          # Wiedergabe-Bibliothek (Media3) fuer Hintergrund-Musik und Sperrbildschirm
+          cat >> $APP/build.gradle <<'GRADLE'
+
+          dependencies {
+              implementation 'androidx.media3:media3-exoplayer:1.4.1'
+              implementation 'androidx.media3:media3-session:1.4.1'
+              implementation 'com.google.guava:guava:33.3.1-android'
+          }
+          GRADLE
+
+          # Berechtigungen und Hintergrund-Dienst eintragen
+          python3 - <<'PY'
+          m='android/app/src/main/AndroidManifest.xml'
+          t=open(m).read()
+          perms='''
+              <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+              <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+              <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+              <uses-permission android:name="android.permission.WAKE_LOCK" />
+          '''
+          svc='''
+                  <service android:name=".PlaybackService" android:exported="true" android:foregroundServiceType="mediaPlayback">
+                      <intent-filter><action android:name="androidx.media3.session.MediaSessionService" /></intent-filter>
+                  </service>
+              </application>'''
+          t=t.replace('</application>',svc,1).replace('</manifest>',perms+'</manifest>',1)
+          open(m,'w').write(t)
+          PY
+          cat android/app/src/main/AndroidManifest.xml
+
+          # App-Symbol: Schallplatte auf Holzbraun
+          sed -i 's/#FFFFFF/#3B2312/' $RES/values/ic_launcher_background.xml
+          pip install --quiet pillow
+          python3 - <<'PY'
+          from PIL import Image, ImageDraw
+          src=Image.open('icon/app-symbol.png').convert('RGBA')
+          res='android/app/src/main/res/'
+          bg=(0x3B,0x23,0x12,255)
+          for n,s,f in [('mdpi',48,108),('hdpi',72,162),('xhdpi',96,216),('xxhdpi',144,324),('xxxhdpi',192,432)]:
+              src.resize((f,f),Image.LANCZOS).save(res+'mipmap-%s/ic_launcher_foreground.png'%n)
+              k=src.size[0]; c=round(k*18/108)
+              ic=Image.new('RGBA',(k-2*c,k-2*c),bg); ic.alpha_composite(src.crop((c,c,k-c,k-c)))
+              ic=ic.resize((s,s),Image.LANCZOS)
+              ic.save(res+'mipmap-%s/ic_launcher.png'%n)
+              m=Image.new('L',(s*4,s*4),0); ImageDraw.Draw(m).ellipse([0,0,s*4-1,s*4-1],fill=255)
+              r=Image.new('RGBA',(s,s),(0,0,0,0)); r.paste(ic,(0,0),m.resize((s,s),Image.LANCZOS))
+              r.save(res+'mipmap-%s/ic_launcher_round.png'%n)
+          PY
+
+          # Dunkle Statusleiste passend zur App
+          sed -i 's#</resources>#    <color name="mp_bg">\#14110F</color>\n</resources>#' $RES/values/styles.xml || true
+          python3 - <<'PY'
+          p='android/app/src/main/res/values/styles.xml'
+          t=open(p).read()
+          t=t.replace('<item name="windowNoTitle">true</item>','<item name="windowNoTitle">true</item>\n        <item name="android:statusBarColor">@color/mp_bg</item>\n        <item name="android:navigationBarColor">@color/mp_bg</item>\n        <item name="android:windowBackground">@color/mp_bg</item>',1)
+          open(p,'w').write(t)
+          PY
+
+          # Versionsnummer hochzaehlen, damit Updates ueber die alte Installation moeglich sind
+          sed -i "s/versionCode 1/versionCode ${RUN_NUMBER:-1}/; s/versionName \"1.0\"/versionName \"1.${RUN_NUMBER:-1}\"/" $APP/build.gradle
+
+      - name: Signaturschluessel einsetzen (gleich bei jedem Build, damit Updates klappen)
+        run: |
+          mkdir -p ~/.android
+          base64 -d native/signing.p12.b64 > ~/.android/musik.p12
+          cat >> android/app/build.gradle <<GRADLE
+
+          android {
+              signingConfigs {
+                  fest {
+                      storeFile file("$HOME/.android/musik.p12")
+                      storeType "pkcs12"
+                      storePassword "android"
+                      keyAlias "androiddebugkey"
+                      keyPassword "android"
+                  }
+              }
+              buildTypes { debug { signingConfig signingConfigs.fest } }
+          }
+          GRADLE
+
+      - name: APK bauen
+        working-directory: android
+        run: |
+          ok=0
+          for i in 1 2 3; do
+            if ./gradlew assembleDebug --no-daemon; then ok=1; break; fi
+            echo "Versuch $i fehlgeschlagen, neuer Versuch in 30 s"; sleep 30
+          done
+          [ "$ok" = 1 ]
+
+      - name: APK als Download bereitstellen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk bTUNES.apk
+          gh release delete apk-latest --yes --cleanup-tag || true
+          gh release create apk-latest bTUNES.apk --title "bTUNES (Android)" --notes "Neueste Android-App. Datei bTUNES.apk laden und installieren."
