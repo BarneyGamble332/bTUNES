@@ -74,11 +74,18 @@ public class PlaybackService extends MediaSessionService {
         String art = m == null || m.mediaMetadata.artworkUri == null ? "" : m.mediaMetadata.artworkUri.toString();
         if (m != null && !p.getPlayWhenReady()) prefs().edit().putLong("pos", p.getCurrentPosition()).apply();
         boolean playing = p.getPlayWhenReady() && p.getPlaybackState() != Player.STATE_ENDED;
-        String key = title + "|" + artist + "|" + playing + "|" + id + "|" + art;
+        // Nächster Titel (beachtet Zufall und Wiederholen)
+        String next = "";
+        int ni = p.getNextMediaItemIndex();
+        if (ni != androidx.media3.common.C.INDEX_UNSET && ni < p.getMediaItemCount()) {
+            CharSequence nt = p.getMediaItemAt(ni).mediaMetadata.title;
+            if (nt != null) next = nt.toString();
+        }
+        String key = title + "|" + artist + "|" + playing + "|" + id + "|" + art + "|" + next;
         if (key.equals(lastWidget)) return;
         lastWidget = key;
         if (m != null) prefs().edit().putInt("index", p.getCurrentMediaItemIndex()).apply();
-        BtunesWidget.save(this, title, artist, playing, id, art);
+        BtunesWidget.save(this, title, artist, playing, id, art, next);
     }
 
     private SharedPreferences prefs() { return getSharedPreferences(BtunesWidget.PREFS, MODE_PRIVATE); }
@@ -160,7 +167,7 @@ public class PlaybackService extends MediaSessionService {
 
     @Override
     public void onDestroy() {
-        BtunesWidget.save(this, prefs().getString("title", ""), prefs().getString("artist", ""), false, prefs().getLong("track", -1L), prefs().getString("art", ""));
+        BtunesWidget.save(this, prefs().getString("title", ""), prefs().getString("artist", ""), false, prefs().getLong("track", -1L), prefs().getString("art", ""), prefs().getString("next", ""));
         if (session != null) {
             session.getPlayer().release();
             session.release();

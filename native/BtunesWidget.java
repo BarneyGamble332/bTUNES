@@ -38,8 +38,8 @@ public class BtunesWidget extends AppWidgetProvider {
     }
 
     /* Aktuellen Stand merken und Widget neu zeichnen (Cover wird im Hintergrund geladen) */
-    static void save(Context ctx, String title, String artist, boolean playing, long trackId, String art) {
-        ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+    static void save(Context ctx, String title, String artist, boolean playing, long trackId, String art, String next) {
+        ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString("next", next)
             .putString("title", title).putString("artist", artist).putString("art", art)
             .putBoolean("playing", playing).putLong("track", trackId).apply();
         refreshAsync(ctx);
@@ -69,14 +69,17 @@ public class BtunesWidget extends AppWidgetProvider {
             coverFor = coverKey;
         }
 
+        String next = p.getString("next", "");
         RemoteViews big = views(ctx, R.layout.btunes_widget, title, artist, playing);
+        big.setTextViewText(R.id.w_next_t, next.isEmpty() ? "" : "Als Nächstes: " + next);
+        big.setViewVisibility(R.id.w_next_t, next.isEmpty() ? android.view.View.GONE : android.view.View.VISIBLE);
         RemoteViews flat = views(ctx, R.layout.btunes_widget_small, title, artist, playing);
         RemoteViews v;
         if (Build.VERSION.SDK_INT >= 31) {
             // Android wählt je nach Widget-Größe selbst: flach (1 Zeile) oder groß
             java.util.Map<android.util.SizeF, RemoteViews> m = new java.util.HashMap<>();
             m.put(new android.util.SizeF(180f, 40f), flat);
-            m.put(new android.util.SizeF(200f, 125f), big);
+            m.put(new android.util.SizeF(200f, 140f), big);
             v = new RemoteViews(m);
         } else {
             v = big;
