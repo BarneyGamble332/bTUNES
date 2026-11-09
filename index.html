@@ -72,6 +72,8 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .arm .swing{transform-box:view-box;transform-origin:88px 14px;transition:transform 1s cubic-bezier(.4,.1,.2,1)}
 .knob{position:absolute;z-index:3;width:9%;aspect-ratio:1;border-radius:50%;
   background:radial-gradient(circle at 35% 30%,#eee,#888 60%,#555);box-shadow:0 2px 4px #000c}
+.scrub{position:absolute;z-index:4;left:42%;top:48%;transform:translate(-50%,-50%) scale(.8);background:#000c;color:#fff;font-weight:800;font-size:18px;padding:8px 14px;border-radius:12px;opacity:0;transition:.15s;pointer-events:none;font-variant-numeric:tabular-nums}
+.scrub.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .led{position:absolute;z-index:3;left:94%;top:82.5%;width:2.2%;aspect-ratio:1;border-radius:50%;background:#4a1d10;
   transition:background .4s,box-shadow .4s}
 .playing .led{background:#ff5a2a;box-shadow:0 0 8px #ff5a2a}
@@ -365,6 +367,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       <div class="knob" style="left:84.5%;top:79%"></div>
       <div class="rpm">33⅓</div>
       <div class="led"></div>
+      <div class="scrub" id="scrub"></div>
     </div>
   </div>
 
@@ -478,7 +481,7 @@ function demoPlugin(){
     art:async({album})=>({url:cov(album)}),
     getState:async()=>({...st}),
     play:async({tracks,index,shuffle,start})=>{q=tracks.map(t=>({id:t.key||t.id,dur:(tr.find(x=>x[0]==t.id)||[])[5]||(t.key?1800000:200000)}));st={...st,playing:true,index,count:q.length,id:String(q[index].id),pos:start||0,dur:q[index].dur};if(shuffle!=null)st.shuffle=shuffle;emit();return{...st};},
-    control:async({action,ms,index,on,mode})=>{if(action==='toggle')st.playing=!st.playing;if(action==='seek')st.pos=ms;if(action==='shuffle')st.shuffle=on;if(action==='repeat')st.repeat=mode;
+    control:async({action,ms,index,on,mode})=>{if(action==='toggle')st.playing=!st.playing;if(action==='pause')st.playing=false;if(action==='play')st.playing=true;if(action==='seek')st.pos=ms;if(action==='shuffle')st.shuffle=on;if(action==='repeat')st.repeat=mode;
       if((action==='next'&&st.index<q.length-1)||(action==='prev'&&st.index>0)||action==='jump'){st.index=action==='jump'?index:st.index+(action==='next'?1:-1);st.id=String(q[st.index].id);st.dur=q[st.index].dur;st.pos=0;}
       emit();return{...st};},
     addListener:(e,f)=>{(L[e]=L[e]||[]).push(f);return{remove(){}};}
@@ -622,7 +625,53 @@ $('#bPlay').onclick=()=>{
   if(!S.id&&queue.length){const l=queue.map(i=>byId.get(i)).filter(Boolean);playList(l,Math.min(S.index||0,l.length-1));return;}
   ctl('toggle');
 };
-$('#record').onclick=()=>$('#bPlay').click();
+/* Platte mit dem Finger anhalten und vor-/zurückdrehen (wie beim echten Plattenspieler).
+   Eine ganze Umdrehung = 8 Sekunden im Lied. Kurz antippen = Abspielen/Pause. */
+const SEC_PER_TURN=8, SPIN_S=3.2;
+let scr=null;
+function discAngle(){const m=getComputedStyle($('#disc')).transform;if(!m||m==='none')return 0;const v=m.match(/matrix\(([^)]+)\)/);if(!v)return 0;const [a,b]=v[1].split(',').map(Number);return Math.atan2(b,a)*180/Math.PI;}
+function fingerAngle(e){const r=$('#record').getBoundingClientRect();return Math.atan2(e.clientY-(r.top+r.height/2),e.clientX-(r.left+r.width/2))*180/Math.PI;}
+const rec=$('#record');
+rec.style.touchAction='none';
+rec.addEventListener('pointerdown',e=>{
+  const t=curTrack();if(!t||swapping){scr={tap:true,x:e.clientX,y:e.clientY,t0:Date.now(),idle:true};return;}
+  rec.setPointerCapture(e.pointerId);
+  let pos=S.pos||0;if(S.playing)pos+=Date.now()-lastPosAt;
+  const start=discAngle();
+  scr={x:e.clientX,y:e.clientY,t0:Date.now(),last:fingerAngle(e),rot:start,start,moved:0,pos0:pos,was:!!S.playing,dur:S.dur||t.dur,tick:0};
+  const d=$('#disc');d.style.animation='none';d.style.transform=`rotate(${start}deg)`;
+});
+rec.addEventListener('pointermove',e=>{
+  if(!scr||scr.idle)return;
+  if(!scr.paused&&(Math.abs(e.clientX-scr.x)>6||Math.abs(e.clientY-scr.y)>6)){scr.paused=true;if(scr.was)ctl('pause');}
+  if(!scr.paused)return;
+  let a=fingerAngle(e),d=a-scr.last;if(d>180)d-=360;if(d<-180)d+=360;scr.last=a;
+  scr.rot+=d;scr.moved+=d;
+  $('#disc').style.transform=`rotate(${scr.rot}deg)`;
+  // kleines Rillen-Ruckeln beim Drehen
+  scr.tick+=Math.abs(d);if(scr.tick>14){scr.tick=0;try{navigator.vibrate&&navigator.vibrate(4);}catch(err){}}
+  const np=Math.max(0,Math.min(scr.dur-500,scr.pos0+scr.moved/360*SEC_PER_TURN*1000));
+  scr.np=np;
+  const off=Math.round((np-scr.pos0)/1000);
+  $('#tPos').textContent=fmt(np);$('#seek').value=scr.dur?Math.round(np/scr.dur*1000):0;$('#seek').style.setProperty('--p',(scr.dur?np/scr.dur*100:0)+'%');
+  const b=$('#scrub');b.textContent=(off>0?'+':off<0?'−':'±')+Math.abs(off)+' s';b.classList.add('show');
+});
+function scrEnd(){
+  if(!scr)return;const s=scr;scr=null;
+  $('#scrub').classList.remove('show');
+  const d=$('#disc');
+  if(s.idle||!s.paused){
+    if(!s.idle){d.style.animation='';d.style.transform='';}
+    if(Date.now()-s.t0<500)$('#bPlay').click();
+    return;}
+  // Platte läuft an der neuen Stelle weiter
+  const ang=((s.rot%360)+360)%360;
+  d.style.transform='';d.style.animation='';d.style.animationDelay=(-ang/360*SPIN_S)+'s';
+  if(s.np!=null)ctl('seek',{ms:Math.round(s.np)});
+  if(s.was)setTimeout(()=>ctl('play'),120);
+}
+rec.addEventListener('pointerup',scrEnd);
+rec.addEventListener('pointercancel',scrEnd);
 $('#bNext').onclick=()=>ctl('next');
 $('#bPrev').onclick=()=>ctl('prev');
 $('#bShuf').onclick=()=>{ctl('shuffle',{on:!S.shuffle});toast(!S.shuffle?'Zufall an':'Zufall aus');};

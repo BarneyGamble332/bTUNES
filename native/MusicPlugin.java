@@ -273,6 +273,7 @@ public class MusicPlugin extends Plugin {
                     else { if (ctl.getPlaybackState() == Player.STATE_IDLE) ctl.prepare(); ctl.play(); }
                     break;
                 case "pause": ctl.pause(); break;
+                case "play": if (ctl.getPlaybackState() == Player.STATE_IDLE) ctl.prepare(); ctl.play(); break;
                 case "next": if (ctl.hasNextMediaItem()) ctl.seekToNextMediaItem(); break;
                 case "prev":
                     if (ctl.getCurrentPosition() > 3000 || !ctl.hasPreviousMediaItem()) ctl.seekTo(0);

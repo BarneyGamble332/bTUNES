@@ -74,6 +74,7 @@ jobs:
               <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
               <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
               <uses-permission android:name="android.permission.WAKE_LOCK" />
+              <uses-permission android:name="android.permission.VIBRATE" />
           '''
           svc='''
                   <service android:name=".PlaybackService" android:exported="true" android:foregroundServiceType="mediaPlayback">
