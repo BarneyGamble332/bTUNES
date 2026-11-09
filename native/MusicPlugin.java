@@ -257,6 +257,9 @@ public class MusicPlugin extends Plugin {
                     .setAlbumTitle(o.optString("album")).build())
                 .build());
         }
+        // Für das Widget merken, damit es auch nach Beenden der App weiterspielen kann
+        getContext().getSharedPreferences(BtunesWidget.PREFS, android.content.Context.MODE_PRIVATE).edit()
+            .putString("queue", t.toString()).putInt("index", index).apply();
         withCtl(() -> {
             if (shuffle != null) ctl.setShuffleModeEnabled(shuffle);
             ctl.setMediaItems(items, Math.max(0, Math.min(index, items.size() - 1)), 0);

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/w_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/w_bg"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <ImageView
+        android:id="@+id/w_record"
+        android:layout_width="92dp"
+        android:layout_height="92dp"
+        android:contentDescription="Platte"
+        android:scaleType="fitCenter" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/w_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/w_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="bTUNES"
+                android:textColor="#F3ECE4"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/w_artist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Leg eine Platte auf"
+                android:textColor="#A59A8E"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <ImageView
+                android:id="@+id/w_prev"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:contentDescription="Zurück"
+                android:padding="10dp"
+                android:src="@drawable/ic_w_prev" />
+            <ImageView
+                android:id="@+id/w_play"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/w_play_bg"
+                android:contentDescription="Abspielen"
+                android:padding="11dp"
+                android:src="@drawable/ic_w_play" />
+            <ImageView
+                android:id="@+id/w_next"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:contentDescription="Weiter"
+                android:padding="10dp"
+                android:src="@drawable/ic_w_next" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

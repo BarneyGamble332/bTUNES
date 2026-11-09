@@ -47,6 +47,9 @@ jobs:
           PKG=$APP/src/main/java/de/bernhard/musik
           RES=$APP/src/main/res
           cp native/*.java $PKG/
+          # Widget: Layout, Symbole, Beschreibung
+          cp -r native/res/* $RES/
+          sed -i 's#</resources>#    <string name="btunes_widget_desc">bTUNES: aktuelle Platte und Tasten</string>\n</resources>#' $RES/values/strings.xml
 
           # Wiedergabe-Bibliothek (Media3) fuer Hintergrund-Musik und Sperrbildschirm
           cat >> $APP/build.gradle <<'GRADLE'
@@ -74,6 +77,10 @@ jobs:
                   <service android:name=".PlaybackService" android:exported="true" android:foregroundServiceType="mediaPlayback">
                       <intent-filter><action android:name="androidx.media3.session.MediaSessionService" /></intent-filter>
                   </service>
+                  <receiver android:name=".BtunesWidget" android:exported="false">
+                      <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+                      <meta-data android:name="android.appwidget.provider" android:resource="@xml/btunes_widget_info" />
+                  </receiver>
               </application>'''
           t=t.replace('</application>',svc,1).replace('</manifest>',perms+'</manifest>',1)
           open(m,'w').write(t)
