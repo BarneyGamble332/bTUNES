@@ -172,6 +172,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   background:#f3ece4;color:#14110f;padding:10px 16px;border-radius:12px;font-weight:600;opacity:0;transition:.25s;pointer-events:none;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%)}
 /* Band-Infos */
+.ncard{margin-top:14px;background:linear-gradient(135deg,#2c241d,#221c17);border:1px solid #3a3029;border-radius:14px;padding:10px 12px 4px;animation:nin .5s ease}
+@keyframes nin{from{opacity:0;transform:translateY(8px)}}
+.ncard .nh{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--acc)}
+.ncard .nh .lv{width:7px;height:7px;border-radius:50%;background:#ff5a2a;box-shadow:0 0 6px #ff5a2a;animation:blink 1.6s infinite}
+@keyframes blink{50%{opacity:.25}}
+.ncard .nh .mo{margin-left:auto;color:var(--mute);letter-spacing:0;text-transform:none;font-weight:600}
+.ncard a{display:block;padding:7px 0;border-top:1px solid #ffffff0d;color:inherit;text-decoration:none}
+.ncard a:first-of-type{border-top:0}
+.ncard a .n{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ncard a .s{color:var(--mute);font-size:12px;margin-top:1px}
+#tArtist{cursor:pointer}
 .bandbtn{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:5px 12px;border-radius:16px;background:#ffffff10;color:var(--mute);font-size:13px;font-weight:600}
 .bandbtn .dot{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 6px var(--acc)}
 .bandbtn svg.i{width:16px;height:16px}
@@ -360,7 +371,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <div class="info" id="info">
     <div class="t" id="tTitle">&nbsp;</div>
     <div class="a" id="tArtist">&nbsp;</div>
-    <button class="bandbtn hidden" id="btnBand"><svg class="i"><use href="#i-news"/></svg><span id="bandLbl">Band-Infos</span><i class="dot hidden" id="bandDot"></i></button>
   </div>
   <div class="prog">
     <span id="tPos">0:00</span>
@@ -374,6 +384,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     <button class="ibtn" id="bNext" aria-label="Weiter"><svg class="i" style="width:30px;height:30px"><use href="#i-next"/></svg></button>
     <button class="ibtn" id="bRep" aria-label="Wiederholen"><svg class="i"><use href="#i-rep"/></svg><span class="one hidden" id="rep1">1</span></button>
   </div>
+  <div class="ncard hidden" id="ncard"></div>
   <div id="welcome" class="welcome hidden">
     Damit der Plattenspieler deine Musik findet, braucht er Zugriff darauf.<br>
     <button id="btnGrant">Musik freigeben</button>
@@ -899,22 +910,29 @@ function openBand(name){
 /* Leuchtpunkt am Knopf, wenn es zum aufgelegten Interpreten frische News gibt */
 let bandFor='';
 function bandOf(t){return t?t.artist:'';}
-function markSeen(name,n){const s=store.get('seen',{});s[norm(name)]=n.length?n[0].date:Date.now();store.set('seen',s);if(norm(name)===norm(bandFor))$('#bandDot').classList.add('hidden');}
+function markSeen(){}
+/* Aktuelles zur aufgelegten Band erscheint von selbst – nur Meldungen der letzten 7 Tage, nur bei aktiven Bands */
+let newsShown=[];
 async function updateBandBtn(t){
   const name=bandOf(t);
-  $('#btnBand').classList.toggle('hidden',!name);
   if(name===bandFor)return;
-  bandFor=name;$('#bandDot').classList.add('hidden');
+  bandFor=name;$('#ncard').classList.add('hidden');
   if(!name)return;
-  $('#bandLbl').textContent='Infos zu '+name;
-  await sleep(2500);if(bandFor!==name)return;
+  await sleep(1500);if(bandFor!==name)return;
   try{const d=await bandInfo(name);if(!d.found||d.ended||bandFor!==name)return;
-    const n=await bandNews(d.name,d.type!=='Person');
-    const seen=store.get('seen',{})[norm(name)]||0;
-    if(bandFor===name&&n.length&&n[0].date>seen&&Date.now()-n[0].date<7*864e5)$('#bandDot').classList.remove('hidden');
+    const n=(await bandNews(d.name,d.type!=='Person')).filter(x=>Date.now()-x.date<7*864e5);
+    if(bandFor!==name||!n.length)return;
+    newsShown=n;
+    const c=$('#ncard');
+    c.innerHTML=`<div class="nh"><i class="lv"></i>Aktuell: ${esc(d.name)}<button class="mo" data-more>${n.length>2?'alle '+n.length+' ›':'mehr ›'}</button></div>`+
+      n.slice(0,2).map((x,i)=>`<a href="#" data-n="${i}"><div class="n">${esc(x.title)}</div><div class="s">${esc(x.src)}${x.src?' · ':''}${ago(x.date)}</div></a>`).join('');
+    c.classList.remove('hidden');
   }catch(e){}
 }
-$('#btnBand').onclick=()=>openBand(bandFor);
+$('#ncard').onclick=e=>{e.preventDefault();const a=e.target.closest('[data-n]');if(a){openUrl(newsShown[+a.dataset.n].link);return;}openBand(bandFor);};
+$('#tArtist').onclick=()=>{if(bandFor)openBand(bandFor);};
+/* Beim Zurückkehren in die App neu nachsehen (News sind 3 Std. zwischengespeichert) */
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&bandFor){const b=bandFor;bandFor='';updateBandBtn(curTrack());}});
 
 /* Vorführmodus im Browser */
 function demoBand(name){const ended=/Polarlicht|Ensemble/.test(name);

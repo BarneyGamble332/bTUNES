@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Flache Variante (1 Zeile hoch): alles nebeneinander, Knöpfe bleiben rund -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/w_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/w_bg"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
+
+    <ImageView
+        android:id="@+id/w_record"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:maxWidth="64dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="Platte"
+        android:scaleType="fitCenter" />
+
+    <LinearLayout
+        android:id="@+id/w_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="10dp"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/w_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#F3ECE4"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/w_artist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#A59A8E"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/w_prev"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:contentDescription="Zurück"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_w_prev" />
+    <ImageView
+        android:id="@+id/w_play"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/w_play_bg"
+        android:contentDescription="Abspielen"
+        android:padding="12dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_w_play" />
+    <ImageView
+        android:id="@+id/w_next"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:contentDescription="Weiter"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_w_next" />
+</LinearLayout>

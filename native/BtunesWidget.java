@@ -69,12 +69,27 @@ public class BtunesWidget extends AppWidgetProvider {
             coverFor = coverKey;
         }
 
-        RemoteViews v = new RemoteViews(ctx.getPackageName(), R.layout.btunes_widget);
+        RemoteViews big = views(ctx, R.layout.btunes_widget, title, artist, playing);
+        RemoteViews flat = views(ctx, R.layout.btunes_widget_small, title, artist, playing);
+        RemoteViews v;
+        if (Build.VERSION.SDK_INT >= 31) {
+            // Android wählt je nach Widget-Größe selbst: flach (1 Zeile) oder groß
+            java.util.Map<android.util.SizeF, RemoteViews> m = new java.util.HashMap<>();
+            m.put(new android.util.SizeF(180f, 40f), flat);
+            m.put(new android.util.SizeF(200f, 125f), big);
+            v = new RemoteViews(m);
+        } else {
+            v = big;
+        }
+        mgr.updateAppWidget(ids, v);
+    }
+
+    private static RemoteViews views(Context ctx, int layout, String title, String artist, boolean playing) {
+        RemoteViews v = new RemoteViews(ctx.getPackageName(), layout);
         v.setTextViewText(R.id.w_title, title.isEmpty() ? "bTUNES" : title);
         v.setTextViewText(R.id.w_artist, artist.isEmpty() ? "Leg eine Platte auf" : artist);
         v.setImageViewBitmap(R.id.w_record, record);
         v.setImageViewResource(R.id.w_play, playing ? R.drawable.ic_w_pause : R.drawable.ic_w_play);
-
         Intent open = ctx.getPackageManager().getLaunchIntentForPackage(ctx.getPackageName());
         PendingIntent po = PendingIntent.getActivity(ctx, 10, open, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         v.setOnClickPendingIntent(R.id.w_record, po);
@@ -82,7 +97,7 @@ public class BtunesWidget extends AppWidgetProvider {
         v.setOnClickPendingIntent(R.id.w_play, action(ctx, A_TOGGLE, 11));
         v.setOnClickPendingIntent(R.id.w_next, action(ctx, A_NEXT, 12));
         v.setOnClickPendingIntent(R.id.w_prev, action(ctx, A_PREV, 13));
-        mgr.updateAppWidget(ids, v);
+        return v;
     }
 
     private static PendingIntent action(Context ctx, String a, int code) {

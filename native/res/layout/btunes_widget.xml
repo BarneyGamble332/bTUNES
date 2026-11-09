@@ -10,8 +10,10 @@
 
     <ImageView
         android:id="@+id/w_record"
-        android:layout_width="92dp"
-        android:layout_height="92dp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:maxWidth="130dp"
+        android:adjustViewBounds="true"
         android:contentDescription="Platte"
         android:scaleType="fitCenter" />
 
@@ -57,26 +59,29 @@
             <ImageView
                 android:id="@+id/w_prev"
                 android:layout_width="0dp"
-                android:layout_height="44dp"
+                android:layout_height="52dp"
                 android:layout_weight="1"
+                android:scaleType="fitCenter"
                 android:contentDescription="Zurück"
-                android:padding="10dp"
+                android:padding="12dp"
                 android:src="@drawable/ic_w_prev" />
             <ImageView
                 android:id="@+id/w_play"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:background="@drawable/w_play_bg"
                 android:contentDescription="Abspielen"
-                android:padding="11dp"
+                android:padding="15dp"
+                android:scaleType="fitCenter"
                 android:src="@drawable/ic_w_play" />
             <ImageView
                 android:id="@+id/w_next"
                 android:layout_width="0dp"
-                android:layout_height="44dp"
+                android:layout_height="52dp"
                 android:layout_weight="1"
+                android:scaleType="fitCenter"
                 android:contentDescription="Weiter"
-                android:padding="10dp"
+                android:padding="12dp"
                 android:src="@drawable/ic_w_next" />
         </LinearLayout>
     </LinearLayout>
