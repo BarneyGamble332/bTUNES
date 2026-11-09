@@ -38,8 +38,10 @@ jobs:
           set -euo pipefail
           mkdir -p www && cp index.html www/index.html
           npm init -y >/dev/null
-          npm i --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/app@6
+          npm i --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/app@6 @capacitor/browser@6
           npx cap init "bTUNES" de.bernhard.musik --web-dir www
+          # Internet-Abfragen (Band-News, Wikipedia) ueber Android statt Browser, damit fremde Seiten erlaubt sind
+          node -e "const f='capacitor.config.json',c=require('./'+f);c.plugins=Object.assign(c.plugins||{},{CapacitorHttp:{enabled:true}});require('fs').writeFileSync(f,JSON.stringify(c,null,2))"
           npx cap add android
           npx cap sync android
 

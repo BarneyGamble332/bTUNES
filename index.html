@@ -171,6 +171,27 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .toast{position:absolute;z-index:60;left:50%;bottom:calc(var(--safe-b) + 86px);transform:translateX(-50%) translateY(20px);
   background:#f3ece4;color:#14110f;padding:10px 16px;border-radius:12px;font-weight:600;opacity:0;transition:.25s;pointer-events:none;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%)}
+/* Band-Infos */
+.bandbtn{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:5px 12px;border-radius:16px;background:#ffffff10;color:var(--mute);font-size:13px;font-weight:600}
+.bandbtn .dot{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 6px var(--acc)}
+.bandbtn svg.i{width:16px;height:16px}
+.bhero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:4px 0 6px}
+.bhero .pic{width:min(56vw,240px);aspect-ratio:1;border-radius:50%;background:#2c2621 center/cover no-repeat;box-shadow:0 10px 26px #000a;display:grid;place-items:center;color:#5d544b}
+.bhero h2{margin:14px 0 4px;font-size:22px}
+.status{display:inline-block;padding:4px 12px;border-radius:14px;font-size:13px;font-weight:700;margin-top:4px}
+.status.on{background:#1f3a24;color:#7fdc8f}.status.off{background:#3a2a1f;color:var(--acc)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}
+.tags span{padding:3px 10px;border-radius:12px;background:var(--card);color:var(--mute);font-size:12px}
+.ptxt p{margin:0 0 10px;color:#ddd3c8;line-height:1.5;user-select:text;-webkit-user-select:text}
+.news a{display:block;padding:11px 2px;border-bottom:1px solid #2a241f;color:inherit;text-decoration:none}
+.news .n{font-weight:600;line-height:1.3}
+.news .s{color:var(--mute);font-size:12.5px;margin-top:3px}
+.tl .row{min-height:44px}
+.tl .yr{width:44px;color:var(--acc);font-weight:700;font-variant-numeric:tabular-nums;flex:none}
+.tl .own{font-size:11px;color:#7fdc8f;font-weight:700;flex:none}
+.wlink{display:inline-block;margin-top:2px;color:var(--acc);font-weight:600}
+.src{color:#6d6359;font-size:12px;text-align:center;margin-top:22px}
+.spin{width:28px;height:28px;border:3px solid #3a332d;border-top-color:var(--acc);border-radius:50%;animation:spin .8s linear infinite;margin:40px auto 12px}
 .welcome{text-align:center;color:var(--mute);margin-top:18px}
 .welcome button{margin-top:12px;height:48px;padding:0 24px;border-radius:14px;background:linear-gradient(180deg,#f2b65d,var(--acc2));color:#1a120b;font-weight:700}
 </style>
@@ -199,6 +220,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></symbol>
   <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
   <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></symbol>
+  <symbol id="i-news" viewBox="0 0 24 24"><path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2"/><path d="M8 8h5M8 12h5M8 16h3"/></symbol>
   <symbol id="i-queue" viewBox="0 0 24 24"><path d="M3 6h12M3 12h12M3 18h8"/><path d="M17 13l5 3-5 3z"/></symbol>
 </svg>
 
@@ -244,6 +266,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <div class="info" id="info">
     <div class="t" id="tTitle">&nbsp;</div>
     <div class="a" id="tArtist">&nbsp;</div>
+    <button class="bandbtn hidden" id="btnBand"><svg class="i"><use href="#i-news"/></svg><span id="bandLbl">Band-Infos</span><i class="dot hidden" id="bandDot"></i></button>
   </div>
   <div class="prog">
     <span id="tPos">0:00</span>
@@ -417,6 +440,7 @@ function render(){
   $('#tTitle').textContent=t?t.title:(tracks.length?'Leg eine Platte auf':' ');
   $('#tArtist').textContent=t?t.artist+' · '+t.album:(tracks.length?tracks.length+' Titel in '+albums.length+' Alben':' ');
   setDeck(t?t.albumId:null);
+  updateBandBtn(t);
   const mini=$('#mini');
   mini.classList.toggle('show',!!t&&$('#lib').classList.contains('open'));
   mini.classList.toggle('playing',playing);
@@ -585,7 +609,8 @@ function openAlbum(id){
 function openArtist(name){
   const a=artists.find(x=>x.name===name);if(!a)return;
   const al=[...a.albums].map(i=>albumById.get(i)).filter(Boolean).sort((x,y)=>(y.year||0)-(x.year||0));
-  openView(a.name,b=>{b.innerHTML=`<div class="acts" style="margin-top:4px"><button class="pri" data-go="play"><svg class="i" style="fill:currentColor;stroke:none"><use href="#i-play"/></svg>Alle abspielen</button><button data-go="shuf"><svg class="i"><use href="#i-shuf"/></svg>Zufall</button></div><div class="sec">Alben</div><div class="grid">${al.map(albumCard).join('')}</div><div class="sec">Titel</div><div class="list">${a.tracks.map(t=>trackRow(t)).join('')}</div>`;
+  openView(a.name,b=>{b.innerHTML=`<div class="acts" style="margin-top:4px"><button class="pri" data-go="play"><svg class="i" style="fill:currentColor;stroke:none"><use href="#i-play"/></svg>Alle abspielen</button><button data-go="shuf"><svg class="i"><use href="#i-shuf"/></svg>Zufall</button></div><button class="bandbtn" data-band="${esc(a.name)}" style="margin:2px 0 4px"><svg class="i"><use href="#i-news"/></svg>News &amp; Infos zu ${esc(a.name)}</button><div class="sec">Alben</div><div class="grid">${al.map(albumCard).join('')}</div><div class="sec">Titel</div><div class="list">${a.tracks.map(t=>trackRow(t)).join('')}</div>`;
+    b.querySelector('[data-band]').onclick=e=>{e.stopPropagation();openBand(name);};
     lazy(b);const list=al.flatMap(x=>x.tracks.filter(t=>(t.albumArtist||t.artist)===name));wireList(b,list);});
 }
 function openTrackView(title,sub,list){
@@ -619,6 +644,7 @@ function trackMenu(t,o={}){
     ['i-play','Jetzt abspielen',()=>{playList([t],0,false);closeAll();}],
     ['i-vinyl','Album öffnen',()=>openAlbum(t.albumId)],
     ['i-user','Interpret öffnen',()=>openArtist(t.albumArtist||t.artist)],
+    ['i-news','News & Infos zur Band',()=>openBand(t.artist)],
     ['i-plus','Zu Playlist hinzufügen…',()=>setTimeout(()=>addToPl(t),260)]];
   if(o.pl!=null)items.push(['i-trash','Aus dieser Playlist entfernen',()=>{const p=playlists[o.pl];p.ids.splice(p.ids.indexOf(t.id),1);savePl();o.redraw&&o.redraw();renderLib();},'del']);
   menu(t.title+' · '+t.artist,items);
@@ -649,6 +675,137 @@ function back(){
 function closeAll(){hideMenu();while(nav.length)back();}
 if(AppP){AppP.addListener('backButton',()=>{if(!back())AppP.minimizeApp();});
   AppP.addListener('resume',()=>Music.getState({}).then(onState).catch(()=>{}));}
+
+/* ===== Band-Infos: aktiv -> News, aufgelöst -> Highlights =====
+   Quellen: MusicBrainz (Status, Alben), Wikipedia (Text, Bild), Google News (Meldungen) */
+const UA='bTUNES/1.0 ( https://github.com/BarneyGamble332/bTUNES )';
+const BrowserP=NATIVE?nativePlugin('Browser'):null;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function openUrl(u){if(BrowserP)BrowserP.open({url:u}).catch(()=>window.open(u,'_blank'));else window.open(u,'_blank');}
+async function getJSON(u,h={}){const r=await fetch(u,{headers:{Accept:'application/json',...h}});if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
+let mbLast=0;   // MusicBrainz erlaubt höchstens eine Anfrage pro Sekunde
+async function mb(path){const w=mbLast+1100-Date.now();if(w>0)await sleep(w);mbLast=Date.now();return getJSON('https://musicbrainz.org/ws/2/'+path+(path.includes('?')?'&':'?')+'fmt=json',{'User-Agent':UA});}
+
+async function bandInfo(name){
+  const key='bi_'+norm(name),c=store.get(key,null);
+  if(c&&Date.now()-c.t<20*864e5)return c.d;
+  if(!NATIVE)return demoBand(name);
+  const res=await mb('artist?limit=5&query='+encodeURIComponent('artist:"'+name+'"'));
+  const list=res.artists||[];
+  const a=list.find(x=>norm(x.name)===norm(name)&&x.score>=85)||list.find(x=>(x.aliases||[]).some(y=>norm(y.name)===norm(name)))||list.find(x=>x.score>=97);
+  if(!a){const d={found:false};store.set(key,{t:Date.now(),d});return d;}
+  const full=await mb('artist/'+a.id+'?inc=url-rels+tags+genres');
+  const rgs=await mb('release-group?type=album&limit=100&artist='+a.id);
+  const albums=(rgs['release-groups']||[]).filter(g=>!(g['secondary-types']||[]).length&&g['first-release-date'])
+    .map(g=>({title:g.title,year:+g['first-release-date'].slice(0,4)})).sort((x,y)=>x.year-y.year);
+  let wiki=null;
+  try{
+    const wd=(full.relations||[]).find(r=>r.type==='wikidata');
+    let title=null,lang='de';
+    if(wd){const q=wd.url.resource.split('/').pop();
+      const e=await getJSON('https://www.wikidata.org/w/api.php?action=wbgetentities&props=sitelinks&sitefilter=dewiki|enwiki&format=json&origin=*&ids='+q);
+      const sl=(e.entities&&e.entities[q]&&e.entities[q].sitelinks)||{};
+      if(sl.dewiki)title=sl.dewiki.title;else if(sl.enwiki){title=sl.enwiki.title;lang='en';}}
+    if(title){
+      const w=await getJSON(`https://${lang}.wikipedia.org/w/api.php?action=query&prop=extracts|pageimages&exintro=1&explaintext=1&piprop=thumbnail&pithumbsize=600&redirects=1&format=json&origin=*&titles=`+encodeURIComponent(title));
+      const pg=Object.values((w.query&&w.query.pages)||{})[0];
+      if(pg&&pg.extract)wiki={title:pg.title,text:pg.extract,img:pg.thumbnail&&pg.thumbnail.source,lang,url:`https://${lang}.m.wikipedia.org/wiki/`+encodeURIComponent(pg.title.replace(/ /g,'_'))};
+    }
+  }catch(e){}
+  const ls=full['life-span']||{};
+  const tags=[...(full.genres||[]),...(full.tags||[])].sort((x,y)=>y.count-x.count).map(t=>t.name).filter((t,i,arr)=>arr.indexOf(t)===i).slice(0,5);
+  const d={found:true,name:full.name,type:full.type,area:full.area&&full.area.name,begin:ls.begin||'',end:ls.end||'',ended:!!ls.ended,tags,albums,wiki};
+  store.set(key,{t:Date.now(),d});
+  return d;
+}
+
+async function bandNews(name,group){
+  const key='bn_'+norm(name),c=store.get(key,null);
+  if(c&&Date.now()-c.t<3*36e5)return c.d;
+  if(!NATIVE)return demoNews(name);
+  const q='"'+name+'"'+(group?' Band':'')+' when:1y';
+  const r=await fetch('https://news.google.com/rss/search?hl=de&gl=DE&ceid=DE:de&q='+encodeURIComponent(q));
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const x=new DOMParser().parseFromString(await r.text(),'text/xml');
+  const items=[...x.querySelectorAll('item')].map(it=>{
+    const src=(it.querySelector('source')||{}).textContent||'';
+    let t=(it.querySelector('title')||{}).textContent||'';
+    if(src&&t.endsWith(' - '+src))t=t.slice(0,-(src.length+3));
+    return{title:t,src,link:(it.querySelector('link')||{}).textContent||'',date:Date.parse((it.querySelector('pubDate')||{}).textContent||'')||0};
+  }).filter(n=>n.title&&n.link&&Date.now()-n.date<365*864e5).sort((a,b)=>b.date-a.date).slice(0,12);
+  store.set(key,{t:Date.now(),d:items});
+  return items;
+}
+
+const ago=d=>{const m=Math.round((Date.now()-d)/6e4);if(m<60)return 'vor '+Math.max(1,m)+' Min.';const h=Math.round(m/60);if(h<24)return 'vor '+h+' Std.';const t=Math.round(h/24);if(t<31)return 'vor '+t+(t===1?' Tag':' Tagen');return new Date(d).toLocaleDateString('de-DE',{day:'numeric',month:'short',year:'numeric'});};
+const yr=s=>(s||'').slice(0,4);
+function statusText(d){
+  const person=d.type==='Person';
+  if(d.ended)return person?`† ${yr(d.end)||'verstorben'}`:`Aufgelöst${d.end?' '+yr(d.end):''}`;
+  return (person?'Aktiv':'Aktiv')+(d.begin?' seit '+yr(d.begin):'');
+}
+
+function openBand(name){
+  if(!name)return;
+  openView(name,async b=>{
+    b.innerHTML=`<div class="spin"></div><div class="hint" style="padding-top:0">Suche Infos zu ${esc(name)}…</div>`;
+    let d;
+    try{d=await bandInfo(name);}catch(e){b.innerHTML=`<div class="hint">Keine Verbindung zum Internet.<br>Band-Infos brauchen Netz.</div>`;return;}
+    if(!d.found){b.innerHTML=`<div class="hint">Zu „${esc(name)}“ habe ich nichts gefunden.<br>Vielleicht ist der Interpret anders geschrieben?</div>`;return;}
+    const own=new Set(albums.map(a=>norm(a.name)));
+    const paras=d.wiki?d.wiki.text.split(/\n+/).map(s=>s.trim()).filter(s=>s.length>30):[];
+    const yrs=d.begin?yr(d.begin)+'–'+(d.ended?yr(d.end):'heute'):'';
+    let h=`<div class="bhero"><div class="pic"${d.wiki&&d.wiki.img?` style="background-image:url('${esc(d.wiki.img)}')"`:''}>${d.wiki&&d.wiki.img?'':'<svg class="i" style="width:60px;height:60px"><use href="#i-user"/></svg>'}</div>
+      <h2>${esc(d.name)}</h2><div class="s" style="color:var(--mute)">${esc([d.type==='Group'?'Band':d.type==='Person'?'Musiker:in':'',d.area,yrs].filter(Boolean).join(' · '))}</div>
+      <div class="status ${d.ended?'off':'on'}">${esc(statusText(d))}</div>
+      ${d.tags.length?`<div class="tags">${d.tags.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}</div>`;
+    const albumsHtml=d.albums.length?`<div class="sec">${d.ended?'Die Alben':'Alben'}</div><div class="list tl">${d.albums.map(a=>`<div class="row"><div class="yr">${a.year}</div><div class="tx"><div class="n">${esc(a.title)}</div></div>${own.has(norm(a.title))?'<div class="own">✓ HAST DU</div>':''}</div>`).join('')}</div>`:'';
+    const wikiLink=d.wiki?`<a class="wlink" href="#" data-url="${esc(d.wiki.url)}">Mehr auf Wikipedia ›</a>`:'';
+    if(d.ended){
+      h+=`<div class="sec">Highlights</div><div class="ptxt">${paras.slice(0,5).map(p=>`<p>${esc(p)}</p>`).join('')||'<p>Keine Beschreibung gefunden.</p>'}</div>${wikiLink}`+albumsHtml;
+    }else{
+      h+=`<div class="sec">Aktuelles</div><div class="news" id="newsBox"><div class="spin" style="margin:14px auto"></div></div>`+
+        (paras.length?`<div class="sec">Über ${d.type==='Person'?'den Künstler':'die Band'}</div><div class="ptxt"><p>${esc(paras[0])}</p></div>${wikiLink}`:'')+albumsHtml;
+    }
+    h+=`<div class="src">Quellen: MusicBrainz${d.wiki?', Wikipedia':''}${d.ended?'':', Google News'}</div>`;
+    b.innerHTML=h;
+    b.onclick=e=>{const a=e.target.closest('[data-url]');if(a){e.preventDefault();openUrl(a.dataset.url);}};
+    if(!d.ended){
+      const box=b.querySelector('#newsBox');
+      try{const n=await bandNews(d.name,d.type!=='Person');
+        box.innerHTML=n.length?n.map(x=>`<a href="#" data-url="${esc(x.link)}"><div class="n">${esc(x.title)}</div><div class="s">${esc(x.src)}${x.src?' · ':''}${ago(x.date)}</div></a>`).join(''):'<div class="hint" style="padding:16px">Keine Meldungen aus dem letzten Jahr.</div>';
+        markSeen(d.name,n);}
+      catch(e){box.innerHTML='<div class="hint" style="padding:16px">News konnten nicht geladen werden.</div>';}
+    }
+  });
+}
+
+/* Leuchtpunkt am Knopf, wenn es zum aufgelegten Interpreten frische News gibt */
+let bandFor='';
+function bandOf(t){return t?t.artist:'';}
+function markSeen(name,n){const s=store.get('seen',{});s[norm(name)]=n.length?n[0].date:Date.now();store.set('seen',s);if(norm(name)===norm(bandFor))$('#bandDot').classList.add('hidden');}
+async function updateBandBtn(t){
+  const name=bandOf(t);
+  $('#btnBand').classList.toggle('hidden',!name);
+  if(name===bandFor)return;
+  bandFor=name;$('#bandDot').classList.add('hidden');
+  if(!name)return;
+  $('#bandLbl').textContent='Infos zu '+name;
+  await sleep(2500);if(bandFor!==name)return;
+  try{const d=await bandInfo(name);if(!d.found||d.ended||bandFor!==name)return;
+    const n=await bandNews(d.name,d.type!=='Person');
+    const seen=store.get('seen',{})[norm(name)]||0;
+    if(bandFor===name&&n.length&&n[0].date>seen&&Date.now()-n[0].date<7*864e5)$('#bandDot').classList.remove('hidden');
+  }catch(e){}
+}
+$('#btnBand').onclick=()=>openBand(bandFor);
+
+/* Vorführmodus im Browser */
+function demoBand(name){const ended=/Polarlicht|Ensemble/.test(name);
+  return{found:true,name,type:'Group',area:'Deutschland',begin:'1998',end:ended?'2014':'',ended,tags:['rock','alpine rock','folk'],
+    albums:albums.filter(a=>a.artist===name).map(a=>({title:a.name,year:a.year})).concat([{title:'Frühe Aufnahmen',year:1999}]).sort((a,b)=>a.year-b.year),
+    wiki:{title:name,lang:'de',url:'https://de.wikipedia.org',img:null,text:name+' ist eine Beispielband aus dem Vorführmodus. Sie wurde 1998 gegründet und spielte über viele Jahre in kleinen Clubs, bevor das zweite Album den Durchbruch brachte.\nIn der echten App steht hier der Wikipedia-Text zur Band: Gründung, größte Erfolge, wichtigste Alben und Besetzungswechsel.\nBei aufgelösten Bands erscheint der ganze Einleitungstext als Highlights.'}};}
+function demoNews(name){const n=Date.now();return[{title:name+' kündigen Tour für nächsten Sommer an',src:'Beispiel-Musikmagazin',link:'https://example.org',date:n-2*36e5},{title:'Neues Album von '+name+' im Test',src:'Beispiel-Zeitung',link:'https://example.org',date:n-3*864e5},{title:name+' live: So war das Konzert',src:'Beispiel-Radio',link:'https://example.org',date:n-20*864e5}];}
 
 /* ===== Start ===== */
 async function loadLibrary(manual){
