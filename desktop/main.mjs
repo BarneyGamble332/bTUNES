@@ -181,3 +181,32 @@ ipcMain.handle('readPdf', async (e, p) => {
 });
 // Großes Fenster zum Zeitunglesen (und wieder zurück)
 ipcMain.handle('toggleMax', () => { if (win.isMaximized()) win.unmaximize(); else win.maximize(); return win.isMaximized(); });
+
+/* ---------- Radio: laufenden Titel aus dem Sender-Stream lesen (ICY-Metadaten) ---------- */
+ipcMain.handle('icy', async (e, url) => {
+  const ac = new AbortController();
+  const timer = setTimeout(() => ac.abort(), 12000);
+  try {
+    const r = await fetch(url, { signal: ac.signal, headers: { 'Icy-MetaData': '1', 'User-Agent': 'bTUNES/1.0 (Linux)' } });
+    const metaint = +r.headers.get('icy-metaint') || 0;
+    if (!metaint || !r.body) { ac.abort(); return ''; }
+    const reader = r.body.getReader();
+    let buf = Buffer.alloc(0);
+    while (buf.length < metaint + 1 + 4080) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf = Buffer.concat([buf, Buffer.from(value)]);
+      if (buf.length > metaint) {
+        const len = buf[metaint] * 16;
+        if (buf.length >= metaint + 1 + len) {
+          const meta = buf.slice(metaint + 1, metaint + 1 + len).toString('utf8');
+          const m = meta.match(/StreamTitle='([^']*)';/);
+          ac.abort();
+          return m ? m[1].trim() : '';
+        }
+      }
+    }
+    ac.abort();
+    return '';
+  } catch { return ''; } finally { clearTimeout(timer); }
+});

@@ -13,6 +13,7 @@ contextBridge.exposeInMainWorld('desktop', {
   deleteDownload: k => ipcRenderer.invoke('deleteDownload', k),
   listDownloads: () => ipcRenderer.invoke('listDownloads'),
   openExternal: u => ipcRenderer.invoke('openExternal', u),
+  icy: u => ipcRenderer.invoke('icy', u),
   findPdfFolders: () => ipcRenderer.invoke('findPdfFolders'),
   listPdfs: f => ipcRenderer.invoke('listPdfs', f),
   readPdf: p => ipcRenderer.invoke('readPdf', p),

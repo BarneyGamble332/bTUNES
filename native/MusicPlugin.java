@@ -218,6 +218,11 @@ public class MusicPlugin extends Plugin {
         r.put("shuffle", ctl.getShuffleModeEnabled());
         r.put("repeat", ctl.getRepeatMode());
         r.put("speed", ctl.getPlaybackParameters().speed);
+        // Radio: laufender Titel, den der Sender mitschickt (z. B. "Interpret - Titel")
+        CharSequence live = ctl.getMediaMetadata().title;
+        CharSequence station = m == null ? null : m.mediaMetadata.title;
+        r.put("meta", live == null ? "" : live.toString());
+        r.put("station", station == null ? "" : station.toString());
         return r;
     }
 

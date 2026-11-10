@@ -67,8 +67,10 @@ public class PlaybackService extends MediaSessionService {
         Player p = session == null ? null : session.getPlayer();
         if (p == null) return;
         MediaItem m = p.getCurrentMediaItem();
-        String title = m == null || m.mediaMetadata.title == null ? "" : m.mediaMetadata.title.toString();
-        String artist = m == null || m.mediaMetadata.artist == null ? "" : m.mediaMetadata.artist.toString();
+        // Metadaten des Players: enthalten beim Radio den gerade laufenden Titel
+        MediaMetadata pm = p.getMediaMetadata();
+        String title = pm.title != null ? pm.title.toString() : (m == null || m.mediaMetadata.title == null ? "" : m.mediaMetadata.title.toString());
+        String artist = pm.artist != null ? pm.artist.toString() : (m == null || m.mediaMetadata.artist == null ? "" : m.mediaMetadata.artist.toString());
         long id = -1;
         try { if (m != null) id = Long.parseLong(m.mediaId); } catch (Exception ignore) {}
         String art = m == null || m.mediaMetadata.artworkUri == null ? "" : m.mediaMetadata.artworkUri.toString();

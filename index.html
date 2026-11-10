@@ -368,6 +368,43 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .ztoc .m{flex:none;color:var(--mute);font-size:12px;padding-top:5px}
 .ztoc.cur .n{color:var(--acc)}
 @media (min-width:900px){.zgrid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
+
+/* ---------- Radio ---------- */
+.seg button{padding:6px 8px!important;font-size:12.5px!important}
+#radio{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);padding-top:calc(var(--safe-t) + 10px)}
+#radio .top{padding:0 16px}
+.rbody{flex:1;overflow-y:auto;padding:6px 14px calc(var(--safe-b) + 30px)}
+.rnow{border-radius:18px;padding:12px 14px 14px;
+  background:repeating-linear-gradient(97deg,#0000 0 3px,#00000018 3px 4px,#0000 4px 9px,#ffffff08 9px 10px),linear-gradient(135deg,#6b4428,#4a2d19 45%,#3b2312);
+  box-shadow:0 12px 28px #000a,inset 0 1px 0 #ffffff30}
+.rdial{position:relative;height:34px;border-radius:8px;background:linear-gradient(180deg,#f3e3bf,#e2c98f);box-shadow:inset 0 2px 5px #0006;overflow:hidden;transition:box-shadow .4s}
+.rnow.on .rdial{background:linear-gradient(180deg,#ffeec2,#f0cf86);box-shadow:inset 0 2px 5px #0005,0 0 16px #ffb54a88}
+.rscale{position:absolute;inset:0 6% 0 6%;display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:3px;font-size:10.5px;font-weight:800;color:#5a3f20;
+  background:repeating-linear-gradient(90deg,#5a3f2088 0 1px,#0000 1px 9px) top/100% 11px no-repeat}
+.rneedle{position:absolute;top:3px;bottom:3px;width:3px;margin-left:-1.5px;border-radius:2px;background:#d42c1a;box-shadow:0 0 4px #d42c1a;transition:left 1.2s cubic-bezier(.3,.7,.2,1)}
+.rrow{display:flex;gap:14px;align-items:center;margin-top:12px}
+.rlogo{position:relative;width:76px;height:76px;flex:none;border-radius:14px;background:#1c1714;display:grid;place-items:center;color:#6d6359;overflow:hidden;box-shadow:inset 0 0 0 1px #0007}
+.rlogo svg.i{width:36px;height:36px}
+.rlogo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
+.rinfo{flex:1;min-width:0}
+.rtag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:.1em;color:#ffcf8a}
+.rtag .lv{width:7px;height:7px;border-radius:50%;background:#ff5a2a;box-shadow:0 0 6px #ff5a2a;animation:blink 1.6s infinite}
+.rname{font-size:18px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px #0008}
+.rsong{color:#f0dcc4;font-size:14px;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rctl{display:flex;align-items:center;gap:12px;margin-top:12px}
+.rctl .play{width:58px;height:58px;flex:none}
+.rctl .play svg.i{width:26px;height:26px}
+.rctl .rfav{background:#0003}
+.rctl .rfav.on,.res .add.on svg.i{color:#ff6b6b}
+.rctl .rfav.on svg.i,.res .add.on svg.i{fill:#ff6b6b}
+.rctl .bandbtn{margin:0;flex:1;justify-content:center;height:40px;background:#0004;color:#fff;font-size:13.5px;min-width:0}
+.rctl .bandbtn span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res.st{cursor:pointer}
+.res.st .add.on{background:#3a1f22}
+.res .th.rl{position:relative;display:grid;place-items:center;color:#6d6359;overflow:hidden;background:#2c2621}
+.res .th.rl img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
+.res.cur .n{color:var(--acc)}
+.res .add svg.i{width:20px;height:20px}
 .welcome{text-align:center;color:var(--mute);margin-top:18px}
 .welcome button{margin-top:12px;height:48px;padding:0 24px;border-radius:14px;background:linear-gradient(180deg,#f2b65d,var(--acc2));color:#1a120b;font-weight:700}
 </style>
@@ -408,6 +445,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></symbol>
   <symbol id="i-paper" viewBox="0 0 24 24"><path d="M4 3h12v18H6a2 2 0 0 1-2-2z"/><path d="M16 8h4v11a2 2 0 0 1-2 2"/><path d="M7 7h6M7 11h6M7 15h4"/></symbol>
   <symbol id="i-max" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></symbol>
+  <symbol id="i-radio" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="13" rx="2"/><path d="M6 8l11-5"/><circle cx="16" cy="14.5" r="3"/><path d="M5.5 12.5h5M5.5 16.5h5"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></symbol>
   <symbol id="i-queue" viewBox="0 0 24 24"><path d="M3 6h12M3 12h12M3 18h8"/><path d="M17 13l5 3-5 3z"/></symbol>
 </svg>
 
@@ -415,7 +455,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <div id="main">
   <div class="top">
     <button class="ibtn" id="btnQueue" aria-label="Warteschlange"><svg class="i"><use href="#i-queue"/></svg></button>
-    <div class="seg"><button data-tab="music">Platten</button><button data-tab="pod">Podcasts</button><button data-tab="zt">Zeitung</button></div>
+    <div class="seg"><button data-tab="music">Platten</button><button data-tab="radio">Radio</button><button data-tab="pod">Podcasts</button><button data-tab="zt">Zeitung</button></div>
     <button class="ibtn" id="btnLib" aria-label="Bibliothek"><svg class="i"><use href="#i-lib"/></svg></button>
   </div>
 
@@ -479,11 +519,38 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 </div>
 
 
+<!-- Radio -->
+<div id="radio" class="hidden">
+  <div class="top">
+    <button class="ibtn" id="rFavBtn" aria-label="Meine Sender"><svg class="i"><use href="#i-heart"/></svg></button>
+    <div class="seg"><button data-tab="music">Platten</button><button data-tab="radio">Radio</button><button data-tab="pod">Podcasts</button><button data-tab="zt">Zeitung</button></div>
+    <button class="ibtn" id="rSearchBtn" aria-label="Sender suchen"><svg class="i"><use href="#i-search"/></svg></button>
+  </div>
+  <div class="rbody">
+    <div class="rnow" id="rNow">
+      <div class="rdial"><div class="rscale"><span>88</span><span>92</span><span>96</span><span>100</span><span>104</span><span>108</span></div><i class="rneedle" id="rNeedle"></i></div>
+      <div class="rrow">
+        <div class="rlogo" id="rLogo"><svg class="i"><use href="#i-radio"/></svg></div>
+        <div class="rinfo"><div class="rtag hidden" id="rLiveTag"><i class="lv"></i>LIVE</div><div class="rname" id="rName">Kein Sender</div><div class="rsong" id="rSong">Wähle unten einen Sender</div></div>
+      </div>
+      <div class="rctl">
+        <button class="ibtn rfav hidden" id="rFav" aria-label="Favorit"><svg class="i"><use href="#i-heart"/></svg></button>
+        <button class="play" id="rPlay" aria-label="Abspielen"><svg class="i"><use href="#i-play" id="rPlayIco"/></svg></button>
+        <button class="bandbtn hidden" id="rBand"><svg class="i"><use href="#i-news"/></svg><span>Infos</span></button>
+      </div>
+    </div>
+    <div class="ncard hidden" id="rcard"></div>
+    <label class="search" style="margin-top:14px"><svg class="i" style="width:20px;height:20px"><use href="#i-search"/></svg>
+      <input id="rQ" type="search" placeholder="Sender suchen: Name, Stadt, Stil" autocomplete="off"></label>
+    <div class="chips" id="rChips" style="margin-top:10px"></div>
+    <div id="rList"></div>
+  </div>
+</div>
 <!-- Podcasts -->
 <div id="pod" class="hidden">
   <div class="top">
     <button class="ibtn" id="pcListBtn" aria-label="Meine Liste"><svg class="i"><use href="#i-queue"/></svg></button>
-    <div class="seg"><button data-tab="music">Platten</button><button data-tab="pod">Podcasts</button><button data-tab="zt">Zeitung</button></div>
+    <div class="seg"><button data-tab="music">Platten</button><button data-tab="radio">Radio</button><button data-tab="pod">Podcasts</button><button data-tab="zt">Zeitung</button></div>
     <button class="ibtn" id="pcAddBtn" aria-label="Podcast hinzufügen"><svg class="i"><use href="#i-plus"/></svg></button>
   </div>
   <label class="search psearch"><svg class="i" style="width:20px;height:20px"><use href="#i-search"/></svg>
@@ -502,7 +569,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <div id="zt" class="hidden">
   <div class="top">
     <button class="ibtn" id="ztFoldBtn" aria-label="Zeitungsordner"><svg class="i"><use href="#i-folder"/></svg></button>
-    <div class="seg"><button data-tab="music">Platten</button><button data-tab="pod">Podcasts</button><button data-tab="zt">Zeitung</button></div>
+    <div class="seg"><button data-tab="music">Platten</button><button data-tab="radio">Radio</button><button data-tab="pod">Podcasts</button><button data-tab="zt">Zeitung</button></div>
     <button class="ibtn" id="ztScanBtn" aria-label="Neu einlesen"><svg class="i"><use href="#i-refresh"/></svg></button>
   </div>
   <label class="search psearch"><svg class="i" style="width:20px;height:20px"><use href="#i-search"/></svg>
@@ -593,7 +660,7 @@ function desktopPlugin(){
   }
   au.addEventListener('ended',()=>{if(repeat===1){au.currentTime=0;au.play();}else next(true);});
   ['play','pause','loadedmetadata','seeked','ratechange','durationchange'].forEach(ev=>au.addEventListener(ev,send));
-  au.addEventListener('error',()=>{toast('Datei konnte nicht abgespielt werden');});
+  au.addEventListener('error',()=>{toast(String(cur()&&cur().key||'').startsWith('r:')?'Sender lässt sich nicht abspielen':'Datei konnte nicht abgespielt werden');});
   if('mediaSession' in navigator){const ms=navigator.mediaSession;
     ms.setActionHandler('play',()=>au.play());ms.setActionHandler('pause',()=>au.pause());
     ms.setActionHandler('nexttrack',()=>next(false));ms.setActionHandler('previoustrack',()=>api.control({action:'prev'}));
@@ -737,14 +804,14 @@ async function playList(list,index=0,shuffle=null){
 }
 async function ctl(action,extra){try{onState(await Music.control({action,...extra}));}catch(e){}}
 
-function curTrack(){if(String(S.id||'').startsWith('p:'))return null;return byId.get(+S.id)||byId.get(queue[S.index])||null;}
+function curTrack(){if(/^[pr]:/.test(String(S.id||'')))return null;return byId.get(+S.id)||byId.get(queue[S.index])||null;}
 
 function onState(s){
   if(!s||s.ready===false)return;
   s={...s};
   if(!s.count){delete s.index;s.id='';}   // Dienst hat nichts geladen: zuletzt aufgelegte Platte nur anzeigen
   Object.assign(S,s);lastPosAt=Date.now();
-  if(s.index!=null&&!String(s.id||'').startsWith('p:')) store.set('qi',s.index);
+  if(s.index!=null&&!/^[pr]:/.test(String(s.id||''))) store.set('qi',s.index);
   render();
 }
 
@@ -762,6 +829,7 @@ function render(){
   setDeck(t?t.albumId:null);
   updateBandBtn(t);
   if(window.pcRender)pcRender();
+  if(window.rRender)rRender();
   const mini=$('#mini');
   mini.classList.toggle('show',!!t&&$('#lib').classList.contains('open'));
   mini.classList.toggle('playing',playing);
@@ -1239,28 +1307,30 @@ let bandFor='';
 function bandOf(t){return t?t.artist:'';}
 function markSeen(){}
 /* Aktuelles zur aufgelegten Band erscheint von selbst – nur Meldungen der letzten 7 Tage, nur bei aktiven Bands */
-let newsShown=[];
-async function updateBandBtn(t){
-  const name=bandOf(t);
-  if(name===bandFor)return;
-  bandFor=name;$('#ncard').classList.add('hidden');
+/* Die Karte wird vom Plattenspieler (#ncard) und vom Radio (#rcard) genutzt */
+const newsCtx={};
+async function showNewsCard(sel,name){
+  const ctx=newsCtx[sel]||(newsCtx[sel]={name:null,list:[]});
+  if(name===ctx.name)return;
+  ctx.name=name;const c=$(sel);c.classList.add('hidden');
   if(!name)return;
-  await sleep(1500);if(bandFor!==name)return;
-  try{const d=await bandInfo(name);if(!d.found||d.ended||bandFor!==name)return;
+  await sleep(1500);if(ctx.name!==name)return;
+  try{const d=await bandInfo(name);if(!d.found||d.ended||ctx.name!==name)return;
     let n=(await bandNews(d.name,d.type!=='Person')).filter(x=>Date.now()-x.date<7*864e5);
     if(hidePw){const inf=await Promise.all(n.slice(0,6).map(articleInfo));n=n.slice(0,6).filter((x,i)=>inf[i].pw!==true);}
-    if(bandFor!==name||!n.length)return;
-    newsShown=n;
-    const c=$('#ncard');
+    if(ctx.name!==name||!n.length)return;
+    ctx.list=n;
     c.innerHTML=`<div class="nh"><i class="lv"></i>Aktuell: ${esc(d.name)}<button class="mo" data-more>${n.length>2?'alle '+n.length+' ›':'mehr ›'}</button></div>`+
       n.slice(0,2).map(newsRow).join('');
     c.classList.remove('hidden');checkRows(c,n);
   }catch(e){}
 }
-$('#ncard').onclick=e=>{e.preventDefault();const a=e.target.closest('[data-n]');if(a){openArticle(newsShown[+a.dataset.n]);return;}openBand(bandFor);};
+function wireNewsCard(sel){$(sel).onclick=e=>{e.preventDefault();const ctx=newsCtx[sel];if(!ctx||!ctx.name)return;const a=e.target.closest('[data-n]');if(a){openArticle(ctx.list[+a.dataset.n]);return;}openBand(ctx.name);};}
+function updateBandBtn(t){bandFor=bandOf(t);showNewsCard('#ncard',bandFor);}
+wireNewsCard('#ncard');
 $('#tArtist').onclick=()=>{if(bandFor)openBand(bandFor);};
 /* Beim Zurückkehren in die App neu nachsehen (News sind 3 Std. zwischengespeichert) */
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&bandFor){const b=bandFor;bandFor='';updateBandBtn(curTrack());}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)return;for(const sel in newsCtx){const n=newsCtx[sel].name;newsCtx[sel].name=null;if(n)showNewsCard(sel,n);}});
 
 /* Vorführmodus im Browser */
 function demoBand(name){const ended=/Polarlicht|Ensemble/.test(name);
@@ -2803,14 +2873,154 @@ function addParas(paras, b, body) {
 function lastText(p) { return p.runs.length ? p.runs[p.runs.length - 1].t.trim() : ''; }
 
 
+/* ===================== RADIO =====================
+   Sender aus dem freien Verzeichnis radio-browser.info, Favoriten, zuletzt gehört.
+   Der laufende Titel (vom Sender mitgeschickt) liefert die Band für News und Infos. */
+const RB_HOSTS=['de1.api.radio-browser.info','de2.api.radio-browser.info','fi1.api.radio-browser.info','nl1.api.radio-browser.info','at1.api.radio-browser.info'];
+let rbHost=store.get('rbhost',RB_HOSTS[0]);
+let rFav=store.get('rfav',[]),rRecent=store.get('rrecent',[]),rChip=store.get('rchip',null);
+const rStations=new Map();
+[...rFav,...rRecent].forEach(x=>rStations.set(x.id,x));
+async function rb(path){
+  for(const h of [rbHost,...RB_HOSTS.filter(x=>x!==rbHost)]){
+    try{const r=await fetch('https://'+h+'/json/'+path,{headers:{'User-Agent':UA}});
+      if(r.ok){if(h!==rbHost){rbHost=h;store.set('rbhost',h);}return r.json();}}catch(e){}
+  }
+  throw new Error('Radio-Verzeichnis nicht erreichbar');
+}
+const normSt=x=>({id:x.stationuuid,name:(x.name||'').trim(),url:x.url_resolved||x.url,logo:x.favicon||'',
+  tags:(x.tags||'').split(',').map(t=>t.trim()).filter(Boolean).slice(0,3).join(', '),cc:x.countrycode||'',codec:x.codec||'',br:x.bitrate||0,hls:!!x.hls});
+async function rbSearch(params){
+  if(!NET)return demoStations(params);
+  const q=new URLSearchParams({hidebroken:'true',order:'clickcount',reverse:'true',limit:'60',...params});
+  const l=(await rb('stations/search?'+q)).map(normSt).filter(x=>x.url&&x.name);
+  l.forEach(x=>rStations.set(x.id,x));return l;
+}
+const R_CHIPS=[['fav','♥ Meine'],['de','Beliebt',{countrycode:'DE'}],['rock','Rock',{tag:'rock',countrycode:'DE'}],['pop','Pop',{tag:'pop',countrycode:'DE'}],
+  ['metal','Metal',{tag:'metal'}],['oldies','Oldies',{tag:'oldies',countrycode:'DE'}],['80s','80er',{tag:'80s'}],['jazz','Jazz',{tag:'jazz'}],
+  ['klassik','Klassik',{tag:'classical',countrycode:'DE'}],['news','Nachrichten',{tag:'news',countrycode:'DE'}],['electro','Electro',{tag:'electronic'}],['schlager','Schlager',{tag:'schlager'}]];
+if(!rChip)rChip=rFav.length?'fav':'de';
+
+function curStation(){const id=String(S.id||'');return id.startsWith('r:')?rStations.get(id.slice(2))||null:null;}
+async function playStation(st){
+  rStations.set(st.id,st);
+  rRecent=[st,...rRecent.filter(x=>x.id!==st.id)].slice(0,12);store.set('rrecent',rRecent);
+  rLive='';rDeskT=0;
+  try{onState(await Music.play({tracks:[{key:'r:'+st.id,uri:st.url,title:st.name,artist:st.name,album:'Radio',art:st.logo}],index:0,shuffle:false,speed:1}));}
+  catch(e){toast('Sender lässt sich nicht abspielen');}
+  if(NET)rb('url/'+st.id).catch(()=>{});   // zählt beim Verzeichnis als "gehört"
+  rRenderList();
+}
+const isFav=id=>rFav.some(x=>x.id===id);
+function toggleFav(st){if(isFav(st.id))rFav=rFav.filter(x=>x.id!==st.id);else rFav=[...rFav,st];store.set('rfav',rFav);toast(isFav(st.id)?'Zu „Meine Sender“ hinzugefügt':'Aus „Meine Sender“ entfernt');rRenderList();rRender();}
+
+/* Laufender Titel: "Interpret - Titel" (Handy: vom Player, Linux: selbst aus dem Stream gelesen) */
+let rLive='',rDeskT=0;
+function liveText(){const st=curStation();if(!st)return '';
+  if(DESKTOP)return rLive;
+  if(!NET)return S.playing?'Die Gipfelstürmer - Morgenlicht':'';
+  const m=(S.meta||'').trim();return m&&m!==st.name&&m!==S.station?m:'';}
+function parseLive(t,st){
+  if(!t||t.length>140||/https?:|www\.|werbung|^\s*-\s*$/i.test(t))return null;
+  const i=t.indexOf(' - ');if(i<1)return{artist:'',title:t};
+  const artist=t.slice(0,i).trim(),title=t.slice(i+3).trim();
+  if(!artist||(st&&norm(artist)===norm(st.name)))return{artist:'',title:t};
+  return{artist,title};
+}
+setInterval(async()=>{
+  if(!DESKTOP)return;const st=curStation();
+  if(!st||!S.playing||Date.now()-rDeskT<15000)return;
+  rDeskT=Date.now();
+  try{const t=await window.desktop.icy(st.url);if(curStation()===st&&t!==rLive){rLive=t;rRender();}}catch(e){}
+},3000);
+
+/* Skala wie beim alten Radio: jeder Sender hat seinen festen Platz */
+const dialPos=id=>8+(parseInt(hash(id||'x'),36)%840)/10;
+function rRender(){
+  const st=curStation(),box=$('#rNow');if(!box)return;
+  const playing=!!(st&&S.playing),buf=!!(st&&S.buffering);
+  box.classList.toggle('on',playing);
+  $('#rNeedle').style.left=(st?dialPos(st.id):4)+'%';
+  const lg=$('#rLogo');lg.querySelector('img')?.remove();
+  if(st&&st.logo){const im=document.createElement('img');im.src=st.logo;im.onerror=()=>im.remove();lg.appendChild(im);}
+  $('#rName').textContent=st?st.name:'Kein Sender';
+  const lv=parseLive(liveText(),st);
+  $('#rSong').textContent=st?(buf?'Verbinde…':lv?(lv.artist?lv.artist+' – '+lv.title:lv.title):(playing?'Live':'Pausiert')):'Wähle unten einen Sender';
+  $('#rLiveTag').classList.toggle('hidden',!playing);
+  $('#rPlayIco').setAttribute('href',playing?'#i-stop':'#i-play');
+  const fv=$('#rFav');fv.classList.toggle('hidden',!st);fv.classList.toggle('on',!!st&&isFav(st.id));
+  const artist=lv&&lv.artist&&playing?lv.artist:'';
+  const bb=$('#rBand');bb.classList.toggle('hidden',!artist);bb.querySelector('span').textContent='Infos zu '+artist;bb.dataset.band=artist;
+  showNewsCard('#rcard',artist);
+  document.querySelectorAll('#rList .res').forEach(r=>r.classList.toggle('cur',!!st&&r.dataset.st===st.id));
+}
+window.rRender=rRender;
+function stRow(x){
+  return `<div class="res st" data-st="${esc(x.id)}"><div class="th rl"><svg class="i"><use href="#i-radio"/></svg>${x.logo?`<img src="${esc(x.logo)}" onerror="this.remove()" loading="lazy">`:''}</div>
+    <div class="tx"><div class="n">${esc(x.name)}</div><div class="s">${esc([x.tags,x.cc,x.br?x.br+' kbit/s':''].filter(Boolean).join(' · '))}</div></div>
+    <button class="add${isFav(x.id)?' on':''}" data-fav="${esc(x.id)}" aria-label="Favorit"><svg class="i"><use href="#i-heart"/></svg></button></div>`;
+}
+let rListData=[],rReq=0;
+async function rLoad(){
+  const box=$('#rList');const my=++rReq;
+  const q=$('#rQ').value.trim();
+  document.querySelectorAll('#rChips button').forEach(b=>b.classList.toggle('on',!q&&b.dataset.c===rChip));
+  if(!q&&rChip==='fav'){rListData=null;rRenderList();return;}
+  box.innerHTML='<div class="spin" style="margin:24px auto"></div>';
+  try{const c=R_CHIPS.find(x=>x[0]===rChip);
+    const l=q?await rbSearch({name:q}):await rbSearch(c[2]);
+    if(my!==rReq)return;rListData=l;rRenderList();}
+  catch(e){if(my===rReq)box.innerHTML='<div class="hint">Radio-Verzeichnis gerade nicht erreichbar.</div>';}
+}
+function rRenderList(){
+  const box=$('#rList');if(!box)return;
+  if(rListData===null||(!$('#rQ').value.trim()&&rChip==='fav')){
+    box.innerHTML=(rFav.length?`<div class="sec">Meine Sender</div>${rFav.map(stRow).join('')}`:`<div class="hint" style="padding:22px 10px">Noch keine Lieblingssender.<br>Tippe bei einem Sender auf ♥, dann landet er hier.</div>`)+
+      (rRecent.some(x=>!isFav(x.id))?`<div class="sec">Zuletzt gehört</div>${rRecent.filter(x=>!isFav(x.id)).slice(0,8).map(stRow).join('')}`:'');
+  }else box.innerHTML=rListData.length?rListData.map(stRow).join(''):'<div class="hint">Keine Sender gefunden.</div>';
+  rRender();
+}
+function rInit(){
+  $('#rChips').innerHTML=R_CHIPS.map(c=>`<button data-c="${c[0]}">${esc(c[1])}</button>`).join('');
+  $('#rChips').onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;rChip=b.dataset.c;store.set('rchip',rChip);$('#rQ').value='';rLoad();};
+  let t;$('#rQ').oninput=()=>{clearTimeout(t);t=setTimeout(rLoad,500);};
+  $('#rList').onclick=e=>{
+    const f=e.target.closest('[data-fav]');
+    if(f){const x=rStations.get(f.dataset.fav);if(x)toggleFav(x);return;}
+    const r=e.target.closest('[data-st]');if(!r)return;
+    const x=rStations.get(r.dataset.st);if(!x)return;
+    const c=curStation();
+    if(c&&c.id===x.id&&S.playing)ctl('pause');else playStation(x);
+  };
+  $('#rPlay').onclick=()=>{const c=curStation();
+    if(c&&S.playing)ctl('pause');
+    else if(c)playStation(c);          // Live: neu verbinden statt alten Puffer weiterspielen
+    else if(rRecent[0])playStation(rRecent[0]);
+    else toast('Wähle unten einen Sender');};
+  $('#rFav').onclick=()=>{const c=curStation();if(c)toggleFav(c);};
+  $('#rBand').onclick=()=>{const b=$('#rBand').dataset.band;if(b)openBand(b);};
+  $('#rFavBtn').onclick=()=>{rChip='fav';store.set('rchip',rChip);$('#rQ').value='';rLoad();};
+  $('#rSearchBtn').onclick=()=>{$('#rQ').focus();};
+  wireNewsCard('#rcard');
+  rLoad();
+}
+
+/* Vorführmodus im Browser */
+function demoStations(p){
+  const n=[['Bayern Rockt','rock, classic rock','#c33'],['Alpenwelle','pop, schlager','#2a8'],['Metal Hammer FM','metal','#555'],['Jazz Lounge','jazz','#a72'],['Klassik Plus','classical','#36a'],['Nachrichten 24','news','#777'],['80er Hits','80s, pop','#a3c']];
+  return Promise.resolve(n.filter((x,i)=>!p.tag||x[1].includes(p.tag==='classical'?'classical':p.tag)||i<2).map((x,i)=>{const st={id:'demo'+i,name:x[0],url:'https://example.org/'+i,logo:'data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="${x[2]}"/><text x="50" y="62" font-family="sans-serif" font-size="34" font-weight="800" fill="#fff" text-anchor="middle">${x[0].split(' ').map(w=>w[0]).join('')}</text></svg>`),tags:x[1],cc:'DE',codec:'MP3',br:128,hls:false};rStations.set(st.id,st);return st;}));
+}
+
 /* Reiter umschalten */
 let curTab=store.get('tab2','music');
 function setTab(t){curTab=t;store.set('tab2',t);
-  $('#main').classList.toggle('hidden',t!=='music');$('#pod').classList.toggle('hidden',t!=='pod');$('#zt').classList.toggle('hidden',t!=='zt');
+  $('#main').classList.toggle('hidden',t!=='music');$('#radio').classList.toggle('hidden',t!=='radio');$('#pod').classList.toggle('hidden',t!=='pod');$('#zt').classList.toggle('hidden',t!=='zt');
   document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
   if(t==='pod'){pcRenderHome();pcMini();refreshAll(false);}
-  if(t==='zt'){ztRenderHome();ztScan(false);}}
+  if(t==='zt'){ztRenderHome();ztScan(false);}
+  if(t==='radio')rRender();}
 document.querySelectorAll('.seg').forEach(s=>s.onclick=e=>{const b=e.target.closest('[data-tab]');if(b)setTab(b.dataset.tab);});
+rInit();
 setTab(curTab);
 dlSync();
 setInterval(()=>refreshAll(false),30*6e4);
