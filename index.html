@@ -439,7 +439,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .cv-recs-in{position:absolute;inset:0;transform:translateY(62%);transition:transform .9s cubic-bezier(.2,.85,.25,1) .45s}
 .crateov.show .cv-recs-in{transform:none}
 .cv-rec{position:absolute;left:calc(50% - var(--R) / 2);bottom:calc(var(--R) * .04);width:var(--R);height:var(--R);transform-origin:50% 100%;
-  border-radius:3px;background:#2c2621 center/cover no-repeat;backface-visibility:hidden;transform:translateZ(0);
+  border-radius:3px;background:#2c2621 center/cover no-repeat;transform:translateZ(0);
   box-shadow:0 -1px 0 #ffffff22,0 -6px 18px #0009}
 /* Folie wie im Plattenladen: Glanzstreifen (wandern beim Kippen mit), Knitter, Falte an der Kante */
 .cv-rec::after{content:"";position:absolute;inset:0;border-radius:3px;pointer-events:none;
@@ -462,6 +462,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .cv-front::before{content:"";position:absolute;left:0;right:0;top:-6px;height:6px;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#c48e57,#9a6838)}
 .cv-front .hd{position:absolute;left:37%;right:37%;top:14%;height:22%;border-radius:20px;background:#1e120a;box-shadow:inset 0 3px 5px #000,0 1px 0 #ffffff35}
 .cv-front .brand{position:absolute;left:0;right:0;bottom:13%;text-align:center;font-weight:900;letter-spacing:.3em;font-size:calc(var(--R) * .048);color:#3a230f;text-shadow:0 1px 0 #ffffff30}
+.crateov.picking .cv-recs,.crateov.picking .cv-acts,.crateov.picking .cv-hint,.crateov.picking .cv-info{opacity:0!important;transition:opacity .35s!important}
+.flyer{position:fixed;z-index:50;pointer-events:none}
+.fl-sleeve{position:absolute;inset:0;border-radius:3px;background:#2c2621 center/cover no-repeat;box-shadow:0 14px 30px #000b,inset 0 0 0 1px #ffffff2a}
+.fl-sleeve::after{content:"";position:absolute;inset:0;border-radius:3px;background:linear-gradient(115deg,#fff0 30%,#ffffff3a 36%,#fff0 42%),linear-gradient(180deg,#ffffff18,#ffffff06 40%,#00000014)}
+.fl-disc{position:absolute;left:2%;top:2%;width:96%;height:96%;border-radius:50%;
+  background:radial-gradient(circle,#0000 0 29.5%,#000 29.5% 30.5%,#0000 30.5%),repeating-radial-gradient(circle,#161616 0 1px,#0c0c0c 1px 2.2px,#1b1b1b 2.2px 3px),#0d0d0d;
+  box-shadow:0 0 0 1px #000,0 10px 24px #000c}
+.fl-disc .fl-lbl{position:absolute;left:21%;top:21%;width:58%;height:58%;border-radius:50%;background:#3b3b3b center/cover no-repeat;box-shadow:0 0 0 2px #0008}
+.fl-disc .fl-hole{position:absolute;left:48.6%;top:48.6%;width:2.8%;height:2.8%;border-radius:50%;background:radial-gradient(#ddd,#888)}
 .cv-acts{display:flex;gap:10px;width:100%;max-width:440px;margin-top:10px;opacity:0;transform:translateY(20px);transition:.5s .9s}
 .crateov.show .cv-acts{opacity:1;transform:none}
 .cv-acts button{flex:1;height:48px;border-radius:14px;background:var(--card);font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
@@ -917,9 +926,19 @@ function render(){
 }
 
 /* Platte wechseln: alte fliegt nach links weg, neue kommt von rechts und legt sich auf den Teller */
+let deckInstant=false;
 function setDeck(albumId){
   if(albumId===deckAlbum)return;
   const rec=$('#record'),old=deckAlbum;deckAlbum=albumId;
+  if(deckInstant&&albumId!=null){                 // Platte kam schon per Animation aus der Kiste
+    deckInstant=false;
+    const a=albumById.get(albumId);
+    $('#lblTxt').textContent='';$('#lbl').style.backgroundImage='';
+    art(albumId,700).then(u=>{if(deckAlbum!==albumId)return;if(u)$('#lbl').style.backgroundImage=`url("${u}")`;else $('#lblTxt').textContent=a?a.name:'';});
+    rec.style.transition='none';rec.className='record';$('#emptyTxt').classList.add('hidden');void rec.offsetWidth;
+    requestAnimationFrame(()=>{rec.style.transition='';});
+    swapping=false;return;
+  }
   const put=()=>{
     if(albumId==null){rec.className='record off';$('#emptyTxt').classList.remove('hidden');return;}
     const a=albumById.get(albumId);
@@ -3125,7 +3144,7 @@ function crateDraw(){
   const p=crate.pos,R=crate.R;
   for(let i=0;i<crate.els.length;i++){
     const el=crate.els[i];const d=i-p;
-    if(d<-1.2||d>7){if(el.style.display!=='none')el.style.display='none';continue;}   // nur wenige Platten gleichzeitig zeichnen
+    if(d<-1.02||d>7){if(el.style.display!=='none')el.style.display='none';continue;}   // nur wenige Platten gleichzeitig zeichnen
     if(el.style.display==='none')el.style.display='';
     let tf,z,shade;
     const L=R*0.17;                              // die vorderste Platte ist etwas herausgezogen
@@ -3136,12 +3155,13 @@ function crateDraw(){
       z=1000-Math.round(d*20);shade=Math.min(0.62,d*0.12);
       op=d<5.5?1:Math.max(0,1-(d-5.5)/1.5);       // hinten sanft einblenden statt plötzlich auftauchen
     }else{                                      // nach vorne gekippt (wie beim Durchblättern mit dem Finger)
-      const t=-d,k=Math.min(t,1),ang=10-k*88-Math.max(0,t-1)*4;
-      tf=`perspective(${R*3}px) translate3d(0,${(-L*(1-k)+Math.max(0,t-1)*R*0.03).toFixed(1)}px,${(t*R*0.04).toFixed(1)}px) rotateX(${ang.toFixed(2)}deg)`;
-      z=1000+Math.round(t*20);shade=Math.min(0.5,k*0.4);
-      op=t<0.6?1:Math.max(0,1-(t-0.6)/0.5);
+      const t=-d,k=Math.min(t,1),e=k*k*(3-2*k);
+      const ang=10-e*62;                          // kippt nach vorne bis ca. 52°
+      const y=-L*(1-e)+e*R*0.55;                  // und sinkt hinter das vordere Brett
+      tf=`perspective(${R*3}px) translate3d(0,${y.toFixed(1)}px,${(e*R*0.06).toFixed(1)}px) rotateX(${ang.toFixed(2)}deg)`;
+      z=1000+Math.round(t*20);shade=Math.min(0.45,e*0.45);
     }
-    el.style.opacity=op.toFixed(3);
+    if(el._op!==op){el.style.opacity=op<1?op.toFixed(3):'';el._op=op;}
     if(d<2.5)el.firstChild.style.transform=`translateX(${(d>=0?d*9-5:d*30-5).toFixed(1)}%)`;   // Folienglanz wandert beim Kippen
     el.style.transform=tf;el.style.zIndex=z;el.lastChild.style.opacity=shade.toFixed(3);
   }
@@ -3177,10 +3197,43 @@ function crateOpen(){
   ov.classList.add('show');crateSize();crateFill();pushNav('crate');
 }
 function crateClose(){$('#crateOv').classList.remove('show');crate.open=false;crate.loadId++;nav=nav.filter(x=>x!=='crate');}
-function cratePlay(){const i=Math.round(crate.pos),c=crate.list[i];if(!c)return;crateClose();setTimeout(()=>playList(c.a.tracks,0,false),250);}
+/* Auflegen: Hülle kommt aus der Kiste, die Platte gleitet heraus und fliegt auf den Plattenspieler */
+async function cratePlay(){
+  const i=Math.round(crate.pos),c=crate.list[i];if(!c||crate.anim)return;
+  crate.anim=true;crate.vel=0;
+  art(c.a.id,700);                                  // großes Cover fürs Etikett schon mal laden
+  const el=crate.els[i],r0=el.getBoundingClientRect(),S=crate.R;
+  const fx=r0.left+(r0.width-S)/2,fy=r0.bottom-S;
+  const fly=document.createElement('div');fly.className='flyer';
+  fly.style.cssText=`left:${fx}px;top:${fy}px;width:${S}px;height:${S}px`;
+  fly.innerHTML=`<div class="fl-disc"><div class="fl-lbl" style="background-image:url('${c.u}')"></div><i class="fl-hole"></i></div><div class="fl-sleeve" style="background-image:url('${c.u}')"></div>`;
+  document.body.appendChild(fly);el.style.visibility='hidden';
+  $('#crateOv').classList.add('picking');
+  const ease='cubic-bezier(.3,.7,.2,1)',K=0.72,DX=-0.2*S,DY=-0.3*S;
+  // 1. Hülle aus der Kiste ziehen (etwas kleiner und nach links, damit die Platte rechts Platz hat)
+  await fly.animate([{transform:'translate(0,0) scale(1)'},{transform:`translate(${DX}px,${DY}px) scale(${K})`}],{duration:600,easing:ease,fill:'forwards'}).finished;
+  // 2. Platte gleitet seitlich aus der Hülle
+  const disc=fly.querySelector('.fl-disc'),sl=fly.querySelector('.fl-sleeve');
+  await disc.animate([{transform:'translateX(0) rotate(0deg)'},{transform:`translateX(${S*0.66}px) rotate(50deg)`}],{duration:800,easing:'cubic-bezier(.45,0,.25,1)',fill:'forwards'}).finished;
+  // 3. Kiste und Hülle verschwinden, Platte fliegt auf den Teller
+  crateClose();
+  sl.animate([{transform:'translateY(0)',opacity:1},{transform:`translateY(${S*0.25}px)`,opacity:0}],{duration:350,easing:'ease-in',fill:'forwards'});
+  const dk=$('#deck').getBoundingClientRect();
+  const tw=dk.width*0.73,tcx=dk.left+dk.width*0.055+tw/2,tcy=dk.top+dk.height*0.125+tw/2;
+  const fcx=fx+S/2+DX,fcy=fy+S/2+DY;                 // Mitte der (verschobenen, verkleinerten) Hülle
+  const tx=(tcx-fcx)/K,ty=(tcy-fcy)/K,sc=tw/(S*0.96*K);
+  await disc.animate([{transform:`translateX(${S*0.66}px) rotate(50deg) scale(1)`},
+    {transform:`translate(${tx.toFixed(1)}px,${(ty-tw*0.1/K).toFixed(1)}px) rotate(260deg) scale(${(sc*1.05).toFixed(3)})`,offset:0.82},
+    {transform:`translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) rotate(320deg) scale(${sc.toFixed(3)})`}],
+    {duration:1050,easing:'cubic-bezier(.35,.1,.25,1)',fill:'forwards'}).finished;
+  // 4. Landen: echte Platte ohne eigene Einflug-Animation auflegen, dann abspielen
+  deckInstant=true;
+  playList(c.a.tracks,0,false);
+  setTimeout(()=>{fly.remove();$('#crateOv').classList.remove('picking');crate.anim=false;},80);
+}
 (function crateWire(){
   const st=$('#cvStage');
-  st.addEventListener('pointerdown',e=>{if(!crate.list.length)return;st.setPointerCapture(e.pointerId);
+  st.addEventListener('pointerdown',e=>{if(!crate.list.length||crate.anim)return;st.setPointerCapture(e.pointerId);
     crate.drag={x:e.clientX,y:e.clientY,p0:crate.pos,t0:performance.now(),lastY:e.clientY,lastX:e.clientX,lastT:performance.now(),moved:0};crate.vel=0;crateKick();});
   st.addEventListener('pointermove',e=>{const d=crate.drag;if(!d)return;
     const dx=e.clientX-d.x,dy=e.clientY-d.y;d.moved=Math.max(d.moved,Math.abs(dx)+Math.abs(dy));
