@@ -207,8 +207,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   transform:rotate(var(--r,-6deg));box-shadow:0 6px 14px #000b,0 1px 2px #0007;
   -webkit-mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/8px 51% repeat-x,conic-gradient(from 135deg at top,#0000,#000 1deg 89deg,#0000 90deg) top/8px 51% repeat-x;
   mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/8px 51% repeat-x,conic-gradient(from 135deg at top,#0000,#000 1deg 89deg,#0000 90deg) top/8px 51% repeat-x}
+.bphoto.top{left:51%;top:-5%;bottom:auto;width:22%}
+.bphoto.right{left:auto;right:-5%;top:38%;bottom:auto;width:24%}
 .bphoto .im{aspect-ratio:1;background:#3a3028 center/cover no-repeat;filter:sepia(.45) saturate(.8) contrast(.95) brightness(1.05)}
-.bphoto.drop{animation:phdrop .7s cubic-bezier(.2,.8,.25,1)}
+.bphoto.drop{animation:phdrop .7s cubic-bezier(.2,.8,.25,1) backwards}
 @keyframes phdrop{from{opacity:0;transform:translate(-14%,12%) rotate(calc(var(--r,-6deg) - 14deg)) scale(1.3)}}
 .bigph{width:100%;aspect-ratio:4/3;border-radius:6px;background:#2c2621 center/contain no-repeat;margin-top:4px}
 .phcap{margin-top:10px;color:#ddd3c8;line-height:1.45;user-select:text;-webkit-user-select:text}
@@ -566,6 +568,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <div class="deckwrap">
     <div class="deck" id="deck">
       <div class="bphoto hidden" id="bphoto"><div class="im"></div></div>
+      <div class="bphoto top hidden" id="bphoto2"><div class="im"></div></div>
+      <div class="bphoto right hidden" id="bphoto3"><div class="im"></div></div>
       <div class="platter"><div class="empty" id="emptyTxt">Keine Platte aufgelegt</div></div>
       <div class="record off" id="record">
         <div class="disc" id="disc"><div class="lbl" id="lbl"><div class="txt" id="lblTxt"></div></div><div class="hole"></div></div>
@@ -3428,57 +3432,87 @@ async function commonsFiles(params){
   return Object.values((r.query&&r.query.pages)||{});
 }
 async function bandPhotos(name){
-  const key='bp_'+norm(name),c=store.get(key,null);
+  const key='bp2_'+norm(name),c=store.get(key,null);
   if(c&&Date.now()-c.t<20*864e5)return c.d;
   if(!NET)return demoPhotos(name);
   const d=await bandInfo(name);
-  let pages=[];
+  const list=[],seen=new Set();
+  const bad=/logo|signature|signatur|autogramm|unterschrift|poster|ticket|map|karte|cover|flag|wappen|grave|grab/i;
+  const addCommons=(pages,cap)=>{for(const pg of pages){
+    const ii=pg.imageinfo&&pg.imageinfo[0];if(!ii||seen.has(pg.title))continue;seen.add(pg.title);
+    if(!/image\/(jpeg|png)/.test(ii.mime||'')||ii.width<500||ii.height<350||bad.test(pg.title))continue;
+    const m=ii.extmetadata||{},g=k=>m[k]&&m[k].value?htmlText(String(m[k].value)):'';
+    list.push({u:ii.thumburl||ii.url,src:ii.descriptionurl,by:g('Artist').slice(0,80),lic:g('LicenseShortName'),year:(g('DateTimeOriginal').match(/(19|20)\d\d/)||[''])[0],
+      desc:(cap?cap+' – ':'')+g('ImageDescription').slice(0,200),from:'Wikimedia Commons'});}};
+  const titlesBatch=async files=>{const out=[];for(let i=0;i<files.length;i+=40)out.push(...await commonsFiles('titles='+encodeURIComponent(files.slice(i,i+40).map(f=>'File:'+f).join('|'))));return out;};
   try{
     if(d.found&&d.qid){
-      const claim=async p=>{const r=await getJSON(`https://www.wikidata.org/w/api.php?action=wbgetclaims&format=json&origin=*&entity=${d.qid}&property=${p}`);
-        const x=((r.claims&&r.claims[p])||[])[0];return x&&x.mainsnak&&x.mainsnak.datavalue&&x.mainsnak.datavalue.value;};
-      const [cat,p18]=await Promise.all([claim('P373'),claim('P18')]);
-      if(p18)pages.push(...await commonsFiles('titles='+encodeURIComponent('File:'+p18)));
-      if(cat){
-        pages.push(...await commonsFiles('generator=categorymembers&gcmtype=file&gcmlimit=40&gcmtitle='+encodeURIComponent('Category:'+cat)));
-        if(pages.length<12){   // oft liegen die Konzertfotos in Unterkategorien
-          const sc=await getJSON('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&list=categorymembers&cmtype=subcat&cmlimit=20&cmtitle='+encodeURIComponent('Category:'+cat));
-          const subs=((sc.query&&sc.query.categorymembers)||[]).map(x=>x.title).sort((a,b)=>/concert|live|konzert|perform|festival/i.test(b)-/concert|live|konzert|perform|festival/i.test(a)).slice(0,4);
-          for(const s of subs)pages.push(...await commonsFiles('generator=categorymembers&gcmtype=file&gcmlimit=15&gcmtitle='+encodeURIComponent(s)));
-        }
+      const claims=async(p)=>{const r=await getJSON(`https://www.wikidata.org/w/api.php?action=wbgetclaims&format=json&origin=*&entity=${d.qid}&property=${p}`);
+        return ((r.claims&&r.claims[p])||[]).map(x=>x.mainsnak&&x.mainsnak.datavalue&&x.mainsnak.datavalue.value).filter(Boolean);};
+      const [cat,p18,members]=await Promise.all([claims('P373'),claims('P18'),claims('P527')]);
+      // 1. Hauptbild und Sammlung der Band
+      if(p18.length)addCommons(await titlesBatch(p18));
+      if(cat[0]){
+        addCommons(await commonsFiles('generator=categorymembers&gcmtype=file&gcmlimit=50&gcmtitle='+encodeURIComponent('Category:'+cat[0])));
+        const sc=await getJSON('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&list=categorymembers&cmtype=subcat&cmlimit=30&cmtitle='+encodeURIComponent('Category:'+cat[0]));
+        const subs=((sc.query&&sc.query.categorymembers)||[]).map(x=>x.title).sort((a,b)=>/concert|live|konzert|perform|festival|tour/i.test(b)-/concert|live|konzert|perform|festival|tour/i.test(a)).slice(0,6);
+        for(const s of subs)addCommons(await commonsFiles('generator=categorymembers&gcmtype=file&gcmlimit=20&gcmtitle='+encodeURIComponent(s)));
+      }
+      // 2. Fotos, auf denen die Band laut Bildbeschreibung zu sehen ist
+      addCommons(await commonsFiles('generator=search&gsrnamespace=6&gsrlimit=30&gsrsearch='+encodeURIComponent('haswbstatement:P180='+d.qid)));
+      // 3. Fotos der Bandmitglieder
+      const mids=members.map(v=>v.id).filter(Boolean).slice(0,10);
+      if(mids.length){
+        const e=await getJSON('https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&origin=*&props=claims|labels&languages=de|en&ids='+mids.join('|'));
+        for(const id of mids){const en=e.entities&&e.entities[id];if(!en)continue;
+          const f=((en.claims&&en.claims.P18)||[]).map(x=>x.mainsnak&&x.mainsnak.datavalue&&x.mainsnak.datavalue.value).filter(Boolean)[0];
+          const lb=(en.labels&&(en.labels.de||en.labels.en)||{}).value||'';
+          if(f)addCommons(await titlesBatch([f]),lb);}
       }
     }
   }catch(e){}
-  const seen=new Set(),list=[];
-  for(const pg of pages){
-    const ii=pg.imageinfo&&pg.imageinfo[0];if(!ii||seen.has(pg.title))continue;seen.add(pg.title);
-    if(!/image\/(jpeg|png)/.test(ii.mime||'')||ii.width<500||ii.height<350)continue;
-    if(/logo|signature|signatur|autogramm|unterschrift|poster|ticket|map|karte|cover/i.test(pg.title))continue;
-    const m=ii.extmetadata||{},g=k=>m[k]&&m[k].value?htmlText(String(m[k].value)):'';
-    list.push({u:ii.thumburl||ii.url,src:ii.descriptionurl,by:g('Artist').slice(0,80),lic:g('LicenseShortName'),year:(g('DateTimeOriginal').match(/(19|20)\d\d/)||[''])[0],desc:g('ImageDescription').slice(0,200)});
-    if(list.length>=40)break;
+  // 4. Openverse (freie Fotos u. a. von Flickr), wenn es noch wenig gibt
+  if(list.length<10){
+    try{const r=await getJSON('https://api.openverse.org/v1/images/?page_size=30&q='+encodeURIComponent('"'+name+'"'));
+      for(const x of r.results||[]){
+        const txt=norm((x.title||'')+' '+(x.tags||[]).map(t=>t.name).join(' '));
+        if(!txt.includes(norm(name))||seen.has(x.id)||bad.test(x.title||''))continue;seen.add(x.id);
+        if(x.width&&x.width<500)continue;
+        list.push({u:x.thumbnail||x.url,src:x.foreign_landing_url||x.url,by:(x.creator||'').slice(0,80),lic:((x.license||'')+' '+(x.license_version||'')).toUpperCase().trim(),year:'',desc:x.title||'',from:x.source?('Openverse / '+x.source):'Openverse'});
+        if(list.length>=60)break;}
+    }catch(e){}
   }
-  if(!list.length&&d.found&&d.wiki&&d.wiki.img)list.push({u:d.wiki.img,src:d.wiki.url,by:'',lic:'Wikipedia',year:'',desc:''});
-  store.set(key,{t:Date.now(),d:list});
-  return list;
+  if(!list.length&&d.found&&d.wiki&&d.wiki.img)list.push({u:d.wiki.img,src:d.wiki.url,by:'',lic:'Wikipedia',year:'',desc:'',from:'Wikipedia'});
+  for(let i=list.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[list[i],list[j]]=[list[j],list[i]];}   // gemischt, damit es abwechslungsreich ist
+  const out=list.slice(0,60);
+  store.set(key,{t:Date.now(),d:out});
+  return out;
 }
+/* Bis zu drei Fotos: unten links, oben, rechts – je nachdem wie viele es gibt */
 let photoList=[],photoIdx=0,photoFor=null;
+const PH_SLOTS=['#bphoto','#bphoto2','#bphoto3'];
 async function photoForAlbum(albumId){
-  const el=$('#bphoto');
   const a=albumId!=null?albumById.get(albumId):null;
   const name=a?(a.artist==='Verschiedene Interpreten'?(a.tracks[0]&&a.tracks[0].artist):a.artist):'';
   photoFor=albumId;
-  if(!name){el.classList.add('hidden');return;}
+  const hideAll=()=>PH_SLOTS.forEach(s=>$(s).classList.add('hidden'));
+  if(!name){hideAll();return;}
   try{
     const list=await bandPhotos(name);if(photoFor!==albumId)return;
-    if(!list.length){el.classList.add('hidden');return;}
-    const cnt=store.get('phi',{}),k=norm(name),i=(cnt[k]||0)%list.length;cnt[k]=(cnt[k]||0)+1;store.set('phi',cnt);  // jedes Mal ein anderes Foto
-    const im=new Image();im.src=list[i].u;await im.decode();if(photoFor!==albumId)return;
-    photoList=list;photoIdx=i;
-    el.querySelector('.im').style.backgroundImage=`url("${list[i].u}")`;
-    el.style.setProperty('--r',(Math.random()*12-8).toFixed(1)+'deg');
-    el.classList.remove('hidden','drop');void el.offsetWidth;el.classList.add('drop');
-  }catch(e){if(photoFor===albumId)el.classList.add('hidden');}
+    if(!list.length){hideAll();return;}
+    const n=Math.min(3,list.length),cnt=store.get('phi',{}),k=norm(name),start=(cnt[k]||0)%list.length;
+    cnt[k]=(cnt[k]||0)+n;store.set('phi',cnt);                    // nächstes Album: die nächsten Fotos
+    const idx=Array.from({length:n},(_,j)=>(start+j)%list.length);
+    await Promise.all(idx.map(i=>{const im=new Image();im.src=list[i].u;return im.decode().catch(()=>{});}));
+    if(photoFor!==albumId)return;
+    photoList=list;
+    PH_SLOTS.forEach((sel,j)=>{const el=$(sel);
+      if(j>=n){el.classList.add('hidden');return;}
+      el.dataset.i=idx[j];el.querySelector('.im').style.backgroundImage=`url("${list[idx[j]].u}")`;
+      const base=[-2,6,-4][j];el.style.setProperty('--r',(base+Math.random()*10-5).toFixed(1)+'deg');
+      el.style.animationDelay=(j*0.18)+'s';
+      el.classList.remove('hidden','drop');void el.offsetWidth;el.classList.add('drop');});
+  }catch(e){if(photoFor===albumId)hideAll();}
 }
 /* Großansicht mit Quellenangabe, darunter die anderen Fotos der Band */
 function openPhoto(){
@@ -3487,15 +3521,15 @@ function openPhoto(){
     const draw=()=>{const p=photoList[photoIdx];
       b.innerHTML=`<div class="bigph" style="background-image:url('${esc(p.u)}')"></div>
         <div class="phcap">${p.desc?`<div>${esc(p.desc)}</div>`:''}<div class="s">Foto: ${esc(p.by||'unbekannt')}${p.year?' · '+p.year:''}${p.lic?' · '+esc(p.lic):''}</div>
-        <a href="#" class="wlink" data-src="${esc(p.src)}">Auf Wikimedia Commons ansehen ›</a></div>
+        <a href="#" class="wlink" data-src="${esc(p.src)}">Zur Bildquelle${p.from?' ('+esc(p.from)+')':''} ›</a></div>
         ${photoList.length>1?`<div class="sec">Weitere Fotos (${photoList.length})</div><div class="phgrid">${photoList.map((x,i)=>`<button data-i="${i}" class="${i===photoIdx?'on':''}" style="background-image:url('${esc(x.u)}')"></button>`).join('')}</div>`:''}`;};
     draw();
     b.onclick=e=>{const s=e.target.closest('[data-src]');if(s){e.preventDefault();openUrl(s.dataset.src);return;}
       const t=e.target.closest('[data-i]');if(t){photoIdx=+t.dataset.i;draw();b.scrollTop=0;
-        $('#bphoto .im').style.backgroundImage=`url("${photoList[photoIdx].u}")`;}};
+        }};
   });
 }
-$('#bphoto').onclick=e=>{e.stopPropagation();openPhoto();};
+PH_SLOTS.forEach(sel=>{$(sel).onclick=e=>{e.stopPropagation();photoIdx=+($(sel).dataset.i||0);openPhoto();};});
 function demoPhotos(name){
   const mk=(c1,c2)=>'data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="#140a14"/></linearGradient><linearGradient id="l" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c2}" stop-opacity=".9"/><stop offset="1" stop-color="${c2}" stop-opacity="0"/></linearGradient></defs><rect width="400" height="300" fill="url(#b)"/><path d="M90 0 L40 230 L160 230Z" fill="url(#l)"/><path d="M300 0 L230 230 L360 230Z" fill="url(#l)"/><g fill="#0b0508"><circle cx="120" cy="170" r="14"/><rect x="108" y="182" width="24" height="40" rx="6"/><circle cx="200" cy="160" r="15"/><rect x="186" y="173" width="28" height="48" rx="7"/><circle cx="280" cy="168" r="14"/><rect x="268" y="180" width="24" height="42" rx="6"/></g><rect y="240" width="400" height="60" fill="#050204"/></svg>`);
   return Promise.resolve([['#1a0d2e','#ffd27a'],['#0d1e2e','#7ab8ff'],['#2e0d0d','#ff8a6a']].map((c,i)=>({u:mk(...c),src:'https://commons.wikimedia.org',by:'Beispiel-Fotograf',lic:'CC BY-SA 4.0',year:String(2015+i*3),desc:name+' live auf der Bühne (Beispiel)'})));
