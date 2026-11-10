@@ -405,6 +405,54 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .res .th.rl img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
 .res.cur .n{color:var(--acc)}
 .res .add svg.i{width:20px;height:20px}
+/* ---------- Plattenkiste ---------- */
+.pick .cratebtn{flex:0 0 78px;padding:0;background:none!important;position:relative;overflow:visible}
+.minicrate{position:absolute;left:4px;right:4px;bottom:0;height:50px}
+.minicrate .mr{position:absolute;bottom:14px;width:30px;height:30px;border-radius:2px;background:#444 center/cover;box-shadow:0 1px 3px #000a;transition:transform .25s}
+.minicrate .mr:nth-child(1){left:6px;transform:rotate(-8deg) translateY(2px)}
+.minicrate .mr:nth-child(2){left:20px;transform:translateY(-4px)}
+.minicrate .mr:nth-child(3){left:34px;transform:rotate(7deg)}
+.cratebtn:active .minicrate .mr:nth-child(2){transform:translateY(-10px)}
+.minicrate .mf{position:absolute;left:0;right:0;bottom:0;height:24px;border-radius:4px;
+  background:repeating-linear-gradient(0deg,#0000 0 11px,#00000040 11px 12px),repeating-linear-gradient(97deg,#0000 0 3px,#00000014 3px 4px),linear-gradient(180deg,#9a6a3e,#6b4428);
+  box-shadow:0 3px 8px #0009,inset 0 1px 0 #ffffff40}
+.minicrate .mf::after{content:"";position:absolute;left:35%;right:35%;top:7px;height:6px;border-radius:3px;background:#2a1a0e;box-shadow:inset 0 1px 2px #000}
+
+.crateov{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;
+  background:radial-gradient(120% 80% at 50% 30%,#2e251e 0%,#120f0d 75%);opacity:0;pointer-events:none;transition:opacity .35s;
+  padding:calc(var(--safe-t) + 8px) 14px calc(var(--safe-b) + 14px);overflow:hidden;touch-action:none}
+.crateov.show{opacity:1;pointer-events:auto}
+.cv-top{width:100%;display:flex;align-items:flex-start;gap:6px;min-height:58px}
+.cv-info{flex:1;min-width:0;text-align:center;padding-left:44px;transition:opacity .2s}
+.cv-info .n{font-size:19px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cv-info .s{color:var(--mute);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cv-stage{position:relative;flex:1;width:100%}
+.cv-crate{position:absolute;left:50%;bottom:12%;width:calc(var(--R) * 1.16);height:calc(var(--R) * 1.6);transform:translate(-50%,115%);transition:transform .55s cubic-bezier(.25,.8,.25,1)}
+.crateov.show .cv-crate{transform:translate(-50%,0)}
+.cv-back{position:absolute;left:0;right:0;bottom:0;height:calc(var(--R) * .38);border-radius:6px;background:linear-gradient(180deg,#3a2414,#24160c);box-shadow:inset 0 6px 14px #000b}
+.cv-recs{position:absolute;inset:0;transform:translateY(55%);transition:transform .6s cubic-bezier(.2,.9,.2,1) .25s}
+.crateov.show .cv-recs{transform:none}
+.cv-rec{position:absolute;left:calc(50% - var(--R) / 2);bottom:calc(var(--R) * .04);width:var(--R);height:var(--R);transform-origin:50% 100%;
+  border-radius:3px;background:#2c2621 center/cover no-repeat;will-change:transform;backface-visibility:hidden;
+  box-shadow:0 -1px 0 #ffffff22,0 -6px 18px #0009}
+.cv-rec::after{content:"";position:absolute;inset:0;border-radius:3px;background:linear-gradient(180deg,#ffffff18,#0000 18%,#0000 80%,#0003);pointer-events:none}
+.cv-rec i{position:absolute;inset:0;border-radius:3px;background:#000;opacity:0;pointer-events:none}
+.cv-front{position:absolute;left:0;right:0;bottom:0;height:calc(var(--R) * .3);z-index:1500;border-radius:6px;pointer-events:none;
+  background:repeating-linear-gradient(0deg,#0000 0 calc(var(--R) * .135),#00000045 calc(var(--R) * .135) calc(var(--R) * .14)),
+    repeating-linear-gradient(97deg,#0000 0 3px,#00000014 3px 4px,#0000 4px 11px,#ffffff08 11px 12px),linear-gradient(180deg,#a8743f,#7a4c27 60%,#5e3a1e);
+  box-shadow:0 14px 30px #000c,inset 0 2px 0 #ffffff45,inset 0 -4px 8px #0006}
+.cv-front .hd{position:absolute;left:36%;right:36%;top:20%;height:20%;border-radius:20px;background:#1e120a;box-shadow:inset 0 2px 4px #000,0 1px 0 #ffffff30}
+.cv-front .brand{position:absolute;left:0;right:0;bottom:12%;text-align:center;font-weight:900;letter-spacing:.3em;font-size:calc(var(--R) * .05);color:#3a230f;text-shadow:0 1px 0 #ffffff30}
+.cv-lid{position:absolute;left:-1%;right:-1%;bottom:calc(var(--R) * .28);height:calc(var(--R) * .14);z-index:1600;border-radius:6px;transform-origin:50% 100%;
+  background:repeating-linear-gradient(97deg,#0000 0 3px,#00000014 3px 4px),linear-gradient(180deg,#b88250,#8a5a30);box-shadow:0 4px 10px #0009;
+  transform:rotateX(0deg);transition:transform .5s cubic-bezier(.4,0,.2,1) .1s,opacity .3s .35s}
+.crateov.show .cv-lid{transform:rotateX(-100deg) translateY(-20%);opacity:0}
+.cv-acts{display:flex;gap:10px;width:100%;max-width:440px;margin-top:10px;opacity:0;transform:translateY(20px);transition:.4s .45s}
+.crateov.show .cv-acts{opacity:1;transform:none}
+.cv-acts button{flex:1;height:48px;border-radius:14px;background:var(--card);font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
+.cv-acts button.pri{background:linear-gradient(180deg,#f2b65d,var(--acc2));color:#1a120b}
+.cv-hint{color:#7a6e62;font-size:12.5px;margin-top:8px}
+.cv-load{position:absolute;left:0;right:0;top:30%;text-align:center;color:var(--mute)}
 .welcome{text-align:center;color:var(--mute);margin-top:18px}
 .welcome button{margin-top:12px;height:48px;padding:0 24px;border-radius:14px;background:linear-gradient(180deg,#f2b65d,var(--acc2));color:#1a120b;font-weight:700}
 </style>
@@ -513,8 +561,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     <button id="btnGrant">Musik freigeben</button>
   </div>
   <div class="pick" id="pick">
+    <button class="cratebtn" id="btnCrate" aria-label="Plattenkiste"><div class="minicrate"><i class="mr"></i><i class="mr"></i><i class="mr"></i><div class="mf"></div></div></button>
     <button id="btnPick"><svg class="i"><use href="#i-vinyl"/></svg>Platte auflegen</button>
-    <button id="btnRandom" style="flex:.55"><svg class="i"><use href="#i-shuf"/></svg>Zufall</button>
+    <button id="btnRandom" style="flex:.5"><svg class="i"><use href="#i-shuf"/></svg>Zufall</button>
   </div>
 </div>
 
@@ -606,6 +655,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <button class="ibtn" id="miniNext"><svg class="i"><use href="#i-next"/></svg></button>
 </div>
 
+<!-- Plattenkiste -->
+<div class="crateov" id="crateOv">
+  <div class="cv-top"><div class="cv-info"><div class="n" id="cvT"></div><div class="s" id="cvA"></div></div>
+    <button class="ibtn" id="cvClose" aria-label="Kiste schließen"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div class="cv-stage" id="cvStage">
+    <div class="cv-load" id="cvLoad">Suche Platten…</div>
+    <div class="cv-crate"><div class="cv-back"></div><div class="cv-recs" id="cvRecs"></div>
+      <div class="cv-front"><i class="hd"></i><div class="brand">bTUNES</div></div><div class="cv-lid"></div></div>
+  </div>
+  <div class="cv-acts"><button id="cvShuffle"><svg class="i"><use href="#i-shuf"/></svg>Neu mischen</button><button class="pri" id="cvPlay"><svg class="i"><use href="#i-vinyl"/></svg>Auflegen</button></div>
+  <div class="cv-hint">Wischen zum Durchblättern · Tippen zum Auflegen</div>
+</div>
 <div class="dim" id="dim"></div>
 <div class="menu" id="menu"></div>
 <div class="toast" id="toast"></div>
@@ -1103,7 +1164,8 @@ function pushNav(x){nav.push(x);}
 function back(){
   const x=nav.pop();
   if(!x)return false;
-  if(x==='menu'){$('#menu').classList.remove('show');$('#dim').classList.remove('show');}
+  if(x==='crate'){$('#crateOv').classList.remove('show');crate.open=false;crate.loadId++;}
+  else if(x==='menu'){$('#menu').classList.remove('show');$('#dim').classList.remove('show');}
   else if(x==='lib')closeLib();
   else{x.classList.remove('open');if(x._close)x._close();setTimeout(()=>x.remove(),300);}
   return true;
@@ -3011,6 +3073,127 @@ function demoStations(p){
   return Promise.resolve(n.filter((x,i)=>!p.tag||x[1].includes(p.tag==='classical'?'classical':p.tag)||i<2).map((x,i)=>{const st={id:'demo'+i,name:x[0],url:'https://example.org/'+i,logo:'data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="18" fill="${x[2]}"/><text x="50" y="62" font-family="sans-serif" font-size="34" font-weight="800" fill="#fff" text-anchor="middle">${x[0].split(' ').map(w=>w[0]).join('')}</text></svg>`),tags:x[1],cc:'DE',codec:'MP3',br:128,hls:false};rStations.set(st.id,st);return st;}));
 }
 
+/* ===================== PLATTENKISTE =====================
+   Zufällige Alben mit Cover stehen in einer Holzkiste. Wischen blättert sie durch:
+   die vordere Platte kippt nach vorne weg, die nächste steht frei. Mit Schwung und Einrasten. */
+const crate={list:[],els:[],pos:0,vel:0,drag:null,raf:0,open:false,R:300,loadId:0};
+const CRATE_N=36, STEP_PX=80;
+function crateSize(){const st=$('#cvStage');const R=Math.round(Math.min(window.innerWidth*0.8,(st?st.clientHeight:600)*0.55,400));crate.R=R;$('#crateOv').style.setProperty('--R',R+'px');}
+/* Zufällige Alben suchen, die ein Cover haben */
+async function crateFill(){
+  const id=++crate.loadId;
+  crate.list=[];crate.els=[];crate.pos=0;crate.vel=0;
+  const box=$('#cvRecs');box.innerHTML='';
+  const pool=albums.slice();for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  $('#cvLoad').classList.toggle('hidden',false);
+  let k=0;
+  const work=async()=>{while(k<pool.length&&crate.list.length<CRATE_N){const a=pool[k++];
+    const u=await art(a.id,500);if(id!==crate.loadId)return;
+    if(u&&crate.list.length<CRATE_N){crate.list.push({a,u});crateAdd(crate.list.length-1);}}};
+  await Promise.all([work(),work(),work(),work()]);
+  if(id!==crate.loadId)return;
+  $('#cvLoad').classList.add('hidden');
+  if(!crate.list.length)$('#cvLoad').classList.remove('hidden'),$('#cvLoad').textContent='Keine Alben mit Cover gefunden.';
+}
+function crateAdd(i){
+  const r=document.createElement('div');r.className='cv-rec';r.style.backgroundImage=`url("${crate.list[i].u}")`;r.innerHTML='<i></i>';
+  r.style.display='none';$('#cvRecs').appendChild(r);crate.els[i]=r;
+  if(i===0){$('#cvLoad').classList.add('hidden');crateInfo();}
+  crateDraw();
+}
+/* Lage jeder Platte aus ihrem Abstand zur aktuellen Position */
+function crateDraw(){
+  const p=crate.pos,R=crate.R;
+  for(let i=0;i<crate.els.length;i++){
+    const el=crate.els[i];const d=i-p;
+    if(d<-2.5||d>10){if(el.style.display!=='none')el.style.display='none';continue;}
+    if(el.style.display==='none')el.style.display='';
+    let tf,z,shade;
+    const L=R*0.17;                              // die vorderste Platte ist etwas herausgezogen
+    let op=1;
+    if(d>=0){                                   // vorne zurückgelehnt, dahinter stehen die anderen höher und weiter hinten
+      const lean=10-Math.min(d,1)*6;
+      tf=`perspective(${R*3}px) translate3d(0,${(-L-d*R*0.06).toFixed(1)}px,${(-d*R*0.1).toFixed(1)}px) rotateX(${lean.toFixed(2)}deg)`;
+      z=1000-Math.round(d*20);shade=Math.min(0.62,d*0.12);
+    }else{                                      // nach vorne gekippt (wie beim Durchblättern mit dem Finger)
+      const t=-d,k=Math.min(t,1),ang=10-k*88-Math.max(0,t-1)*4;
+      tf=`perspective(${R*3}px) translate3d(0,${(-L*(1-k)+Math.max(0,t-1)*R*0.03).toFixed(1)}px,${(t*R*0.04).toFixed(1)}px) rotateX(${ang.toFixed(2)}deg)`;
+      z=t<0.3?1000+Math.round(t*20):2000-Math.round(t*20);shade=Math.min(0.5,k*0.4);
+      op=t<0.6?1:Math.max(0,1-(t-0.6)/0.5);
+    }
+    el.style.opacity=op;
+    el.style.transform=tf;el.style.zIndex=z;el.firstChild.style.opacity=shade.toFixed(3);
+  }
+}
+let crateIdx=-1;
+function crateInfo(){
+  const i=Math.max(0,Math.min(crate.list.length-1,Math.round(crate.pos)));
+  if(i===crateIdx||!crate.list[i])return;crateIdx=i;
+  const a=crate.list[i].a;
+  $('#cvT').textContent=a.name;$('#cvA').textContent=a.artist+(a.year?' · '+a.year:'');
+  try{navigator.vibrate&&navigator.vibrate(3);}catch(e){}
+}
+/* Bewegung: Ziehen folgt dem Finger, danach Schwung mit Reibung, dann weich einrasten */
+function crateLoop(){
+  crate.raf=0;
+  const n=crate.list.length;if(!n)return;
+  if(!crate.drag){
+    const target=Math.round(Math.max(0,Math.min(n-1,crate.pos+crate.vel*8)));
+    if(Math.abs(crate.vel)>0.012){crate.pos+=crate.vel;crate.vel*=0.93;}
+    else{crate.vel=0;const diff=target-crate.pos;crate.pos+=diff*0.18;if(Math.abs(diff)<0.002)crate.pos=target;}
+    if(crate.pos<0){crate.pos+=(0-crate.pos)*0.25;crate.vel*=0.5;}
+    if(crate.pos>n-1){crate.pos+=(n-1-crate.pos)*0.25;crate.vel*=0.5;}
+  }
+  crateDraw();crateInfo();
+  const settled=!crate.drag&&crate.vel===0&&Math.abs(crate.pos-Math.round(crate.pos))<0.002;
+  if(!settled)crate.raf=requestAnimationFrame(crateLoop);
+}
+const crateKick=()=>{if(!crate.raf)crate.raf=requestAnimationFrame(crateLoop);};
+function crateOpen(){
+  if(!albums.length){toast('Noch keine Musik eingelesen');return;}
+  const ov=$('#crateOv');crate.open=true;crateIdx=-1;
+  $('#cvT').textContent='';$('#cvA').textContent='';$('#cvLoad').textContent='Suche Platten…';
+  ov.classList.add('show');crateSize();crateFill();pushNav('crate');
+}
+function crateClose(){$('#crateOv').classList.remove('show');crate.open=false;crate.loadId++;nav=nav.filter(x=>x!=='crate');}
+function cratePlay(){const i=Math.round(crate.pos),c=crate.list[i];if(!c)return;crateClose();setTimeout(()=>playList(c.a.tracks,0,false),250);}
+(function crateWire(){
+  const st=$('#cvStage');
+  st.addEventListener('pointerdown',e=>{if(!crate.list.length)return;st.setPointerCapture(e.pointerId);
+    crate.drag={x:e.clientX,y:e.clientY,p0:crate.pos,t0:performance.now(),lastY:e.clientY,lastX:e.clientX,lastT:performance.now(),moved:0};crate.vel=0;crateKick();});
+  st.addEventListener('pointermove',e=>{const d=crate.drag;if(!d)return;
+    const dx=e.clientX-d.x,dy=e.clientY-d.y;d.moved=Math.max(d.moved,Math.abs(dx)+Math.abs(dy));
+    const delta=Math.abs(dy)>=Math.abs(dx)?dy:-dx;     // runter oder nach links wischen = weiterblättern
+    const n=crate.list.length;let p=d.p0+delta/STEP_PX;
+    if(p<0)p=p*0.35;if(p>n-1)p=n-1+(p-(n-1))*0.35;   // gummiartig am Rand
+    const now=performance.now(),dt=Math.max(1,now-d.lastT);
+    const step=(Math.abs(dy)>=Math.abs(dx)?(e.clientY-d.lastY):-(e.clientX-d.lastX))/STEP_PX;
+    d.v=(d.v||0)*0.6+(step/dt*16.7)*0.4;d.lastY=e.clientY;d.lastX=e.clientX;d.lastT=now;
+    crate.pos=p;crateKick();});
+  const up=e=>{const d=crate.drag;if(!d)return;crate.drag=null;
+    if(d.moved<8&&performance.now()-d.t0<350){       // Tippen auf die vordere Platte = auflegen
+      cratePlay();}
+    else crate.vel=Math.max(-0.9,Math.min(0.9,d.v||0));
+    crateKick();};
+  st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up);
+  st.addEventListener('wheel',e=>{e.preventDefault();crate.vel+=e.deltaY/1400;crateKick();},{passive:false});
+  document.addEventListener('keydown',e=>{if(!crate.open)return;
+    if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.stopPropagation();crate.vel=0.25;crateKick();}
+    if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.stopPropagation();crate.vel=-0.25;crateKick();}
+    if(e.key==='Enter')cratePlay();},true);
+  $('#cvClose').onclick=crateClose;
+  $('#cvPlay').onclick=cratePlay;
+  $('#cvShuffle').onclick=()=>{crateIdx=-1;$('#cvLoad').textContent='Suche Platten…';crateFill();};
+  $('#btnCrate').onclick=crateOpen;
+  window.addEventListener('resize',()=>{if(crate.open){crateSize();crateDraw();}});
+})();
+/* Kleine Kiste auf dem Plattenspieler-Reiter: drei Cover schauen heraus */
+async function miniCrate(){
+  const els=document.querySelectorAll('#btnCrate .mr');if(!albums.length)return;
+  const pool=albums.slice().sort(()=>Math.random()-0.5);let k=0;
+  for(const el of els){while(k<pool.length){const u=await art(pool[k++].id,150);if(u){el.style.backgroundImage=`url("${u}")`;break;}}}
+}
+
 /* Reiter umschalten */
 let curTab=store.get('tab2','music');
 function setTab(t){curTab=t;store.set('tab2',t);
@@ -3043,7 +3226,7 @@ async function loadLibrary(manual){
     const r=await Music.scan();buildLibrary(r.tracks||[]);
     if(manual)toast(tracks.length+' Titel gefunden');
   }catch(e){toast(String(e&&e.message||e));}
-  renderLib();render();
+  renderLib();render();miniCrate();
 }
 async function start(){
   Music.addListener('state',onState);
