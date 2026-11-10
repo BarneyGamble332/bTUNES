@@ -568,7 +568,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <div class="deckwrap">
     <div class="deck" id="deck">
       <div class="bphoto hidden" id="bphoto"><div class="im"></div></div>
-      <div class="bphoto top hidden" id="bphoto2"><div class="im"></div></div>
       <div class="bphoto right hidden" id="bphoto3"><div class="im"></div></div>
       <div class="platter"><div class="empty" id="emptyTxt">Keine Platte aufgelegt</div></div>
       <div class="record off" id="record">
@@ -3244,9 +3243,14 @@ function crateSize(){const st=$('#cvStage');const R=Math.round(Math.min(window.i
 /* Zufällige Alben suchen, die ein Cover haben */
 async function crateFill(){
   const id=++crate.loadId;
-  crate.list=[];crate.els=[];crate.pos=0;crate.vel=0;
+  const prev=crate.list||[];crate.list=[];crate.els=[];crate.pos=0;crate.vel=0;
   const box=$('#cvRecs');box.innerHTML='';
-  const pool=albums.slice();for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  // Zuerst Alben, die zuletzt nicht in der Kiste waren – erst wenn alle durch sind, geht es von vorn los
+  let seenIds=new Set(store.get('crateseen',[]));
+  const mix=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+  let fresh=albums.filter(a=>!seenIds.has(a.id)&&!(crate.noCover||new Set()).has(a.id));
+  if(fresh.length<12){seenIds=new Set(prev.map(x=>x.a.id));fresh=albums.filter(a=>!seenIds.has(a.id));}
+  const pool=[...mix(fresh),...mix(albums.filter(a=>!fresh.includes(a)))];
   $('#cvLoad').classList.toggle('hidden',false);
   let k=0;
   const work=async()=>{while(k<pool.length&&crate.list.length<CRATE_N){const a=pool[k++];
@@ -3254,7 +3258,8 @@ async function crateFill(){
     if(u&&crate.list.length<CRATE_N){
       try{const im=new Image();im.src=u;await im.decode();}catch(e){}   // Bild vorab entpacken, sonst blitzt es beim ersten Zeigen
       if(id!==crate.loadId)return;
-      if(crate.list.length<CRATE_N){crate.list.push({a,u});crateAdd(crate.list.length-1);}}}};
+      if(crate.list.length<CRATE_N){crate.list.push({a,u});crateAdd(crate.list.length-1);seenIds.add(a.id);store.set('crateseen',[...seenIds]);}}
+    else if(!u)(crate.noCover||(crate.noCover=new Set())).add(a.id);}};
   await Promise.all([work(),work(),work(),work()]);
   if(id!==crate.loadId)return;
   $('#cvLoad').classList.add('hidden');
@@ -3490,7 +3495,7 @@ async function bandPhotos(name){
 }
 /* Bis zu drei Fotos: unten links, oben, rechts – je nachdem wie viele es gibt */
 let photoList=[],photoIdx=0,photoFor=null;
-const PH_SLOTS=['#bphoto','#bphoto2','#bphoto3'];
+const PH_SLOTS=['#bphoto','#bphoto3'];
 async function photoForAlbum(albumId){
   const a=albumId!=null?albumById.get(albumId):null;
   const name=a?(a.artist==='Verschiedene Interpreten'?(a.tracks[0]&&a.tracks[0].artist):a.artist):'';
@@ -3500,7 +3505,7 @@ async function photoForAlbum(albumId){
   try{
     const list=await bandPhotos(name);if(photoFor!==albumId)return;
     if(!list.length){hideAll();return;}
-    const n=Math.min(3,list.length),cnt=store.get('phi',{}),k=norm(name),start=(cnt[k]||0)%list.length;
+    const n=Math.min(PH_SLOTS.length,list.length),cnt=store.get('phi',{}),k=norm(name),start=(cnt[k]||0)%list.length;
     cnt[k]=(cnt[k]||0)+n;store.set('phi',cnt);                    // nächstes Album: die nächsten Fotos
     const idx=Array.from({length:n},(_,j)=>(start+j)%list.length);
     await Promise.all(idx.map(i=>{const im=new Image();im.src=list[i].u;return im.decode().catch(()=>{});}));
@@ -3509,7 +3514,7 @@ async function photoForAlbum(albumId){
     PH_SLOTS.forEach((sel,j)=>{const el=$(sel);
       if(j>=n){el.classList.add('hidden');return;}
       el.dataset.i=idx[j];el.querySelector('.im').style.backgroundImage=`url("${list[idx[j]].u}")`;
-      const base=[-2,6,-4][j];el.style.setProperty('--r',(base+Math.random()*10-5).toFixed(1)+'deg');
+      const base=[-2,-4][j];el.style.setProperty('--r',(base+Math.random()*10-5).toFixed(1)+'deg');
       el.style.animationDelay=(j*0.18)+'s';
       el.classList.remove('hidden','drop');void el.offsetWidth;el.classList.add('drop');});
   }catch(e){if(photoFor===albumId)hideAll();}
