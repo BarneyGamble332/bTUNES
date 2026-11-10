@@ -10,3 +10,8 @@ Einfacher Musik-Player für Android, der die Musik auf dem Handy abspielt – mi
 
 Die App wird bei jeder Änderung automatisch über GitHub Actions gebaut (`.github/workflows/android.yml`).
 `index.html` lässt sich auch im Browser öffnen – dann läuft ein Vorführmodus mit Beispielalben.
+
+## Linux-Version
+
+Unter *Releases* → `linux-latest`: `bTUNES-….AppImage` (ausführbar machen und starten) oder `bTUNES-….rpm` für Fedora (`sudo dnf install ./bTUNES-*.rpm`).
+Die Musikordner wählst du in der Bibliothek über das Ordner-Symbol.

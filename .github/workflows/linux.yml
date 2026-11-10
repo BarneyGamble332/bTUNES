@@ -1,0 +1,46 @@
+name: Linux-Version bauen
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - index.html
+      - desktop/**
+      - .github/workflows/linux.yml
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Werkzeug fuer das Fedora-Paket (.rpm)
+        run: sudo apt-get update && sudo apt-get install -y rpm
+
+      - name: App bauen (AppImage + RPM)
+        working-directory: desktop
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          mkdir -p app && cp ../index.html app/index.html
+          npm version "1.0.${RUN_NUMBER}" --no-git-tag-version --allow-same-version
+          npm install --no-audit --no-fund
+          npx electron-builder --linux AppImage rpm --publish never
+          ls -la dist
+
+      - name: Als Download bereitstellen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete linux-latest --yes --cleanup-tag || true
+          gh release create linux-latest desktop/dist/*.AppImage desktop/dist/*.rpm \
+            --title "bTUNES (Linux)" \
+            --notes "Neueste Linux-Version. AppImage: herunterladen, ausfuehrbar machen, starten. Fedora: .rpm installieren (sudo dnf install ./bTUNES-*.rpm)."
