@@ -1199,7 +1199,7 @@ function pushNav(x){nav.push(x);}
 function back(){
   const x=nav.pop();
   if(!x)return false;
-  if(x==='crate'){$('#crateOv').classList.remove('show');crate.open=false;crate.loadId++;}
+  if(x==='crate'){$('#crateOv').classList.remove('show');crate.open=false;crate.loadId++;clearTimeout(crate.hideT);$('#main').style.visibility='';}
   else if(x==='menu'){$('#menu').classList.remove('show');$('#dim').classList.remove('show');}
   else if(x==='lib')closeLib();
   else{x.classList.remove('open');if(x._close)x._close();setTimeout(()=>x.remove(),300);}
@@ -3112,7 +3112,7 @@ function demoStations(p){
    Zufällige Alben mit Cover stehen in einer Holzkiste. Wischen blättert sie durch:
    die vordere Platte kippt nach vorne weg, die nächste steht frei. Mit Schwung und Einrasten. */
 const crate={list:[],els:[],pos:0,vel:0,drag:null,raf:0,open:false,R:300,loadId:0};
-const CRATE_N=36, STEP_PX=150;   // Fingerweg pro Platte
+const CRATE_N=36, STEP_PX=95;    // Fingerweg pro Platte
 function crateSize(){const st=$('#cvStage');const R=Math.round(Math.min(window.innerWidth*0.8,(st?st.clientHeight:600)*0.55,400));crate.R=R;$('#crateOv').style.setProperty('--R',R+'px');}
 /* Zufällige Alben suchen, die ein Cover haben */
 async function crateFill(){
@@ -3195,8 +3195,9 @@ function crateOpen(){
   const ov=$('#crateOv');crate.open=true;crateIdx=-1;
   $('#cvT').textContent='';$('#cvA').textContent='';$('#cvLoad').textContent='Suche Platten…';
   ov.classList.add('show');crateSize();crateFill();pushNav('crate');
+  clearTimeout(crate.hideT);crate.hideT=setTimeout(()=>{if(crate.open)$('#main').style.visibility='hidden';},450);
 }
-function crateClose(){$('#crateOv').classList.remove('show');crate.open=false;crate.loadId++;nav=nav.filter(x=>x!=='crate');}
+function crateClose(){$('#crateOv').classList.remove('show');crate.open=false;crate.loadId++;nav=nav.filter(x=>x!=='crate');clearTimeout(crate.hideT);$('#main').style.visibility='';}
 /* Auflegen: Hülle kommt aus der Kiste, die Platte gleitet heraus und fliegt auf den Plattenspieler */
 async function cratePlay(){
   const i=Math.round(crate.pos),c=crate.list[i];if(!c||crate.anim)return;
