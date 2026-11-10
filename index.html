@@ -1769,7 +1769,7 @@ let pcSleepKey='';
 /* ===================== ZEITUNG =====================
    PDF-Ausgaben aus lokalen Ordnern: Übersicht mit Titelseiten, Seitenansicht mit Zoom
    (Doppeltipp = auf die Spalte zoomen) und Lesemodus, der die Artikel als Fließtext zeigt. */
-const ZV=6;   // Version der Artikel-Erkennung (bei Änderung wird das Inhaltsverzeichnis neu erstellt)
+const ZV=7;   // Version der Artikel-Erkennung (bei Änderung wird das Inhaltsverzeichnis neu erstellt)
 let ztFolders=store.get('ztfold',[]);    // gewählte Ordner [{path,on}]
 let ztFiles=store.get('ztfiles',[]);     // zuletzt gefundene PDFs
 let ztPos=store.get('ztpos',{});         // Lesestand je Ausgabe {p,n,t,m,a}
@@ -1847,7 +1847,7 @@ function ztRenderHome(){
     if(is.length)h+=`<div class="sec">Ausgaben</div><div class="zgrid">${is.map(ztCard).join('')}</div>`;
     const hits=[];
     for(const [k,idx] of ztIdxMem){const f=ztList.find(x=>ztKey(x)===k);if(!f)continue;
-      for(const e of idx.flat())if(e&&!e.o&&norm(e.t+' '+e.k+' '+e.n).includes(q))hits.push([f,e]);}
+      for(const e of zArtList(idx))if(norm(e.t+' '+e.k+' '+e.n).includes(q))hits.push([f,e]);}
     if(hits.length)h+=`<div class="sec">Artikel</div>`+hits.slice(0,60).map(([f,e])=>`<button class="ztoc" data-zhit="${esc(ztKey(f))}|${e.p}|${e.i}"><span class="pg">${e.p+1}</span><div class="tx"><div class="k">${esc(f.paper+' '+f.label)}</div><div class="n">${esc(e.t)}</div>${e.n?`<div class="s">${esc(e.n)}</div>`:''}</div></button>`).join('');
     if(!h)h=`<div class="hint">Nichts gefunden.<br><span style="font-size:13px">Artikel werden gefunden, sobald eine Ausgabe einmal geöffnet war.</span></div>`;
     B.innerHTML=h;ztLazy(B);return;}
@@ -2294,17 +2294,29 @@ function zSegOf(i,fonts){
     let fn=null;
     if(fonts){await page.getOperatorList();fn=k=>{try{return page.commonObjs.get(k).name||'';}catch(e){return '';}};}
     const items=tc.items.map(it=>it.transform?{str:it.str,width:it.width,fontName:it.fontName,transform:[it.transform[0],it.transform[1],it.transform[2],it.transform[3],it.transform[4]-vb[0],it.transform[5]-vb[1]]}:it);
-    return zSegment(items,vb[2]-vb[0],vb[3]-vb[1],fn);
+    return zSegment(items,vb[2]-vb[0],vb[3]-vb[1],fn,tc.styles);
   })().catch(()=>[]));
   return m.get(i);
 }
 const zText=a=>a.paras.map(p=>p.runs.map(r=>r.t).join('')).join('\n');
-function zEntries(p,segs){return segs.map((a,i)=>({p,i,t:a.title||zFirstWords(a),k:a.kicker,n:a.intro.slice(0,240),r:a.ressort,w:a.words,o:!a.title,x:(a.title+' '+a.intro+' '+zText(a)).slice(0,30000)}));}
+function zEntries(p,segs){const mag=Z.pages[p]&&Z.pages[0]&&Z.pages[p].w<Z.pages[0].w*0.8;
+  return segs.map((a,i)=>({p,i,t:a.title||zFirstWords(a),k:a.kicker,n:a.intro.slice(0,240),r:a.ressort,w:a.words,o:!a.title,ad:a.adPage,f:a.fonts||[],mag,x:(a.title+' '+a.intro+' '+zText(a)).slice(0,30000)}));}
 async function zPageIdx(p){if(!Z.idx[p])Z.idx[p]=zEntries(p,await zSegOf(p));return Z.idx[p];}
 function zEntry(p,i){return Z.idx[p]&&Z.idx[p][i]||null;}
 /* Artikel, die als eigener Eintrag zählen (ohne Anzeigenreste) */
 const zReal=e=>e.w>=60||(e.n&&!e.o);
-function zArtList(){const out=[];for(const l of Z.idx)if(l)for(const e of l)if(zReal(e))out.push(e);return out;}
+/* Hausschrift der Ausgabe = Schrift mit dem meisten Text; Anzeigen nutzen meist andere Schriften */
+function zFam(idx){const t={};for(const l of idx)if(l)for(const e of l)for(const [fp,c] of e.f||[])t[fp]=(t[fp]||0)+c;
+  const top=Object.keys(t).sort((a,b)=>t[b]-t[a])[0];return top?top.split('|'):null;}
+const Z_SKIP=/^(STELLENMARKT|KENNENLERNEN|INHALT|ANZEIGE|SCHACH|SUDOKU|RÄTSEL|IMPRESSUM)/i;
+/* Nur Hauptartikel: mit Titel, genug Text, überwiegend in der Hausschrift, keine Anzeigen-/Stellenseiten */
+function zMain(e,fam){
+  if(e.o||e.ad||e.w<200||Z_SKIP.test(e.r||''))return false;
+  if(/^LESERBRIEFE/i.test(e.r||'')&&e.w<600)return false;
+  if(fam&&e.f&&e.f.length){let all=0,own=0;for(const [fp,c] of e.f){all+=c;const [f,a]=fp.split('|');if(f===fam[0]&&Math.abs(+a-+fam[1])<0.025)own+=c;}if(all&&own/all<0.6)return false;}
+  return true;
+}
+function zArtList(idx){idx=idx||Z.idx;const fam=zFam(idx),out=[];for(const l of idx)if(l)for(const e of l)if(zMain(e,fam))out.push(e);return out;}
 async function zBuildIndex(){
   const myZ=Z,ck='zi:'+ZV+':'+Z.key;
   const cached=await idb.get(ck);
@@ -2325,7 +2337,7 @@ function zSetMode(m){
     if(Z.sel){zShowArticle(Z.sel.p,Z.sel.i);return;}
     if(Z.col){zShowArticle(Z.col.p,Z.col.ai);return;}
     // erster richtiger Artikel ab der aktuellen Seite
-    (async()=>{for(let p=Z.page;p<Z.n;p++){const l=await zPageIdx(p);const e=l.find(x=>x.w>=60&&!x.o)||l.find(zReal);if(e){zShowArticle(e.p,e.i);return;}}toast('Kein Artikel gefunden');})();
+    (async()=>{for(let p=Z.page;p<Z.n;p++){const l=await zPageIdx(p);const fam=zFam(Z.idx);const e=l.find(x=>zMain(x,fam))||l.find(zReal);if(e){zShowArticle(e.p,e.i);return;}}toast('Kein Artikel gefunden');})();
     return;}
   Z.mode='page';$('#zRead').classList.add('hidden');$('#zPages').classList.remove('hidden');
   if(Z.cur){const [p,i]=Z.cur;zGoPage(p,false);zSegOf(p).then(segs=>{const a=segs[i];if(a&&Z.mode==='page'){zSelect({p,i,box:a.box,title:a.title||zFirstWords(a)});
@@ -2370,11 +2382,11 @@ async function zShowArticle(p,i){
 }
 async function zStep(d){
   if(!Z||!Z.cur)return;const [p,i]=Z.cur;
-  const here=(await zPageIdx(p)).filter(zReal);
-  const pos=here.findIndex(e=>e.i===i);
-  if(d>0&&pos>=0&&pos<here.length-1){zShowArticle(p,here[pos+1].i);return;}
-  if(d<0&&pos>0){zShowArticle(p,here[pos-1].i);return;}
-  for(let q=p+d;q>=0&&q<Z.n;q+=d){const l=(await zPageIdx(q)).filter(zReal);if(l.length){const e=d>0?l[0]:l[l.length-1];zShowArticle(e.p,e.i);return;}}
+  for(let q=p;q>=0&&q<Z.n;q+=d){
+    await zPageIdx(q);const fam=zFam(Z.idx);
+    let l=Z.idx[q].filter(e=>zMain(e,fam)&&(q!==p||(d>0?e.i>i:e.i<i)));
+    if(l.length){const e=d>0?l[0]:l[l.length-1];zShowArticle(e.p,e.i);return;}
+  }
   toast(d>0?'Das war der letzte Artikel':'Das ist der erste Artikel');
 }
 
@@ -2401,10 +2413,10 @@ function zTocDraw(){
   let lastR=null,n=0;
   for(const e of zArtList()){
     if(q&&!norm(e.t+' '+e.k+' '+e.n+' '+(e.x||'')).includes(q))continue;
-    const rs=e.r||(e.p===0?'Titelseite':'');
+    const rs=e.mag?'Magazin':(e.r||(e.p===0?'Titelseite':''));
     if(!q&&rs&&rs!==lastR){h+=`<div class="sec">${esc(rs)}</div>`;lastR=rs;}
     const cur=Z.cur&&Z.cur[0]===e.p&&Z.cur[1]===e.i;
-    h+=`<button class="ztoc${cur?' cur':''}" data-za="${e.p}:${e.i}"><span class="pg" data-zp="${e.p}">${e.p+1}</span><div class="tx">${e.k?`<div class="k">${esc(e.k)}</div>`:''}<div class="n">${esc(e.t)}</div>${e.n?`<div class="s">${esc(e.n)}</div>`:''}</div><span class="m">${e.w>=60?Math.max(1,Math.round(e.w/220))+' Min.':''}</span></button>`;
+    h+=`<button class="ztoc${cur?' cur':''}" data-za="${e.p}:${e.i}"><span class="pg" data-zp="${e.p}">${e.p+1}</span><div class="tx">${e.k?`<div class="k">${esc(e.k)}</div>`:''}<div class="n">${esc(e.t)}</div>${e.n?`<div class="s">${esc(e.n)}</div>`:''}</div><span class="m">${Math.max(1,Math.round(e.w/220))} Min.</span></button>`;
     if(++n>400)break;
   }
   if(!n)h+=`<div class="hint">${q?'Nichts gefunden.':'Noch keine Artikel erkannt.'}</div>`;
@@ -2429,7 +2441,7 @@ document.addEventListener('keydown',e=>{if(!DESKTOP&&window.zKey(e))e.preventDef
 /* ----- Artikel-Erkennung (aus den Textpositionen von pdf.js) ----- */
 /* Zeitungsseite in Artikel zerlegen (aus den Textpositionen von pdf.js).
    Ergebnis: [{title, kicker, intro, blocks:[{k:'p'|'h'|'cap', runs:[{t,b,i}]}], box:[x0,y0,x1,y1], cols:[[x0,x1]...]}] */
-function zSegment(items, W, H, fontName) {
+function zSegment(items, W, H, fontName, styles) {
   const fname = fontName || (() => '');
   // 1) Textstücke: Position (oben links), Größe, Schrift
   const parts = [];
@@ -2446,11 +2458,17 @@ function zSegment(items, W, H, fontName) {
       px = x - it.width; py = H - y + fs * 0.7;
     }
     const fn = fname(it.fontName) || '';
-    parts.push({ s, x: px, x1: px + it.width, y: py, fs, fn, bold: /Bold|SemBol|Black|Heavy/i.test(fn), ital: /Italic|Oblique|Kursiv/i.test(fn) });
+    const st = styles && styles[it.fontName];
+    const fp = st ? st.fontFamily + '|' + (+st.ascent || 0).toFixed(3) + '|' + (+st.descent || 0).toFixed(3) : '';
+    parts.push({ fp, s, x: px, x1: px + it.width, y: py, fs, fn, bold: /Bold|SemBol|Black|Heavy/i.test(fn), ital: /Italic|Oblique|Kursiv/i.test(fn) });
   }
   if (!parts.length) return [];
-  { const seen = new Set();
-    for (let i = parts.length - 1; i >= 0; i--) { const p = parts[i], k = p.s + '|' + Math.round(p.x) + '|' + Math.round(p.y); if (seen.has(k)) parts.splice(i, 1); else seen.add(k); } }
+  { const seen = new Map();
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const p = parts[i], l = seen.get(p.s) || [];
+      // gleicher Text auf gleicher Höhe, der sich zu mehr als der Hälfte überdeckt = Mehrfachdruck
+      if (p.s.trim().length > 2 && l.some(q => Math.abs(q.y - p.y) < 2.5 && Math.min(q.x1, p.x1) - Math.max(q.x, p.x) > (p.x1 - p.x) * 0.5)) parts.splice(i, 1); else { l.push(p); seen.set(p.s, l); }
+    } }
 
   // 2) Grundschrift der Seite = häufigste Größe (nach Zeichen)
   const cnt = {};
@@ -2489,6 +2507,10 @@ function zSegment(items, W, H, fontName) {
     const eL = {}, eR = {};
     for (const l of lines) { if (Math.abs(l.fs - body) > 1) continue; const a = Math.round(l.x), b = Math.round(l.x1); eL[a] = (eL[a] || 0) + 1; eR[b] = (eR[b] || 0) + 1; }
     const near = (m, v) => { for (let d = -2; d <= 2; d++) if ((m[Math.round(v) + d] || 0) >= 4) return true; return false; };
+    // übliche Spaltenbreite: zusammengefügte Zeile darf nicht breiter werden
+    const wc = {};
+    for (const l of lines) if (Math.abs(l.fs - body) <= 1) { const w = Math.round((l.x1 - l.x) / 4) * 4; wc[w] = (wc[w] || 0) + 1; }
+    const colW = +Object.keys(wc).sort((a, b) => wc[b] - wc[a])[0] || W;
     lines.sort((a, b) => a.y - b.y || a.x - b.x);
     for (let i = 0; i < lines.length; i++) {
       const A = lines[i];
@@ -2498,6 +2520,7 @@ function zSegment(items, W, H, fontName) {
         const gap = B.x - A.x1;
         if (gap < 0 || gap > A.fs * 2.6) continue;
         if (near(eL, B.x) && (near(eR, A.x1) || gap > A.fs * 1.2)) continue;
+        if (B.x1 - A.x > colW + body * 1.5) continue;
         A.ps.push(...B.ps); A.x1 = Math.max(A.x1, B.x1);
         for (const k in B.chars) A.chars[k] = (A.chars[k] || 0) + B.chars[k];
         lines.splice(j, 1); j = i;
@@ -2541,10 +2564,13 @@ function zSegment(items, W, H, fontName) {
   // 6) Überschriften-Gruppen: große Zeilen, die untereinander stehen
   const big = l => l.fs >= body * 1.3;
   let ressort = '';
-  for (const l of lines) if (l.y < headBand && l.fs > body * 1.5 && /\p{Lu}{3}/u.test(l.text) && !/ZEIT/.test(l.text)) ressort = l.text.trim();
-  const isLabel = l => { const t = l.text.trim(); return l.fs >= body * 1.9 && t.length > 2 && t === t.toUpperCase() && /\p{Lu}{3}/u.test(t) && t.split(/\s+/).length <= 3; };
+  const unspace = t => /^(\S )+\S$/.test(t.trim()) ? t.replace(/ /g, '') : t;   // "E N T D E C K E N"
+  for (const l of lines) if (l.y < headBand && l.fs > body * 1.5 && /\p{Lu}{3}/u.test(unspace(l.text)) && !/ZEIT/.test(l.text)) ressort = unspace(l.text).trim();
+  const headTxt = lines.filter(l => l.y < headBand).map(l => l.text).join(' ');
+  const adPage = /A\s?N\s?Z\s?E\s?I\s?G\s?E/.test(headTxt) && !/DIE ZEIT/.test(headTxt);
+  const isLabel = l => { const t = unspace(l.text).trim(); return l.fs >= body * 1.9 && t.length > 2 && t === t.toUpperCase() && /\p{Lu}{3}/u.test(t) && t.split(/\s+/).length <= 3; };
   const isNum = l => !/\p{L}{2}/u.test(l.text);
-  const heads = use.filter(l => big(l) && !isNum(l) && !(isLabel(l) && (ressort = ressort || l.text.trim()))).sort((a, b) => a.y - b.y);
+  const heads = use.filter(l => big(l) && !isNum(l) && !(isLabel(l) && (ressort = ressort || unspace(l.text).trim()))).sort((a, b) => a.y - b.y);
   const groups = [];
   for (const l of heads) {
     let g = null;
@@ -2638,16 +2664,22 @@ function zSegment(items, W, H, fontName) {
   const orphan = { title: '', kicker: '', intro: '', x: 0, x1: W, y0: 0, y1: 0, orphan: true };
   for (const a of arts) a.blocks = [];
   orphan.blocks = [];
+  blocks.sort((p, q) => p.y0 - q.y0);
   for (const b of blocks) {
     const mid = (b.x + b.x1) / 2;
     let best = arts.find(g => g.row && g.row.has(b)) || null;
-    if (best) { best.blocks.push(b); continue; }
+    if (best) { best.blocks.push(b); b.art = best; continue; }
+    // Block direkt darüber in derselben Spalte (Text fließt weiter)
+    const pred = blocks.filter(q => q.art && q !== b && Math.abs(q.x - b.x) < body * 2 && q.y1 < b.y0 && b.y0 - q.y1 < H * 0.5 && !q.cap && !b.cap)
+      .sort((p, q) => q.y1 - p.y1)[0];
     for (const a of arts) {
       if (a.boxOf || a.y1 > b.y0 + body) continue;
       const ov = Math.min(a.x1, b.x1) - Math.max(a.x, b.x);
       if (ov < (b.x1 - b.x) * 0.3 && !(mid > a.x - body && mid < a.x1 + body)) continue;
       if (!best || a.y1 > best.y1) best = a;
     }
+    // Überschrift zwischen Vorgänger und Block? Sonst gehört der Block zum Artikel darüber
+    if (pred && (!best || best.y1 <= pred.y1 + body)) { pred.art.blocks.push(b); b.art = pred.art; continue; }
     if (!best) {
       // Überschrift darüber, die nicht überlappt (ZEIT-Titel sind zentriert und schmaler als der Artikel)
       const above = arts.filter(a => !a.boxOf && a.y1 <= b.y0 + body);
@@ -2655,11 +2687,15 @@ function zSegment(items, W, H, fontName) {
     }
     if (!best) {
       // Spalte neben der Überschrift (Text beginnt links oben, Titel steht rechts daneben)
-      const side = arts.filter(a => !a.boxOf && a.y0 < b.y1 && a.y1 > b.y0 - body * 4);
+      const side = arts.filter(a => !a.boxOf && b.y0 >= a.y0 - H * 0.08 && b.y0 <= a.y1 + body * 4);
       if (side.length) best = side.sort((p, q) => Math.min(Math.abs(p.x - b.x1), Math.abs(b.x - p.x1)) - Math.min(Math.abs(q.x - b.x1), Math.abs(b.x - q.x1)))[0];
-      else if (arts.filter(a => !a.weak).length === 1) best = arts.find(a => !a.weak);
+      else {
+        // einzige Überschrift der Seite – wenn sie breit genug für einen Artikeltitel ist (schmale Namen = Anzeigen)
+        const one = arts.filter(a => !a.weak && !a.boxOf);
+        if (one.length === 1 && (one[0].x1 - one[0].x > W * 0.35 || Math.min(one[0].x1, b.x1) - Math.max(one[0].x, b.x) > 0)) best = one[0];
+      }
     }
-    (best || orphan).blocks.push(b);
+    (best || orphan).blocks.push(b); b.art = best || orphan;
   }
   if (orphan.blocks.length) arts.unshift(orphan);
 
@@ -2678,11 +2714,14 @@ function zSegment(items, W, H, fontName) {
     const paras = [];
     for (const b of body_) addParas(paras, b, body);
     const words = body_.reduce((s, b) => s + b.words, 0);
+    const fpc = {};
+    for (const b of body_) for (const l of b.lines) for (const q of l.ps) if (q.fp) fpc[q.fp] = (fpc[q.fp] || 0) + q.s.length;
     const all = [...a.blocks, ...(a.lines || [])];
     const box = a.orphan ? [Math.min(...all.map(b => b.x)), Math.min(...all.map(b => b.y0)), Math.max(...all.map(b => b.x1)), Math.max(...all.map(b => b.y1))] : [Math.min(a.x, ...all.map(b => b.x)), Math.min(a.y0 ?? 1e9, ...all.map(b => b.y0 ?? b.top)), Math.max(a.x1, ...all.map(b => b.x1)), Math.max(a.y1, ...all.map(b => b.y1 ?? b.y))];
     out.push({
       title: a.title, kicker: a.kicker, intro: a.intro, orphan: !!a.orphan, words,
       paras, caps: caps.map(b => joinLines(b.lines)).filter(t => t.length > 15), boxOf: a.boxOf, src: a,
+      fonts: Object.entries(fpc).sort((p, q) => q[1] - p[1]).slice(0, 4),
       box: box.map(Math.round),
       cols: body_.map(b => [Math.round(b.x), Math.round(b.y0), Math.round(b.x1), Math.round(b.y1 + 3)]),
     });
@@ -2694,7 +2733,7 @@ function zSegment(items, W, H, fontName) {
     out.splice(out.indexOf(o), 1);
   }
   for (const o of out) {
-    delete o.src; delete o.boxOf; o.ressort = ressort; o.by = '';
+    delete o.src; delete o.boxOf; o.ressort = ressort; o.by = ''; o.adPage = adPage;
     // Autorenzeile ("VON JULIANE SCHÄUBLE") vom Vorspann trennen
     for (const f of ['intro', 'title', 'kicker']) {
       const m = o[f].match(/\s*\b(?:VON|Von)\s+((?:[\p{Lu}][\p{Lu}'’.-]*(?:\s+|$)(?:UND\s+)?){1,6})$/u);
