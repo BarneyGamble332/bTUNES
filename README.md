@@ -5,6 +5,10 @@ Einfacher Musik-Player für Android, der die Musik auf dem Handy abspielt – mi
 - Bibliothek nach Alben (mit Cover), Interpreten, Ordnern oder Titeln
 - Suche, Zufall, Wiederholen, eigene Playlists
 - Spielt im Hintergrund weiter, Steuerung in Benachrichtigung und Sperrbildschirm
+- Reiter **Zeitung**: PDF-Ausgaben (z. B. DIE ZEIT) aus lokalen Ordnern – die App sucht auf Wunsch selbst nach Ordnern mit PDFs
+  - Seitenansicht: Doppeltipp zoomt auf die Spalte, „Spalte ›“ springt weiter; Zoom mit zwei Fingern (PC: Strg + Mausrad)
+  - Lesemodus: Artikel als Fließtext mit großer Schrift, hell/dunkel, Inhaltsverzeichnis mit Suche
+  - Am Handy braucht die App dafür einmalig den Zugriff „Alle Dateien verwalten“
 
 **Installieren:** Unter *Releases* → `apk-latest` die Datei `bTUNES.apk` aufs Handy laden und öffnen.
 

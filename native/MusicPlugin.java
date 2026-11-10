@@ -399,6 +399,144 @@ public class MusicPlugin extends Plugin {
         call.resolve(r);
     }
 
+    /* ---------- Zeitungen: PDF-Dateien im Speicher finden ----------
+       Ab Android 11 braucht das Lesen fremder Dateien (PDFs im Download-Ordner usw.)
+       den Zugriff "Alle Dateien verwalten", den man einmal in den Einstellungen erlaubt. */
+
+    private boolean filesOk() {
+        if (Build.VERSION.SDK_INT >= 30) return android.os.Environment.isExternalStorageManager();
+        return has(Manifest.permission.READ_EXTERNAL_STORAGE);
+    }
+
+    @PluginMethod
+    public void filesStatus(PluginCall call) {
+        JSObject r = new JSObject();
+        r.put("granted", filesOk());
+        call.resolve(r);
+    }
+
+    @PluginMethod
+    public void filesRequest(PluginCall call) {
+        if (filesOk()) { filesStatus(call); return; }
+        if (Build.VERSION.SDK_INT >= 30) {
+            android.content.Intent i;
+            try {
+                i = new android.content.Intent(android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                    Uri.parse("package:" + getContext().getPackageName()));
+                i.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+                getContext().startActivity(i);
+            } catch (Exception e) {
+                i = new android.content.Intent(android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                i.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+                getContext().startActivity(i);
+            }
+            JSObject r = new JSObject();
+            r.put("granted", false);
+            r.put("settings", true);   // Ergebnis kommt, wenn die App wieder im Vordergrund ist
+            call.resolve(r);
+        } else {
+            requestPermissionForAlias("storage", call, "filesPermDone");
+        }
+    }
+
+    @PermissionCallback
+    private void filesPermDone(PluginCall call) { filesStatus(call); }
+
+    /* Speicher-Wurzeln: interner Speicher und SD-Karte */
+    private List<java.io.File> storageRoots() {
+        List<java.io.File> out = new ArrayList<>();
+        java.io.File[] dirs = getContext().getExternalFilesDirs(null);
+        if (dirs != null) for (java.io.File d : dirs) {
+            if (d == null) continue;
+            String p = d.getAbsolutePath();
+            int i = p.indexOf("/Android/data/");
+            if (i > 0) out.add(new java.io.File(p.substring(0, i)));
+        }
+        if (out.isEmpty()) out.add(android.os.Environment.getExternalStorageDirectory());
+        return out;
+    }
+
+    private static boolean isPdf(java.io.File f) {
+        return f.isFile() && f.getName().toLowerCase(java.util.Locale.ROOT).endsWith(".pdf") && !f.getName().startsWith(".");
+    }
+
+    /* Alle Ordner, in denen PDFs liegen: [{path, count, latest}] */
+    @PluginMethod
+    public void findPdfFolders(PluginCall call) {
+        if (!filesOk()) { call.reject("Kein Zugriff auf Dateien"); return; }
+        pool.execute(() -> {
+            JSArray out = new JSArray();
+            int[] visited = { 0 };
+            for (java.io.File root : storageRoots()) walkFolders(root, 0, out, visited, true);
+            JSObject r = new JSObject();
+            r.put("folders", out);
+            call.resolve(r);
+        });
+    }
+
+    private void walkFolders(java.io.File dir, int depth, JSArray out, int[] visited, boolean top) {
+        if (depth > 10 || visited[0]++ > 30000) return;
+        java.io.File[] fs = dir.listFiles();
+        if (fs == null) return;
+        int count = 0;
+        long latest = 0;
+        for (java.io.File f : fs) {
+            String n = f.getName();
+            if (n.startsWith(".")) continue;
+            if (f.isDirectory()) {
+                if (top && n.equals("Android")) continue;   // App-Daten anderer Apps
+                walkFolders(f, depth + 1, out, visited, false);
+            } else if (isPdf(f)) {
+                count++;
+                latest = Math.max(latest, f.lastModified());
+            }
+        }
+        if (count > 0) {
+            JSObject o = new JSObject();
+            o.put("path", dir.getAbsolutePath());
+            o.put("count", count);
+            o.put("latest", latest);
+            out.put(o);
+        }
+    }
+
+    /* PDFs in den gewählten Ordnern (mit Unterordnern): [{path, name, size, mtime, dir}] */
+    @PluginMethod
+    public void listPdfs(PluginCall call) {
+        if (!filesOk()) { call.reject("Kein Zugriff auf Dateien"); return; }
+        JSONArray folders = call.getData().optJSONArray("folders");
+        pool.execute(() -> {
+            JSArray out = new JSArray();
+            java.util.Set<String> seen = new java.util.HashSet<>();
+            if (folders != null) for (int i = 0; i < folders.length(); i++) {
+                String p = folders.optString(i, "");
+                if (!p.isEmpty()) walkPdfs(new java.io.File(p), 0, out, seen);
+            }
+            JSObject r = new JSObject();
+            r.put("files", out);
+            call.resolve(r);
+        });
+    }
+
+    private void walkPdfs(java.io.File dir, int depth, JSArray out, java.util.Set<String> seen) {
+        if (depth > 6) return;
+        java.io.File[] fs = dir.listFiles();
+        if (fs == null) return;
+        for (java.io.File f : fs) {
+            if (f.getName().startsWith(".")) continue;
+            if (f.isDirectory()) walkPdfs(f, depth + 1, out, seen);
+            else if (isPdf(f) && seen.add(f.getAbsolutePath())) {
+                JSObject o = new JSObject();
+                o.put("path", f.getAbsolutePath());
+                o.put("name", f.getName());
+                o.put("size", f.length());
+                o.put("mtime", f.lastModified());
+                o.put("dir", dir.getAbsolutePath());
+                out.put(o);
+            }
+        }
+    }
+
     @Override
     protected void handleOnDestroy() {
         if (future != null) MediaController.releaseFuture(future);

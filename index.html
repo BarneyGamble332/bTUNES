@@ -137,6 +137,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   transform:translateX(100%);transition:transform .28s cubic-bezier(.3,.7,.2,1)}
 .view.open{transform:none}
 .vhead{display:flex;align-items:center;gap:4px;padding:calc(var(--safe-t) + 8px) 8px 4px}
+.vhead .ex{display:flex;align-items:center;flex:none}
 .vhead .tt{flex:1;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .vbody{flex:1;overflow-y:auto;padding:0 14px calc(var(--safe-b) + 90px)}
 .hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:6px 0 10px}
@@ -296,6 +297,77 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .pextra{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
 .pextra button{height:38px;padding:0 14px;border-radius:19px;background:var(--card);font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:6px}
 .pextra button.on{color:var(--acc)}
+/* ---------- Reiter Zeitung ---------- */
+.seg button{padding:6px 11px}
+#zt{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);padding-top:calc(var(--safe-t) + 10px)}
+#zt .top{padding:0 16px}
+.zgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:16px 12px}
+.zc{text-align:left;min-width:0}
+.zcv{aspect-ratio:.71;border-radius:3px;background:#ebe6dc center top/cover no-repeat;box-shadow:0 6px 14px #000a;position:relative;overflow:hidden;display:grid;place-items:center}
+.zcv .ph{color:#5b5248;font:700 13px/1.3 Georgia,serif;text-align:center;padding:10px;white-space:pre-line}
+.zcv .badge{position:absolute;top:6px;right:6px;background:var(--acc);color:#1a120b;font-size:11px;font-weight:800;padding:2px 7px;border-radius:9px}
+.zcv .pb{position:absolute;left:0;right:0;bottom:0;height:4px;background:#0007}.zcv .pb i{display:block;height:100%;background:var(--acc)}
+.zc .n{font-weight:600;font-size:13.5px;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zc .s{color:var(--mute);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.secrow .cnt{color:var(--mute);font-size:12px;letter-spacing:0;text-transform:none;font-weight:600}
+.zcont{display:flex;gap:14px;align-items:center;width:100%;text-align:left;background:var(--card);border-radius:14px;padding:12px}
+.zcont .zcv{width:74px;flex:none}
+.zcont .tx{flex:1;min-width:0}.zcont .k{color:var(--acc);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.zcont .n{font:600 17px/1.25 Georgia,serif;margin:3px 0}.zcont .s{color:var(--mute);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zcont .bar{height:4px;border-radius:2px;background:#4a423b;margin-top:8px;overflow:hidden}.zcont .bar i{display:block;height:100%;background:var(--acc)}
+.zchk{color:var(--mute)}.zchk.on{background:#1f3a24;color:#7fdc8f}
+.list .row .add{width:40px;height:40px;border-radius:50%;background:var(--card);display:grid;place-items:center;color:var(--acc);flex:none}
+.list .row .add.on{background:#1f3a24;color:#7fdc8f}
+/* Ausgabe lesen */
+.zview .vhead{background:var(--bg);position:relative;z-index:2}
+.zview .vbody.zbody{padding:0;position:relative;overflow:hidden}
+.zmode{height:34px;padding:0 13px;border-radius:17px;background:var(--card);font-weight:700;font-size:13.5px;margin-right:2px}
+.zpages{position:absolute;inset:0;overflow:auto;touch-action:pan-x pan-y;background:#2b2724;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.zpages.drag{cursor:grabbing}
+.zin{position:relative;transform-origin:0 0}
+.zpg{position:absolute;background:#fff;box-shadow:0 2px 10px #0009}
+.zpg canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
+.zpg canvas.zh{width:auto;height:auto}
+.zpg .pn{position:absolute;inset:0;display:grid;place-items:center;color:#c8c2b8;font:700 22px Georgia,serif}
+.zhl{position:absolute;border:3px solid var(--acc);background:#e8a5471c;border-radius:4px;pointer-events:none;box-shadow:0 0 0 2000px #0000002a;z-index:2}
+.zbar{position:absolute;left:50%;bottom:calc(var(--safe-b) + 12px);transform:translateX(-50%);display:flex;align-items:center;gap:2px;background:#2b2520f0;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:24px;padding:4px;box-shadow:0 6px 18px #000a;max-width:calc(100% - 20px);z-index:3;color:var(--txt)}
+.zbar:empty{display:none}
+.zbar button{height:40px;min-width:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 9px;font-weight:700;font-size:14px;flex:none}
+.zbar button:active{background:#ffffff14}
+.zbar .lbl{padding:0 6px;font-size:13px;color:var(--mute);font-variant-numeric:tabular-nums;white-space:nowrap}
+.zbar button.pri{background:linear-gradient(180deg,#f2b65d,var(--acc2));color:#1a120b;flex:0 1 auto;min-width:0;max-width:64vw;display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;line-height:40px;padding:0 16px}
+.zload{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--mute);gap:4px}
+.zread{position:absolute;inset:0;overflow-y:auto;touch-action:pan-y;background:#17130f;color:#e8e0d4;-webkit-overflow-scrolling:touch}
+.zread.light{background:#f5f0e6;color:#211d18}
+.zart{max-width:35em;margin:0 auto;padding:22px 20px calc(var(--safe-b) + 110px);font-family:Georgia,"Noto Serif","DejaVu Serif","Times New Roman",serif;font-size:var(--zfs,19px);line-height:1.62;
+  hyphens:auto;-webkit-hyphens:auto;user-select:text;-webkit-user-select:text;overflow-wrap:break-word}
+.zart .zres{font:700 12px/1.2 system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
+.zread.light .zart .zres{color:#a5651f}
+.zart .zk{font-size:.92em;font-style:italic;opacity:.8;margin-top:14px;line-height:1.4}
+.zart h1{font-size:1.8em;line-height:1.14;margin:.35em 0 .45em;font-weight:400;letter-spacing:-.01em;hyphens:manual;text-wrap:balance}
+.zart .zi{font-size:1.07em;line-height:1.45;opacity:.92;margin:0 0 .4em}
+.zart .zm{font:600 12.5px system-ui,sans-serif;opacity:.55;margin:12px 0 22px}
+.zart .zby{font-variant:small-caps;letter-spacing:.04em;font-size:14px}
+.zart p{margin:0 0 .85em}
+.zart h3{font-size:1em;font-weight:700;margin:1.5em 0 .5em;line-height:1.35}
+.zart .zbox{border-left:3px solid var(--acc);padding:2px 0 2px 16px;margin:1.8em 0;font-size:.9em}
+.zart .zbox h4{margin:0 0 .3em;font-size:1.05em}
+.zart .zcaps{margin-top:1.8em;border-top:1px solid #8884;padding-top:10px}
+.zart .zcap{font:13.5px/1.45 system-ui,sans-serif;opacity:.65;margin:.5em 0}
+.zart .zacts{display:flex;gap:10px;margin-top:26px;font-family:system-ui,sans-serif}
+.zart .zacts button{flex:1;height:44px;border-radius:12px;background:#8882;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:14px}
+.zart .znext{display:block;width:100%;text-align:left;margin-top:14px;padding:14px 16px;border-radius:14px;background:#8881;font-family:system-ui,sans-serif}
+.zart .znext span{display:block;font-size:12px;opacity:.6;margin-bottom:3px}.zart .znext b{font:400 1.05em/1.3 Georgia,serif}
+.zart .zsrc{font:12px/1.4 system-ui,sans-serif;opacity:.4;margin-top:22px;text-align:center}
+.ztoc{display:flex;gap:12px;width:100%;text-align:left;padding:11px 0;border-bottom:1px solid #2a241f;align-items:flex-start}
+.ztoc .pg{flex:none;min-width:34px;height:26px;padding:0 6px;border-radius:7px;background:var(--card);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--mute)}
+.ztoc .tx{flex:1;min-width:0}
+.ztoc .k{font-size:12px;color:var(--acc);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ztoc .n{font:17px/1.25 Georgia,serif}
+.ztoc .s{color:var(--mute);font-size:12.5px;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ztoc .m{flex:none;color:var(--mute);font-size:12px;padding-top:5px}
+.ztoc.cur .n{color:var(--acc)}
+@media (min-width:900px){.zgrid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
 .welcome{text-align:center;color:var(--mute);margin-top:18px}
 .welcome button{margin-top:12px;height:48px;padding:0 24px;border-radius:14px;background:linear-gradient(180deg,#f2b65d,var(--acc2));color:#1a120b;font-weight:700}
 </style>
@@ -334,6 +406,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></symbol>
   <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></symbol>
   <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></symbol>
+  <symbol id="i-paper" viewBox="0 0 24 24"><path d="M4 3h12v18H6a2 2 0 0 1-2-2z"/><path d="M16 8h4v11a2 2 0 0 1-2 2"/><path d="M7 7h6M7 11h6M7 15h4"/></symbol>
+  <symbol id="i-max" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></symbol>
   <symbol id="i-queue" viewBox="0 0 24 24"><path d="M3 6h12M3 12h12M3 18h8"/><path d="M17 13l5 3-5 3z"/></symbol>
 </svg>
 
@@ -341,7 +415,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <div id="main">
   <div class="top">
     <button class="ibtn" id="btnQueue" aria-label="Warteschlange"><svg class="i"><use href="#i-queue"/></svg></button>
-    <div class="seg"><button data-tab="music">Platten</button><button data-tab="pod">Podcasts</button></div>
+    <div class="seg"><button data-tab="music">Platten</button><button data-tab="pod">Podcasts</button><button data-tab="zt">Zeitung</button></div>
     <button class="ibtn" id="btnLib" aria-label="Bibliothek"><svg class="i"><use href="#i-lib"/></svg></button>
   </div>
 
@@ -409,7 +483,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <div id="pod" class="hidden">
   <div class="top">
     <button class="ibtn" id="pcListBtn" aria-label="Meine Liste"><svg class="i"><use href="#i-queue"/></svg></button>
-    <div class="seg"><button data-tab="music">Platten</button><button data-tab="pod">Podcasts</button></div>
+    <div class="seg"><button data-tab="music">Platten</button><button data-tab="pod">Podcasts</button><button data-tab="zt">Zeitung</button></div>
     <button class="ibtn" id="pcAddBtn" aria-label="Podcast hinzufügen"><svg class="i"><use href="#i-plus"/></svg></button>
   </div>
   <label class="search psearch"><svg class="i" style="width:20px;height:20px"><use href="#i-search"/></svg>
@@ -424,6 +498,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     <div class="pr" id="pcMiniPr"></div>
   </div>
 </div>
+<!-- Zeitung -->
+<div id="zt" class="hidden">
+  <div class="top">
+    <button class="ibtn" id="ztFoldBtn" aria-label="Zeitungsordner"><svg class="i"><use href="#i-folder"/></svg></button>
+    <div class="seg"><button data-tab="music">Platten</button><button data-tab="pod">Podcasts</button><button data-tab="zt">Zeitung</button></div>
+    <button class="ibtn" id="ztScanBtn" aria-label="Neu einlesen"><svg class="i"><use href="#i-refresh"/></svg></button>
+  </div>
+  <label class="search psearch"><svg class="i" style="width:20px;height:20px"><use href="#i-search"/></svg>
+    <input id="ztQ" type="search" placeholder="Ausgaben & Artikel durchsuchen" autocomplete="off"></label>
+  <div class="pbody" id="ztBody"></div>
+</div>
+<input type="file" id="ztFile" accept="application/pdf,.pdf" multiple class="hidden">
 <input type="file" id="opmlFile" accept=".opml,.xml,text/xml,text/x-opml,application/xml,*/*" class="hidden">
 <!-- Bibliothek -->
 <div class="sheet" id="lib">
@@ -545,6 +631,7 @@ function desktopPlugin(){
   /* Tastatur: Leertaste = Pause, Pfeile = spulen, Esc = zurück */
   document.addEventListener('keydown',e=>{
     if(e.target.closest('input,textarea'))return;
+    if(window.zKey&&window.zKey(e))return;
     if(e.code==='Space'){e.preventDefault();api.control({action:'toggle'});}
     else if(e.key==='ArrowRight'){au.currentTime+=e.shiftKey?30:10;}
     else if(e.key==='ArrowLeft'){au.currentTime=Math.max(0,au.currentTime-(e.shiftKey?30:10));}
@@ -950,12 +1037,14 @@ function back(){
   if(!x)return false;
   if(x==='menu'){$('#menu').classList.remove('show');$('#dim').classList.remove('show');}
   else if(x==='lib')closeLib();
-  else{x.classList.remove('open');setTimeout(()=>x.remove(),300);}
+  else{x.classList.remove('open');if(x._close)x._close();setTimeout(()=>x.remove(),300);}
   return true;
 }
 function closeAll(){hideMenu();while(nav.length)back();}
 if(AppP){AppP.addListener('backButton',()=>{if(!back())AppP.minimizeApp();});
-  AppP.addListener('resume',()=>Music.getState({}).then(onState).catch(()=>{}));}
+  AppP.addListener('resume',()=>{Music.getState({}).then(onState).catch(()=>{});
+    document.querySelectorAll('.view').forEach(v=>{if(v._onResume)v._onResume();});
+    if(curTab==='zt'&&!Z)ztScan(false);});}
 
 /* ===== Band-Infos: aktiv -> News, aufgelöst -> Highlights =====
    Quellen: MusicBrainz (Status, Alben), Wikipedia (Text, Bild), Google News (Meldungen) */
@@ -1677,12 +1766,1011 @@ window.pcRender=function(){
 };
 let pcSleepKey='';
 
+/* ===================== ZEITUNG =====================
+   PDF-Ausgaben aus lokalen Ordnern: Übersicht mit Titelseiten, Seitenansicht mit Zoom
+   (Doppeltipp = auf die Spalte zoomen) und Lesemodus, der die Artikel als Fließtext zeigt. */
+const ZV=6;   // Version der Artikel-Erkennung (bei Änderung wird das Inhaltsverzeichnis neu erstellt)
+let ztFolders=store.get('ztfold',[]);    // gewählte Ordner [{path,on}]
+let ztFiles=store.get('ztfiles',[]);     // zuletzt gefundene PDFs
+let ztPos=store.get('ztpos',{});         // Lesestand je Ausgabe {p,n,t,m,a}
+let ztHidden=store.get('zthide',[]);
+let ztPrefs=Object.assign({fs:19,th:'dark'},store.get('ztprefs',{}));
+let ztPicked=[];                          // per Dateiauswahl geöffnet (nur diese Sitzung)
+let ztFound=null;                         // Ergebnis der Ordnersuche
+const ztKey=f=>f.path+'|'+f.size;
+const DPR=Math.min(3,window.devicePixelRatio||1);
+
+/* Kleiner Speicher für größere Daten (Titelbilder, Inhaltsverzeichnisse) */
+const idb=(()=>{let dbp;
+  const db=()=>dbp||(dbp=new Promise((res,rej)=>{const r=indexedDB.open('btunes',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}));
+  const tx=async(m,f)=>{const d=await db();return new Promise((res,rej)=>{const t=d.transaction('kv',m);const q=f(t.objectStore('kv'));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error);});};
+  return{get:k=>tx('readonly',s=>s.get(k)).catch(()=>undefined),set:(k,v)=>tx('readwrite',s=>s.put(v,k)).catch(()=>{}),del:k=>tx('readwrite',s=>s.delete(k)).catch(()=>{})};})();
+
+/* PDF-Bibliothek (pdf.js) erst laden, wenn sie gebraucht wird */
+let pdfjsP=null;
+function pdfjs(){
+  if(!pdfjsP)pdfjsP=(async()=>{
+    const base=new URL('pdfjs/',location.href).href;let m;
+    try{m=await import(base+'pdf.min.js');m.GlobalWorkerOptions.workerSrc=base+'pdf.worker.min.js';}
+    catch(e){const cdn='https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/';m=await import(cdn+'pdf.min.mjs');m.GlobalWorkerOptions.workerSrc=cdn+'pdf.worker.min.mjs';}
+    return m;})().catch(e=>{pdfjsP=null;throw e;});
+  return pdfjsP;
+}
+async function ztBytes(f){
+  if(f.file)return new Uint8Array(await f.file.arrayBuffer());
+  if(DESKTOP)return new Uint8Array(await window.desktop.readPdf(f.path));
+  if(NATIVE){const u=Capacitor.convertFileSrc('file://'+f.path.split('/').map(encodeURIComponent).join('/'));
+    const r=await fetch(u);if(!r.ok)throw new Error('Datei nicht lesbar ('+r.status+')');return new Uint8Array(await r.arrayBuffer());}
+  throw new Error('Datei nicht erreichbar');
+}
+async function ztLoadDoc(f){const lib=await pdfjs();return lib.getDocument({data:await ztBytes(f),isEvalSupported:false,verbosity:0}).promise;}
+
+/* Name, Nummer und Datum aus dem Dateinamen: "DIE-ZEIT-gesamt-48-2026-05_11_2026.pdf" */
+const MON=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+function ztInfo(f){
+  const base=f.name.replace(/\.pdf$/i,'');
+  let d=0,m,dm=null;
+  if((m=base.match(/(\d{1,2})[._-](\d{1,2})[._-](20\d\d)/))&&+m[2]<=12){d=new Date(+m[3],+m[2]-1,+m[1]).getTime();dm=m;}
+  else if((m=base.match(/(20\d\d)[._-](\d{1,2})[._-](\d{1,2})/))&&+m[2]<=12){d=new Date(+m[1],+m[2]-1,+m[3]).getTime();dm=m;}
+  else if((m=base.match(/(20\d\d)(\d\d)(\d\d)/))&&+m[2]>=1&&+m[2]<=12&&+m[3]<=31){d=new Date(+m[1],+m[2]-1,+m[3]).getTime();dm=m;}
+  let no='';
+  const re=/(?:^|[-_ ])(\d{1,3})[-_ /](20\d\d)(?=[-_ .]|$)/g;
+  while((m=re.exec(base))){if(dm&&m.index>=dm.index-1&&m.index<dm.index+dm[0].length)continue;no=m[1]+'/'+m[2];break;}
+  let paper=base.split(/[-_ ]?\d/)[0].replace(/[-_.]+/g,' ').replace(/\b(gesamt|ausgabe|e ?paper|komplett|digital|pdf|nr|no)\b/gi,'').replace(/\s+/g,' ').trim();
+  if(!paper||paper.length<2)paper=(f.dir||'').split('/').filter(Boolean).pop()||'Zeitung';
+  if(paper===paper.toLowerCase())paper=paper.charAt(0).toUpperCase()+paper.slice(1);
+  const dt=d?new Date(d):null;
+  const ds=dt?dt.getDate()+'. '+MON[dt.getMonth()]+' '+dt.getFullYear():'';
+  return{paper,no,date:d,ds,label:no?'Nr. '+no:(ds||base)};
+}
+function ztAll(){
+  const seen=new Set();
+  return [...ztPicked,...ztFiles].filter(f=>{const k=ztKey(f);if(seen.has(k)||ztHidden.includes(k))return false;seen.add(k);return true;})
+    .map(f=>Object.assign(f,ztInfo(f))).sort((a,b)=>(b.date||b.mtime||0)-(a.date||a.mtime||0));
+}
+const shortPath=p=>String(p||'').replace(/^\/storage\/emulated\/0\/?/,'Interner Speicher/').replace(/^\/home\/[^/]+\/?/,'~/').replace(/\/$/,'')||'/';
+
+/* ---------- Übersicht ---------- */
+let ztList=[];
+function ztRenderHome(){
+  const B=$('#ztBody');if(!B)return;
+  ztList=ztAll();
+  const q=norm($('#ztQ').value.trim());
+  if(!ztList.length){
+    B.innerHTML=`<div class="hint" style="padding-top:44px"><svg class="i" style="width:54px;height:54px;color:var(--acc)"><use href="#i-paper"/></svg><br><br><b style="color:var(--txt);font-size:17px">Zeitungen als PDF lesen</b><br>
+      ${NET?'Sag bTUNES, in welchen Ordnern deine Ausgaben liegen (z. B. Download). Die App kann auch selbst danach suchen.':'Im Browser kannst du eine PDF-Ausgabe zum Ausprobieren öffnen.'}</div>
+      <div class="acts">${NET?'<button class="pri" data-go="folders"><svg class="i"><use href="#i-search"/></svg>Ordner suchen</button>':''}<button${NET?'':' class="pri"'} data-go="pick"><svg class="i"><use href="#i-upload"/></svg>PDF öffnen</button></div>`;
+    return;}
+  let h='';
+  if(q){
+    const is=ztList.filter(f=>norm(f.paper+' '+f.label+' '+f.ds+' '+f.name).includes(q));
+    if(is.length)h+=`<div class="sec">Ausgaben</div><div class="zgrid">${is.map(ztCard).join('')}</div>`;
+    const hits=[];
+    for(const [k,idx] of ztIdxMem){const f=ztList.find(x=>ztKey(x)===k);if(!f)continue;
+      for(const e of idx.flat())if(e&&!e.o&&norm(e.t+' '+e.k+' '+e.n).includes(q))hits.push([f,e]);}
+    if(hits.length)h+=`<div class="sec">Artikel</div>`+hits.slice(0,60).map(([f,e])=>`<button class="ztoc" data-zhit="${esc(ztKey(f))}|${e.p}|${e.i}"><span class="pg">${e.p+1}</span><div class="tx"><div class="k">${esc(f.paper+' '+f.label)}</div><div class="n">${esc(e.t)}</div>${e.n?`<div class="s">${esc(e.n)}</div>`:''}</div></button>`).join('');
+    if(!h)h=`<div class="hint">Nichts gefunden.<br><span style="font-size:13px">Artikel werden gefunden, sobald eine Ausgabe einmal geöffnet war.</span></div>`;
+    B.innerHTML=h;ztLazy(B);return;}
+  const lastK=Object.keys(ztPos).sort((a,b)=>ztPos[b].t-ztPos[a].t).find(k=>ztList.some(f=>ztKey(f)===k));
+  const last=lastK&&ztList.find(f=>ztKey(f)===lastK);
+  if(last){const ps=ztPos[lastK];
+    h+=`<div class="sec">Weiterlesen</div><button class="zcont" data-zo="${esc(lastK)}"><div class="zcv" data-zth="${esc(lastK)}"><span class="ph">${esc(last.paper)}</span></div>
+      <div class="tx"><div class="k">${esc(last.paper)}</div><div class="n">${esc(last.label)}${last.no&&last.ds?' · '+esc(last.ds):''}</div>
+      <div class="s">${ps.m==='read'&&ps.at?esc(ps.at):'Seite '+(ps.p+1)+' von '+ps.n}</div><div class="bar"><i style="width:${Math.round((ps.p+1)/ps.n*100)}%"></i></div></div></button>`;}
+  const groups=new Map();
+  for(const f of ztList){if(!groups.has(f.paper))groups.set(f.paper,[]);groups.get(f.paper).push(f);}
+  for(const [p,l] of groups)h+=`<div class="sec secrow"><span>${esc(p)}</span><span class="cnt">${l.length} ${l.length===1?'Ausgabe':'Ausgaben'}</span></div><div class="zgrid">${l.map(ztCard).join('')}</div>`;
+  if(NET)h+=`<div class="acts" style="margin-top:22px"><button data-go="folders"><svg class="i"><use href="#i-folder"/></svg>Ordner</button><button data-go="pick"><svg class="i"><use href="#i-upload"/></svg>PDF öffnen</button></div>`;
+  B.innerHTML=h;ztLazy(B);
+}
+function ztCard(f){
+  const k=ztKey(f),ps=ztPos[k];
+  return `<button class="zc" data-zo="${esc(k)}"><div class="zcv" data-zth="${esc(k)}"><span class="ph">${esc(f.paper)}\n${esc(f.label)}</span>${ps?`<div class="pb"><i style="width:${Math.round((ps.p+1)/ps.n*100)}%"></i></div>`:'<b class="badge">neu</b>'}</div>
+    <div class="n">${esc(f.label)}</div><div class="s">${esc(f.no&&f.ds?f.ds:shortPath(f.dir).split('/').pop())}</div></button>`;
+}
+/* Titelseiten nach Bedarf erzeugen (eine nach der anderen, sie werden gemerkt) */
+const ztThumbMem=new Map();let ztThumbQ=[],ztThumbBusy=false;
+const ztIo=new IntersectionObserver(es=>{for(const e of es){if(!e.isIntersecting)continue;ztIo.unobserve(e.target);ztThumb(e.target);}},{rootMargin:'200px'});
+function ztLazy(root){root.querySelectorAll('[data-zth]').forEach(el=>{const u=ztThumbMem.get(el.dataset.zth);if(u)ztSetThumb(el,u);else ztIo.observe(el);});}
+function ztSetThumb(el,u){el.style.backgroundImage=`url("${u}")`;const ph=el.querySelector('.ph');if(ph)ph.remove();}
+async function ztThumb(el){
+  const k=el.dataset.zth;
+  const u=ztThumbMem.get(k)||await idb.get('th:'+k);
+  if(u){ztThumbMem.set(k,u);document.querySelectorAll(`[data-zth="${CSS.escape(k)}"]`).forEach(x=>ztSetThumb(x,u));return;}
+  if(!ztThumbQ.includes(k))ztThumbQ.push(k);ztThumbRun();
+}
+async function ztThumbRun(){
+  if(ztThumbBusy)return;ztThumbBusy=true;
+  while(ztThumbQ.length){
+    const k=ztThumbQ.shift();const f=ztAll().find(x=>ztKey(x)===k);if(!f)continue;
+    try{
+      const own=Z&&Z.key===k;const doc=own?Z.doc:await ztLoadDoc(f);
+      const page=await doc.getPage(1);const vp0=page.getViewport({scale:1});const vp=page.getViewport({scale:300/vp0.width});
+      const c=document.createElement('canvas');c.width=Math.round(vp.width);c.height=Math.round(vp.height);
+      const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
+      await page.render({canvasContext:ctx,viewport:vp}).promise;
+      const u=c.toDataURL('image/jpeg',0.78);
+      if(!own)await doc.destroy();
+      ztThumbMem.set(k,u);idb.set('th:'+k,u);
+      document.querySelectorAll(`[data-zth="${CSS.escape(k)}"]`).forEach(x=>ztSetThumb(x,u));
+    }catch(e){}
+  }
+  ztThumbBusy=false;
+}
+$('#ztBody').onclick=e=>{
+  const g=e.target.closest('[data-go]');
+  if(g){if(g.dataset.go==='folders')ztOpenFolders();else if(g.dataset.go==='pick')$('#ztFile').click();return;}
+  const h=e.target.closest('[data-zhit]');
+  if(h){const s=h.dataset.zhit,j=s.lastIndexOf('|'),j2=s.lastIndexOf('|',j-1);const k=s.slice(0,j2),p=+s.slice(j2+1,j),i=+s.slice(j+1);const f=ztList.find(x=>ztKey(x)===k);if(f)ztOpen(f,{read:[p,i]});return;}
+  const o=e.target.closest('[data-zo]');
+  if(o){const f=ztList.find(x=>ztKey(x)===o.dataset.zo);if(f)ztOpen(f);}
+};
+$('#ztBody').addEventListener('contextmenu',e=>{const o=e.target.closest('.zc');if(!o)return;e.preventDefault();ztCardMenu(o.dataset.zo);});
+let ztLp=null;
+$('#ztBody').addEventListener('pointerdown',e=>{const o=e.target.closest('.zc');if(!o||e.pointerType==='mouse')return;clearTimeout(ztLp);ztLp=setTimeout(()=>{ztLp='done';ztCardMenu(o.dataset.zo);},600);});
+['pointerup','pointercancel','pointermove'].forEach(t=>$('#ztBody').addEventListener(t,e=>{if(t==='pointermove'&&Math.abs(e.movementY||0)<3)return;if(ztLp!=='done')clearTimeout(ztLp);},true));
+$('#ztBody').addEventListener('click',e=>{if(ztLp==='done'){ztLp=null;e.stopImmediatePropagation();e.preventDefault();}},true);
+function ztCardMenu(k){
+  const f=ztList.find(x=>ztKey(x)===k);if(!f)return;
+  menu(f.paper+' · '+f.label,[
+    ['i-paper','Öffnen',()=>ztOpen(f)],
+    ...(ztPos[k]?[['i-rew','Lesestand zurücksetzen',()=>{delete ztPos[k];store.set('ztpos',ztPos);ztRenderHome();}]]:[]),
+    ['i-folder','Ordner: '+shortPath(f.dir||'–'),()=>{}],
+    ['i-x','Aus der Liste ausblenden',()=>{ztHidden.push(k);store.set('zthide',ztHidden);ztRenderHome();toast('Ausgeblendet – über „Ordner“ wieder einblendbar');},'del']]);
+}
+$('#ztQ').oninput=()=>ztRenderHome();
+$('#ztFoldBtn').onclick=()=>ztOpenFolders();
+$('#ztScanBtn').onclick=()=>ztScan(true);
+$('#ztFile').onchange=e=>{
+  const fs=[...e.target.files];e.target.value='';if(!fs.length)return;
+  for(const file of fs)if(!ztPicked.some(x=>x.name===file.name&&x.size===file.size))ztPicked.push({path:'datei:'+file.name,name:file.name,size:file.size,mtime:file.lastModified,dir:'',file});
+  ztRenderHome();
+  const f=ztAll().find(x=>x.name===fs[0].name&&x.size===fs[0].size);if(f)ztOpen(f);
+};
+
+/* PDFs in den gewählten Ordnern auflisten */
+let ztScanning=false;
+async function ztScan(manual){
+  const on=ztFolders.filter(f=>f.on!==false).map(f=>f.path);
+  if(!NET||!on.length){ztRenderHome();if(manual&&NET)ztOpenFolders();return;}
+  if(ztScanning)return;ztScanning=true;
+  try{
+    if(NATIVE&&!(await Music.filesStatus()).granted){if(manual)ztOpenFolders();ztScanning=false;return;}
+    const r=NATIVE?await Music.listPdfs({folders:on}):await window.desktop.listPdfs(on);
+    ztFiles=(r.files||[]).map(x=>({path:x.path,name:x.name,size:x.size,mtime:x.mtime,dir:x.dir}));
+    store.set('ztfiles',ztFiles);
+    if(manual)toast(ztFiles.length+(ztFiles.length===1?' Ausgabe':' Ausgaben')+' gefunden');
+  }catch(e){if(manual)toast(String(e&&e.message||e));}
+  ztScanning=false;ztRenderHome();
+}
+
+/* ---------- Ordner wählen und suchen ---------- */
+function ztOpenFolders(){
+  openView('Zeitungsordner',(b,v)=>{
+    let searching=false;
+    const draw=async()=>{
+      let access=true;
+      if(NATIVE){try{access=(await Music.filesStatus()).granted;}catch(e){access=false;}}
+      const rows=ztFolders.map((f,i)=>`<div class="row"><button class="th zchk${f.on!==false?' on':''}" data-tog="${i}"><svg class="i"><use href="#${f.on!==false?'i-check':'i-folder'}"/></svg></button><div class="tx"><div class="n">${esc(f.path.split('/').filter(Boolean).pop()||f.path)}</div><div class="s">${esc(shortPath(f.path))}</div></div><button class="more" data-rm="${i}" aria-label="Entfernen"><svg class="i" style="width:20px"><use href="#i-x"/></svg></button></div>`).join('');
+      const chosen=new Set(ztFolders.map(f=>f.path));
+      let found='';
+      if(searching)found=`<div class="spin"></div><div class="hint" style="padding-top:0">Durchsuche den Speicher nach PDFs…</div>`;
+      else if(ztFound){
+        const l=ztFound.slice().sort((a,b)=>(/zeit|zeitung|e-?paper|presse|news|magazin|abo/i.test(b.path)?1e6:0)+b.count-((/zeit|zeitung|e-?paper|presse|news|magazin|abo/i.test(a.path)?1e6:0)+a.count)).slice(0,40);
+        found=`<div class="sec secrow"><span>Gefunden: ${ztFound.length} ${ztFound.length===1?'Ordner':'Ordner'} mit PDFs</span>${l.some(f=>!chosen.has(f.path))?'<button class="lnk" data-go="addall">Alle hinzufügen</button>':''}</div>
+          <div class="list">${l.map((f,i)=>`<div class="row"><div class="th"><svg class="i"><use href="#i-folder"/></svg></div><div class="tx"><div class="n">${esc(f.path.split('/').filter(Boolean).pop()||f.path)}</div><div class="s">${f.count} PDF${f.count===1?'':'s'} · ${esc(shortPath(f.path))}</div></div><button class="add${chosen.has(f.path)?' on':''}" data-add="${esc(f.path)}"><svg class="i"><use href="#${chosen.has(f.path)?'i-check':'i-plus'}"/></svg></button></div>`).join('')||'<div class="hint">Keine PDFs gefunden.</div>'}</div>`;}
+      const hidden=ztHidden.length?`<div class="acts"><button data-go="unhide"><svg class="i"><use href="#i-rew"/></svg>${ztHidden.length} ausgeblendete wieder zeigen</button></div>`:'';
+      b.innerHTML=(NATIVE&&!access?`<div class="pwbox maybe" style="margin-top:6px;color:var(--txt)"><b>Zugriff auf Dateien</b><br>Damit bTUNES PDFs in deinen Ordnern (z. B. <i>Download</i>) öffnen darf, braucht die App den Zugriff „Alle Dateien verwalten“. Gleich öffnet sich die Einstellung: dort bTUNES einschalten und mit Zurück in die App wechseln.</div><div class="acts"><button class="pri" data-go="grant"><svg class="i"><use href="#i-check"/></svg>Zugriff erlauben</button></div>`:'')+
+        `<div style="color:var(--mute);font-size:13.5px;margin:4px 2px 10px">bTUNES zeigt alle PDFs aus diesen Ordnern (mit Unterordnern) als Ausgaben.</div>
+        <div class="list">${rows||'<div class="hint" style="padding:20px">Noch kein Ordner gewählt.</div>'}</div>
+        <div class="acts">${NET?`<button class="pri" data-go="search"${NATIVE&&!access?' disabled style="opacity:.5"':''}><svg class="i"><use href="#i-search"/></svg>Ordner suchen</button>`:''}${DESKTOP?'<button data-go="pick"><svg class="i"><use href="#i-folder"/></svg>Ordner wählen…</button>':''}<button data-go="file"><svg class="i"><use href="#i-upload"/></svg>PDF</button></div>${found}${hidden}`;
+    };
+    v._draw=draw;v._onResume=draw;draw();
+    const changed=()=>{store.set('ztfold',ztFolders);draw();ztScan(false);};
+    b.onclick=async e=>{
+      const t=e.target.closest('[data-tog]');if(t){const f=ztFolders[+t.dataset.tog];f.on=f.on===false;changed();return;}
+      const rm=e.target.closest('[data-rm]');if(rm){ztFolders.splice(+rm.dataset.rm,1);changed();return;}
+      const ad=e.target.closest('[data-add]');if(ad){const p=ad.dataset.add,i=ztFolders.findIndex(f=>f.path===p);if(i>=0)ztFolders.splice(i,1);else ztFolders.push({path:p,on:true});changed();return;}
+      const g=e.target.closest('[data-go]');if(!g||g.disabled)return;const a=g.dataset.go;
+      if(a==='grant'){try{const r=await Music.filesRequest();if(r.granted)draw();}catch(err){toast('Einstellung ließ sich nicht öffnen');}}
+      else if(a==='search'){searching=true;draw();
+        try{const r=NATIVE?await Music.findPdfFolders():await window.desktop.findPdfFolders();ztFound=r.folders||[];}
+        catch(err){toast(String(err&&err.message||err));ztFound=[];}
+        searching=false;draw();}
+      else if(a==='addall'){for(const f of ztFound)if(!ztFolders.some(x=>x.path===f.path))ztFolders.push({path:f.path,on:true});changed();}
+      else if(a==='pick'){const add=await window.desktop.pickFolder('Ordner mit Zeitungen wählen');for(const p of add)if(!ztFolders.some(x=>x.path===p))ztFolders.push({path:p,on:true});changed();}
+      else if(a==='file')$('#ztFile').click();
+      else if(a==='unhide'){ztHidden=[];store.set('zthide',ztHidden);draw();ztRenderHome();}
+    };
+  });
+}
+
+/* ---------- Eine Ausgabe lesen ---------- */
+let Z=null;               // die offene Ausgabe
+const ztIdxMem=new Map(); // Inhaltsverzeichnisse geöffneter Ausgaben (für die Suche)
+function zSavePos(){
+  if(!Z||!Z.n)return;
+  const e=Z.mode==='read'&&Z.cur?zEntry(Z.cur[0],Z.cur[1]):null;
+  ztPos[Z.key]={p:Z.mode==='read'&&Z.cur?Z.cur[0]:Z.page,n:Z.n,t:Date.now(),m:Z.mode,a:Z.cur||null,at:e?'„'+e.t+'“':''};
+  store.set('ztpos',ztPos);
+}
+function ztOpen(f,o={}){
+  if(Z)closeAll();
+  const key=ztKey(f);
+  const v=openView(f.paper+' · '+f.label,(b,v)=>{
+    v.classList.add('zview');b.className='vbody zbody';
+    b.innerHTML=`<div class="zpages" id="zPages"><div class="zin" id="zIn"></div></div><div class="zread hidden" id="zRead"></div>
+      <div class="zbar" id="zBar"></div><div class="zload" id="zLoad"><div class="spin"></div><div id="zLoadTx">Lade ${esc(f.label)}…</div></div>`;
+  });
+  const ex=v.querySelector('.ex');
+  ex.innerHTML=`<button class="zmode" data-z="mode">Lesen</button><button class="ibtn" data-z="toc" aria-label="Inhalt"><svg class="i"><use href="#i-list"/></svg></button>${DESKTOP?'<button class="ibtn" data-z="max" aria-label="Großes Fenster"><svg class="i"><use href="#i-max"/></svg></button>':''}`;
+  ex.onclick=e=>{const b=e.target.closest('[data-z]');if(!b||!Z)return;const a=b.dataset.z;
+    if(a==='mode')zSetMode(Z.mode==='page'?'read':'page');else if(a==='toc')zOpenToc();else if(a==='max')window.desktop.toggleMax().then(()=>setTimeout(zLayout,250));};
+  Z={f,key,v,doc:null,n:0,pages:[],pe:[],seg:new Map(),segF:new Map(),idx:[],zf:1,fitW:0,page:0,mode:'page',sel:null,col:null,cur:null,gen:0};
+  const myZ=Z;
+  v._close=()=>{if(Z!==myZ)return;zSavePos();if(myZ.doc)myZ.doc.destroy().catch(()=>{});myZ.dead=true;Z=null;window.removeEventListener('resize',zResize);ztRenderHome();};
+  (async()=>{
+    try{
+      const doc=await ztLoadDoc(f);
+      if(myZ.dead){doc.destroy();return;}
+      myZ.doc=doc;myZ.n=doc.numPages;
+      $('#zLoadTx').textContent='Lade Seiten…';
+      const sizes=await Promise.all(Array.from({length:doc.numPages},(_,i)=>doc.getPage(i+1).then(p=>{const vb=p.view;return{w:vb[2]-vb[0],h:vb[3]-vb[1]};})));
+      if(myZ.dead)return;
+      myZ.pages=sizes;
+      $('#zLoad').remove();
+      zSetup();
+      const ps=ztPos[key];
+      if(o.read)zShowArticle(o.read[0],o.read[1]);
+      else if(ps&&ps.m==='read'&&ps.a)zShowArticle(ps.a[0],ps.a[1]);
+      else zGoPage(ps?Math.min(ps.p,myZ.n-1):0,false);
+      zBuildIndex();
+    }catch(e){const l=$('#zLoad');if(l)l.innerHTML=`<div class="hint">Die Ausgabe ließ sich nicht öffnen.<br><span style="font-size:13px">${esc(String(e&&e.message||e))}</span></div>`;}
+  })();
+}
+
+/* Seitenansicht: alle Seiten untereinander, gleich breit */
+function zSetup(){
+  const C=$('#zPages'),I=$('#zIn');
+  Z.pe=Z.pages.map((pg,i)=>{const el=document.createElement('div');el.className='zpg';el.innerHTML=`<div class="pn">${i+1}</div>`;I.appendChild(el);return{el,base:null,hi:null};});
+  zLayout();
+  C.addEventListener('scroll',zOnScroll,{passive:true});
+  zGestures(C);
+  window.addEventListener('resize',zResize);
+  const R=$('#zRead');
+  // Lesemodus: zur Seite wischen = nächster/voriger Artikel
+  let sw=null;
+  R.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;sw={x:e.clientX,y:e.clientY,t:Date.now()};});
+  R.addEventListener('pointerup',e=>{if(!sw)return;const dx=e.clientX-sw.x,dy=e.clientY-sw.y;const ok=Date.now()-sw.t<600&&Math.abs(dx)>80&&Math.abs(dx)>Math.abs(dy)*2;sw=null;
+    if(ok&&!getSelection().toString())zStep(dx<0?1:-1);});
+  R.addEventListener('pointercancel',()=>{sw=null;});
+  R.addEventListener('scroll',()=>{clearTimeout(R._t);R._t=setTimeout(()=>{if(Z&&Z.mode==='read')Z.readY=R.scrollTop;},200);},{passive:true});
+}
+let zResizeT=null;
+function zResize(){clearTimeout(zResizeT);zResizeT=setTimeout(()=>{if(Z&&Z.pe.length){const p=Z.page;zLayout();if(Z.mode==='page'&&!Z.col)zGoPage(p,false);}},150);}
+function zLayout(anchor){
+  const C=$('#zPages');if(!C||!Z)return;
+  const W=C.clientWidth,H=C.clientHeight,p0=Z.pages[0];
+  // Handy: Seitenbreite füllen. Großer Bildschirm: ganze Seite sichtbar
+  Z.fitW=W>=700?Math.min(W-24,Math.max(420,(H-24)*p0.w/p0.h)):W-12;
+  Z.minZ=W>=700?0.5:1;Z.maxZ=Math.max(4,(W-16)/(Z.fitW*140/1134));
+  const w=Z.fitW*Z.zf,gap=W>=700?12:6;
+  const inW=Math.max(W,w+gap*2);
+  let y=gap;
+  Z.rect=Z.pages.map(pg=>{const h=w*pg.h/pg.w,r={x:(inW-w)/2,y,w,h,s:w/pg.w};y+=h+gap;return r;});
+  const I=$('#zIn');I.style.width=inW+'px';I.style.height=(y+90)+'px';
+  Z.pe.forEach((pe,i)=>{const r=Z.rect[i];Object.assign(pe.el.style,{left:r.x+'px',top:r.y+'px',width:r.w+'px',height:r.h+'px'});if(pe.hi){pe.hi.remove();pe.hi=null;}});
+  if(Z.sel)zHighlight(Z.sel.p,Z.sel.box);
+  zOnScroll();
+}
+function zVisible(){
+  const C=$('#zPages');const t=C.scrollTop,b=t+C.clientHeight;
+  const out=[];for(let i=0;i<Z.rect.length;i++){const r=Z.rect[i];if(r.y+r.h>=t&&r.y<=b)out.push(i);if(r.y>b)break;}return out;
+}
+let zScrollT=null;
+function zOnScroll(){
+  if(!Z||!Z.rect)return;
+  const C=$('#zPages');const mid=C.scrollTop+C.clientHeight*0.4;
+  let p=0;for(let i=0;i<Z.rect.length;i++){if(Z.rect[i].y<=mid)p=i;else break;}
+  if(p!==Z.page){Z.page=p;zBar();}
+  const vis=zVisible();
+  const want=new Set();for(const i of vis)for(let k=i-1;k<=i+1;k++)if(k>=0&&k<Z.n)want.add(k);
+  Z.pe.forEach((pe,i)=>{if(!want.has(i)&&Math.abs(i-p)>3&&pe.base){pe.base.width=0;pe.base.remove();pe.base=null;}});
+  zQueueBase([...want].sort((a,b)=>Math.abs(a-p)-Math.abs(b-p)));
+  clearTimeout(zScrollT);zScrollT=setTimeout(()=>{zRenderHi();zSavePos();},180);
+}
+/* Grundbild jeder Seite (in Bildschirmauflösung bei ganzer Breite) */
+let zBaseBusy=false,zBaseQ=[];
+function zQueueBase(list){zBaseQ=list;zBaseRun();}
+async function zBaseRun(){
+  if(zBaseBusy)return;zBaseBusy=true;const myZ=Z;
+  while(Z===myZ&&zBaseQ.length){
+    const i=zBaseQ.shift();const pe=Z.pe[i];if(!pe||pe.base)continue;
+    try{
+      const page=await Z.doc.getPage(i+1);const pg=Z.pages[i];
+      const sc=Math.min(Z.fitW*DPR,1400)/pg.w;
+      const vp=page.getViewport({scale:sc});
+      const c=document.createElement('canvas');c.className='zb';c.width=Math.round(vp.width);c.height=Math.round(vp.height);
+      await page.render({canvasContext:c.getContext('2d',{alpha:false}),viewport:vp}).promise;
+      if(Z!==myZ)break;
+      if(pe.base)continue;
+      pe.el.prepend(c);pe.base=c;const pn=pe.el.querySelector('.pn');if(pn)pn.remove();
+    }catch(e){}
+  }
+  zBaseBusy=false;
+}
+/* Scharfes Bild für den sichtbaren Ausschnitt, wenn hineingezoomt */
+let zHiTasks=[];
+async function zRenderHi(){
+  if(!Z||Z.mode!=='page'||!Z.rect)return;
+  zHiTasks.forEach(t=>{try{t.cancel();}catch(e){}});zHiTasks=[];
+  const C=$('#zPages');const gen=++Z.gen;
+  const need=Z.fitW*Z.zf*DPR>Math.min(Z.fitW*DPR,1400)*1.12;
+  const vis=need?zVisible():[];
+  Z.pe.forEach((pe,i)=>{if(pe.hi&&!vis.includes(i)){pe.hi.remove();pe.hi=null;}});
+  for(const i of vis.slice(0,3)){
+    const r=Z.rect[i],pe=Z.pe[i];
+    const x0=Math.max(C.scrollLeft,r.x),x1=Math.min(C.scrollLeft+C.clientWidth,r.x+r.w);
+    const y0=Math.max(C.scrollTop,r.y),y1=Math.min(C.scrollTop+C.clientHeight,r.y+r.h);
+    if(x1<=x0||y1<=y0)continue;
+    let d=DPR;while((x1-x0)*(y1-y0)*d*d>8e6&&d>1)d-=0.5;
+    try{
+      const page=await Z.doc.getPage(i+1);if(!Z||gen!==Z.gen)return;
+      const vp=page.getViewport({scale:r.s*d});
+      const c=document.createElement('canvas');c.className='zh';c.width=Math.ceil((x1-x0)*d);c.height=Math.ceil((y1-y0)*d);
+      const task=page.render({canvasContext:c.getContext('2d',{alpha:false}),viewport:vp,transform:[1,0,0,1,-(x0-r.x)*d,-(y0-r.y)*d]});
+      zHiTasks.push(task);await task.promise;
+      if(!Z||gen!==Z.gen)return;
+      Object.assign(c.style,{left:(x0-r.x)+'px',top:(y0-r.y)+'px',width:(x1-x0)+'px',height:(y1-y0)+'px'});
+      if(pe.hi)pe.hi.remove();pe.el.appendChild(c);pe.hi=c;
+    }catch(e){}
+  }
+}
+/* Bildschirmpunkt <-> Stelle auf einer Seite (in PDF-Punkten) */
+function zHit(cx,cy){
+  const C=$('#zPages'),R=C.getBoundingClientRect();
+  const x=C.scrollLeft+cx-R.left,y=C.scrollTop+cy-R.top;
+  for(let i=0;i<Z.rect.length;i++){const r=Z.rect[i];if(y>=r.y-6&&y<=r.y+r.h+6)return{i,x:(x-r.x)/r.s,y:(y-r.y)/r.s,inside:x>=r.x&&x<=r.x+r.w};}
+  return null;
+}
+/* Zoom setzen; die Stelle (Seite i, Punkt px/py) bleibt am Bildschirmpunkt sx/sy */
+function zZoomTo(zf,i,px,py,sx,sy,smooth){
+  zf=Math.max(Z.minZ,Math.min(Z.maxZ,zf));
+  Z.zf=zf;zLayout();
+  const C=$('#zPages'),r=Z.rect[i];
+  const l=r.x+px*r.s-sx,t=r.y+py*r.s-sy;
+  if(smooth)C.scrollTo({left:l,top:t,behavior:'smooth'});else{C.scrollLeft=l;C.scrollTop=t;}
+  zOnScroll();zBar();
+}
+function zGoPage(i,smooth){
+  i=Math.max(0,Math.min(Z.n-1,i));
+  const C=$('#zPages'),r=Z.rect[i];
+  const top=r.y-(Z.zf>1.05?0:6);
+  C.scrollTo({top,left:Z.zf>1.05?C.scrollLeft:0,behavior:smooth?'smooth':'auto'});
+  Z.page=i;zBar();zOnScroll();
+}
+/* Gesten: zwei Finger = Zoom, Doppeltipp = Spalte, Tipp = Artikel wählen */
+function zGestures(C){
+  const I=$('#zIn');let pin=null;
+  const two=e=>{const a=e.touches[0],b=e.touches[1];return{d:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY),x:(a.clientX+b.clientX)/2,y:(a.clientY+b.clientY)/2};};
+  C.addEventListener('touchstart',e=>{
+    if(e.touches.length!==2)return;e.preventDefault();
+    const t=two(e),h=zHit(t.x,t.y);if(!h)return;
+    const R=C.getBoundingClientRect();
+    pin={d0:t.d,x0:t.x,y0:t.y,h,s:1,x:t.x,y:t.y,ox:C.scrollLeft+t.x-R.left,oy:C.scrollTop+t.y-R.top};
+    I.style.transformOrigin=pin.ox+'px '+pin.oy+'px';tapS=null;
+  },{passive:false});
+  C.addEventListener('touchmove',e=>{
+    if(!pin||e.touches.length<2)return;if(e.cancelable)e.preventDefault();
+    const t=two(e);const zf=Math.max(Z.minZ,Math.min(Z.maxZ,Z.zf*t.d/pin.d0));
+    pin.s=zf/Z.zf;pin.x=t.x;pin.y=t.y;
+    I.style.transform=`translate(${t.x-pin.x0}px,${t.y-pin.y0}px) scale(${pin.s})`;
+  },{passive:false});
+  const tend=e=>{if(!pin||e.touches.length>=2)return;const p=pin;pin=null;I.style.transform='';
+    const R=C.getBoundingClientRect();Z.col=null;zZoomTo(Z.zf*p.s,p.h.i,p.h.x,p.h.y,p.x-R.left,p.y-R.top);};
+  C.addEventListener('touchend',tend);C.addEventListener('touchcancel',tend);
+  // Tippen erkennen (Finger und Maus)
+  let tapS=null,last=null,tapT=null,drag=null;
+  C.addEventListener('pointerdown',e=>{
+    tapS={x:e.clientX,y:e.clientY,t:Date.now(),id:e.pointerId};
+    if(e.pointerType==='mouse'&&e.button===0&&Z.zf>1.02){drag={x:e.clientX,y:e.clientY,l:C.scrollLeft,t:C.scrollTop};}
+  });
+  C.addEventListener('pointermove',e=>{
+    if(tapS&&Math.hypot(e.clientX-tapS.x,e.clientY-tapS.y)>10)tapS=null;
+    if(drag&&(e.buttons&1)){C.scrollLeft=drag.l-(e.clientX-drag.x);C.scrollTop=drag.t-(e.clientY-drag.y);C.classList.add('drag');}
+  });
+  C.addEventListener('pointerup',e=>{
+    drag=null;C.classList.remove('drag');
+    if(!tapS||pin||tapS.id!==e.pointerId||Date.now()-tapS.t>400){tapS=null;return;}
+    const t=tapS;tapS=null;
+    if(last&&Date.now()-last.t<330&&Math.hypot(t.x-last.x,t.y-last.y)<40){clearTimeout(tapT);last=null;zDoubleTap(t.x,t.y);}
+    else{last={x:t.x,y:t.y,t:Date.now()};clearTimeout(tapT);tapT=setTimeout(()=>{last=null;zTap(t.x,t.y);},300);}
+  });
+  C.addEventListener('pointercancel',()=>{tapS=null;drag=null;});
+  C.addEventListener('wheel',e=>{
+    if(!e.ctrlKey)return;e.preventDefault();
+    const R=C.getBoundingClientRect(),h=zHit(e.clientX,e.clientY);if(!h)return;
+    Z.col=null;zZoomTo(Z.zf*Math.exp(-e.deltaY*0.0025),h.i,h.x,h.y,e.clientX-R.left,e.clientY-R.top);
+  },{passive:false});
+}
+/* Artikel / Spalte an einer Stelle der Seite */
+function zFindAt(segs,x,y){
+  for(let ai=0;ai<segs.length;ai++){const a=segs[ai];
+    for(let ci=0;ci<a.cols.length;ci++){const c=a.cols[ci];if(x>=c[0]-6&&x<=c[2]+6&&y>=c[1]-8&&y<=c[3]+8)return{ai,ci};}}
+  let best=null;
+  for(let ai=0;ai<segs.length;ai++){const a=segs[ai];
+    for(let ci=0;ci<a.cols.length;ci++){const c=a.cols[ci];const dx=Math.max(c[0]-x,0,x-c[2]),dy=Math.max(c[1]-y,0,y-c[3]);const d=Math.hypot(dx,dy);if(d<40&&(!best||d<best.d))best={ai,ci,d};}
+    const b=a.box;if(!best&&x>=b[0]&&x<=b[2]&&y>=b[1]&&y<=b[3])best={ai,ci:-1,d:99};}
+  return best;
+}
+async function zTap(cx,cy){
+  if(!Z||Z.mode!=='page')return;
+  const h=zHit(cx,cy);if(!h||!h.inside){zSelect(null);return;}
+  if(Z.col){return;}
+  const segs=await zSegOf(h.i);const f=zFindAt(segs,h.x,h.y);
+  if(!f){zSelect(null);return;}
+  if(Z.sel&&Z.sel.p===h.i&&Z.sel.i===f.ai){zShowArticle(h.i,f.ai);return;}
+  zSelect({p:h.i,i:f.ai,box:segs[f.ai].box,title:segs[f.ai].title||zFirstWords(segs[f.ai])});
+}
+async function zDoubleTap(cx,cy){
+  if(!Z||Z.mode!=='page')return;
+  const C=$('#zPages'),R=C.getBoundingClientRect();
+  const h=zHit(cx,cy);if(!h)return;
+  if(Z.zf>1.25){const r=Z.rect[h.i];Z.col=null;zSelect(null);zZoomTo(1,h.i,h.x,h.y,cx-R.left,cy-R.top);return;}
+  const segs=await zSegOf(h.i);const f=zFindAt(segs,h.x,h.y);
+  if(f&&f.ci>=0){zColumn(h.i,f.ai,f.ci,cy-R.top,h.y);return;}
+  zZoomTo(2.5,h.i,h.x,h.y,cx-R.left,cy-R.top);
+}
+/* Spaltenmodus: Spalte füllt die Breite, Pfeile springen zur nächsten Spalte */
+async function zColumn(p,ai,ci,sy,py){
+  const segs=await zSegOf(p);const a=segs[ai];if(!a)return;const c=a.cols[ci];
+  const C=$('#zPages');const W=C.clientWidth;
+  const colW=c[2]-c[0]+10;
+  const pgW=Z.pages[p].w;
+  // Handy: Spalte füllt die Breite. Großer Bildschirm: höchstens ~2,3 Bildpunkte je Punkt (angenehme Lesegröße), mittig
+  const s=Math.min((W-12)/colW,2.3);
+  const zf=s*pgW/Z.fitW;
+  Z.col={p,ai,ci};zSelect(null,true);
+  zZoomTo(zf,p,c[0]-5,py!=null?py:c[1]-6,Math.max(6,(W-colW*s)/2),sy!=null?sy:8,py==null);
+}
+function zColStep(d){
+  if(!Z||!Z.col)return;const {p,ai,ci}=Z.col;
+  zSegOf(p).then(segs=>{const a=segs[ai];const n=ci+d;
+    if(n>=0&&n<a.cols.length){zColumn(p,ai,n);return;}
+    toast(d>0?'Ende des Artikels':'Anfang des Artikels');});
+}
+function zSelect(sel,keep){
+  Z.sel=sel;
+  document.querySelectorAll('.zhl').forEach(x=>x.remove());
+  if(sel)zHighlight(sel.p,sel.box);
+  if(!keep)Z.col=null;
+  zBar();
+}
+function zHighlight(p,box){
+  const pe=Z.pe[p],r=Z.rect[p];if(!pe)return;
+  document.querySelectorAll('.zhl').forEach(x=>x.remove());
+  const d=document.createElement('div');d.className='zhl';
+  Object.assign(d.style,{left:(box[0]*r.s-4)+'px',top:(box[1]*r.s-4)+'px',width:((box[2]-box[0])*r.s+8)+'px',height:((box[3]-box[1])*r.s+8)+'px'});
+  pe.el.appendChild(d);
+}
+function zFirstWords(a){const t=(a.paras[0]?a.paras[0].runs.map(r=>r.t).join(''):'').split(/\s+/).slice(0,7).join(' ');return t?t+' …':'Text';}
+
+/* Leiste unten */
+function zBar(){
+  const B=$('#zBar');if(!B||!Z)return;
+  const ico=(n,f)=>`<svg class="i"${f?' style="fill:currentColor;stroke:none"':''}><use href="#${n}"/></svg>`;
+  if(Z.mode==='read'){
+    const all=zArtList(),k=Z.cur?all.findIndex(e=>e.p===Z.cur[0]&&e.i===Z.cur[1]):-1;
+    B.innerHTML=`<button data-b="prev" aria-label="Voriger Artikel">${ico('i-back')}</button><button data-b="smaller" aria-label="Schrift kleiner">A−</button><span class="lbl">${k>=0?(k+1)+' / '+all.length+(Z.idxDone?'':'…'):''}</span><button data-b="bigger" aria-label="Schrift größer">A+</button><button data-b="theme" aria-label="Hell/Dunkel">${ico('i-moon')}</button><button data-b="next" aria-label="Nächster Artikel" style="transform:scaleX(-1)">${ico('i-back')}</button>`;
+  }else if(Z.col){
+    B.innerHTML=`<button data-b="cprev">${ico('i-back')}Spalte</button><button class="pri" data-b="readcol">Lesen</button><button data-b="cnext">Spalte<span style="transform:scaleX(-1);display:flex">${ico('i-back')}</span></button><button data-b="cx" aria-label="Zurück zur Seite">${ico('i-x')}</button>`;
+  }else if(Z.sel){
+    B.innerHTML=`<button class="pri" data-b="read">Lesen: ${esc(Z.sel.title)}</button><button data-b="cx" aria-label="Auswahl aufheben">${ico('i-x')}</button>`;
+  }else{
+    B.innerHTML=`<button data-b="pprev" aria-label="Vorige Seite">${ico('i-up')}</button><span class="lbl">Seite ${Z.page+1} / ${Z.n}</span><button data-b="pnext" aria-label="Nächste Seite">${ico('i-down')}</button>${Z.zf>1.05?`<button data-b="fit" aria-label="Ganze Seite">${ico('i-x')}</button>`:''}`;
+  }
+  const head=Z.v.querySelector('.zmode');if(head)head.textContent=Z.mode==='page'?'Lesen':'Seite';
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('#zBar [data-b]');if(!b||!Z)return;const a=b.dataset.b;
+  if(a==='pprev')zGoPage(Z.page-1,true);
+  else if(a==='pnext')zGoPage(Z.page+1,true);
+  else if(a==='fit'){const C=$('#zPages'),R=C.getBoundingClientRect();const h=zHit(R.left+C.clientWidth/2,R.top+C.clientHeight/2);Z.col=null;if(h)zZoomTo(1,h.i,h.x,h.y,C.clientWidth/2,C.clientHeight/2);else{Z.zf=1;zLayout();}}
+  else if(a==='read'&&Z.sel)zShowArticle(Z.sel.p,Z.sel.i);
+  else if(a==='readcol'&&Z.col)zShowArticle(Z.col.p,Z.col.ai);
+  else if(a==='cprev')zColStep(-1);else if(a==='cnext')zColStep(1);
+  else if(a==='cx'){if(Z.col){const C=$('#zPages'),R=C.getBoundingClientRect();const h=zHit(R.left+8,R.top+C.clientHeight/2);Z.col=null;if(h)zZoomTo(1,h.i,h.x,h.y,8,C.clientHeight/2);}zSelect(null);}
+  else if(a==='prev')zStep(-1);else if(a==='next')zStep(1);
+  else if(a==='smaller'||a==='bigger'){ztPrefs.fs=Math.max(14,Math.min(30,ztPrefs.fs+(a==='bigger'?1:-1)));store.set('ztprefs',ztPrefs);zApplyPrefs();}
+  else if(a==='theme'){ztPrefs.th=ztPrefs.th==='dark'?'light':'dark';store.set('ztprefs',ztPrefs);zApplyPrefs();}
+});
+
+/* ---------- Artikel-Erkennung je Seite ---------- */
+function zSegOf(i,fonts){
+  const m=fonts?Z.segF:Z.seg;
+  if(!m.has(i))m.set(i,(async()=>{
+    const page=await Z.doc.getPage(i+1);const vb=page.view;
+    const tc=await page.getTextContent();
+    let fn=null;
+    if(fonts){await page.getOperatorList();fn=k=>{try{return page.commonObjs.get(k).name||'';}catch(e){return '';}};}
+    const items=tc.items.map(it=>it.transform?{str:it.str,width:it.width,fontName:it.fontName,transform:[it.transform[0],it.transform[1],it.transform[2],it.transform[3],it.transform[4]-vb[0],it.transform[5]-vb[1]]}:it);
+    return zSegment(items,vb[2]-vb[0],vb[3]-vb[1],fn);
+  })().catch(()=>[]));
+  return m.get(i);
+}
+const zText=a=>a.paras.map(p=>p.runs.map(r=>r.t).join('')).join('\n');
+function zEntries(p,segs){return segs.map((a,i)=>({p,i,t:a.title||zFirstWords(a),k:a.kicker,n:a.intro.slice(0,240),r:a.ressort,w:a.words,o:!a.title,x:(a.title+' '+a.intro+' '+zText(a)).slice(0,30000)}));}
+async function zPageIdx(p){if(!Z.idx[p])Z.idx[p]=zEntries(p,await zSegOf(p));return Z.idx[p];}
+function zEntry(p,i){return Z.idx[p]&&Z.idx[p][i]||null;}
+/* Artikel, die als eigener Eintrag zählen (ohne Anzeigenreste) */
+const zReal=e=>e.w>=60||(e.n&&!e.o);
+function zArtList(){const out=[];for(const l of Z.idx)if(l)for(const e of l)if(zReal(e))out.push(e);return out;}
+async function zBuildIndex(){
+  const myZ=Z,ck='zi:'+ZV+':'+Z.key;
+  const cached=await idb.get(ck);
+  if(Z!==myZ)return;
+  if(cached&&cached.length===Z.n){Z.idx=cached;Z.idxDone=true;ztIdxMem.set(Z.key,Z.idx);zBar();zTocDraw();return;}
+  for(let p=0;p<Z.n;p++){
+    if(Z!==myZ)return;
+    await zPageIdx(p);
+    if(p%10===9){zTocDraw();zBar();}
+  }
+  Z.idxDone=true;idb.set(ck,Z.idx);ztIdxMem.set(Z.key,Z.idx);zTocDraw();zBar();
+}
+
+/* ---------- Lesemodus ---------- */
+function zSetMode(m){
+  if(!Z)return;
+  if(m==='read'){
+    if(Z.sel){zShowArticle(Z.sel.p,Z.sel.i);return;}
+    if(Z.col){zShowArticle(Z.col.p,Z.col.ai);return;}
+    // erster richtiger Artikel ab der aktuellen Seite
+    (async()=>{for(let p=Z.page;p<Z.n;p++){const l=await zPageIdx(p);const e=l.find(x=>x.w>=60&&!x.o)||l.find(zReal);if(e){zShowArticle(e.p,e.i);return;}}toast('Kein Artikel gefunden');})();
+    return;}
+  Z.mode='page';$('#zRead').classList.add('hidden');$('#zPages').classList.remove('hidden');
+  if(Z.cur){const [p,i]=Z.cur;zGoPage(p,false);zSegOf(p).then(segs=>{const a=segs[i];if(a&&Z.mode==='page'){zSelect({p,i,box:a.box,title:a.title||zFirstWords(a)});
+    const C=$('#zPages'),r=Z.rect[p];C.scrollTop=Math.max(0,r.y+a.box[1]*r.s-60);}});}
+  zBar();zSavePos();
+}
+function zApplyPrefs(){const R=$('#zRead');if(!R)return;R.style.setProperty('--zfs',ztPrefs.fs+'px');R.classList.toggle('light',ztPrefs.th==='light');}
+const zRuns=runs=>runs.map(r=>{let t=esc(r.t);if(r.i)t='<i>'+t+'</i>';if(r.b)t='<b>'+t+'</b>';return t;}).join('');
+async function zShowArticle(p,i){
+  if(!Z)return;
+  Z.mode='read';Z.cur=[p,i];Z.sel=null;Z.col=null;
+  const R=$('#zRead');R.classList.remove('hidden');$('#zPages').classList.add('hidden');zApplyPrefs();
+  zBar();
+  const myZ=Z;
+  if(!R.firstChild)R.innerHTML='<div class="spin" style="margin-top:80px"></div>';
+  const segs=await zSegOf(p,true);
+  await zPageIdx(p);
+  if(Z!==myZ||!Z.cur||Z.cur[0]!==p||Z.cur[1]!==i)return;
+  const plain=await zSegOf(p);
+  // gleiche Reihenfolge in beiden Durchläufen; zur Sicherheit über die Position zuordnen
+  const ref=plain[i];const a=segs.find(x=>ref&&x.box.join()===ref.box.join())||segs[i];
+  if(!a){R.innerHTML='<div class="hint">Artikel nicht gefunden.</div>';return;}
+  const min=Math.max(1,Math.round(a.words/220));
+  const all=zArtList(),k=all.findIndex(e=>e.p===p&&e.i===i),nx=all[k+1];
+  const title=a.title||'Fortsetzung';
+  R.innerHTML=`<article class="zart" lang="de">
+    <div class="zres">${esc([a.ressort||(p===0?'Titelseite':''),'Seite '+(p+1)].filter(Boolean).join(' · '))}</div>
+    ${a.kicker?`<div class="zk">${esc(a.kicker)}</div>`:''}
+    <h1>${esc(title)}</h1>
+    ${a.intro?`<p class="zi">${esc(a.intro)}</p>`:''}
+    <div class="zm">${a.by?`<span class="zby">${esc(a.by)}</span> · `:''}${min} Min. Lesezeit</div>
+    ${a.paras.map(q=>q.k==='h'?`<h3>${zRuns(q.runs)}</h3>`:`<p>${zRuns(q.runs)}</p>`).join('')}
+    ${(a.boxes||[]).map(b=>`<aside class="zbox"><h4>${esc(b.title)}</h4>${b.paras.map(q=>`<p>${zRuns(q.runs)}</p>`).join('')}</aside>`).join('')}
+    ${a.caps.length?`<div class="zcaps">${a.caps.map(c=>`<div class="zcap">${esc(c)}</div>`).join('')}</div>`:''}
+    <div class="zacts"><button data-r="page"><svg class="i"><use href="#i-paper"/></svg>Original-Seite</button><button data-r="toc"><svg class="i"><use href="#i-list"/></svg>Inhalt</button></div>
+    ${nx?`<button class="znext" data-r="next"><span>Nächster Artikel · Seite ${nx.p+1}</span><b>${esc(nx.t)}</b></button>`:''}
+    <div class="zsrc">Lesemodus: Text automatisch aus dem PDF übernommen – bei ungewöhnlichem Layout hilft die Original-Seite.</div>
+  </article>`;
+  R.scrollTop=0;
+  R.onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;const r=b.dataset.r;if(r==='page')zSetMode('page');else if(r==='toc')zOpenToc();else if(r==='next')zStep(1);};
+  zBar();zSavePos();
+}
+async function zStep(d){
+  if(!Z||!Z.cur)return;const [p,i]=Z.cur;
+  const here=(await zPageIdx(p)).filter(zReal);
+  const pos=here.findIndex(e=>e.i===i);
+  if(d>0&&pos>=0&&pos<here.length-1){zShowArticle(p,here[pos+1].i);return;}
+  if(d<0&&pos>0){zShowArticle(p,here[pos-1].i);return;}
+  for(let q=p+d;q>=0&&q<Z.n;q+=d){const l=(await zPageIdx(q)).filter(zReal);if(l.length){const e=d>0?l[0]:l[l.length-1];zShowArticle(e.p,e.i);return;}}
+  toast(d>0?'Das war der letzte Artikel':'Das ist der erste Artikel');
+}
+
+/* ---------- Inhaltsverzeichnis ---------- */
+let zTocV=null;
+function zOpenToc(){
+  if(!Z)return;
+  zTocV=openView('Inhalt',(b,v)=>{
+    b.innerHTML=`<label class="search" style="margin:4px 0 8px"><svg class="i" style="width:20px;height:20px"><use href="#i-search"/></svg><input id="zTocQ" type="search" placeholder="In dieser Ausgabe suchen" autocomplete="off"></label><div id="zTocL"></div>`;
+    b.querySelector('#zTocQ').oninput=()=>zTocDraw();
+    b.onclick=e=>{
+      const pg=e.target.closest('[data-zp]');if(pg){e.stopPropagation();const p=+pg.dataset.zp;back();zSetMode('page');Z.cur=null;zGoPage(p,false);return;}
+      const r=e.target.closest('[data-za]');if(r){const [p,i]=r.dataset.za.split(':').map(Number);back();zShowArticle(p,i);}};
+    v._draw=zTocDraw;
+  });
+  zTocDraw();
+}
+function zTocDraw(){
+  if(!Z||!zTocV||!document.body.contains(zTocV))return;
+  const L=zTocV.querySelector('#zTocL');if(!L)return;
+  const q=norm(zTocV.querySelector('#zTocQ').value.trim());
+  const done=Z.idx.filter(Boolean).length;
+  let h=Z.idxDone?'':`<div class="s" style="color:var(--mute);font-size:13px;margin:0 2px 8px">Inhalt wird erstellt … Seite ${done} von ${Z.n}</div>`;
+  let lastR=null,n=0;
+  for(const e of zArtList()){
+    if(q&&!norm(e.t+' '+e.k+' '+e.n+' '+(e.x||'')).includes(q))continue;
+    const rs=e.r||(e.p===0?'Titelseite':'');
+    if(!q&&rs&&rs!==lastR){h+=`<div class="sec">${esc(rs)}</div>`;lastR=rs;}
+    const cur=Z.cur&&Z.cur[0]===e.p&&Z.cur[1]===e.i;
+    h+=`<button class="ztoc${cur?' cur':''}" data-za="${e.p}:${e.i}"><span class="pg" data-zp="${e.p}">${e.p+1}</span><div class="tx">${e.k?`<div class="k">${esc(e.k)}</div>`:''}<div class="n">${esc(e.t)}</div>${e.n?`<div class="s">${esc(e.n)}</div>`:''}</div><span class="m">${e.w>=60?Math.max(1,Math.round(e.w/220))+' Min.':''}</span></button>`;
+    if(++n>400)break;
+  }
+  if(!n)h+=`<div class="hint">${q?'Nichts gefunden.':'Noch keine Artikel erkannt.'}</div>`;
+  L.innerHTML=h;
+}
+/* Tastatur am PC */
+window.zKey=e=>{
+  if(!Z||!Z.v||nav[nav.length-1]!==Z.v||e.target.closest('input,textarea'))return false;
+  const k=e.key;
+  if(Z.mode==='read'){
+    if(k==='ArrowRight'){zStep(1);return true;}if(k==='ArrowLeft'){zStep(-1);return true;}
+    if(k===' '){return true;}return false;}
+  if(Z.col&&(k==='ArrowRight'||k==='ArrowLeft')){zColStep(k==='ArrowRight'?1:-1);return true;}
+  if(k==='ArrowRight'||k==='PageDown'){e.preventDefault();zGoPage(Z.page+1,true);return true;}
+  if(k==='ArrowLeft'||k==='PageUp'){e.preventDefault();zGoPage(Z.page-1,true);return true;}
+  if(k==='+'||k==='='||k==='-'||k==='0'){const C=$('#zPages'),R=C.getBoundingClientRect();const h=zHit(R.left+C.clientWidth/2,R.top+C.clientHeight/2);if(h){Z.col=null;zZoomTo(k==='0'?1:Z.zf*(k==='-'?0.8:1.25),h.i,h.x,h.y,C.clientWidth/2,C.clientHeight/2);}return true;}
+  if(k===' '){return true;}
+  return false;
+};
+document.addEventListener('keydown',e=>{if(!DESKTOP&&window.zKey(e))e.preventDefault();});
+
+/* ----- Artikel-Erkennung (aus den Textpositionen von pdf.js) ----- */
+/* Zeitungsseite in Artikel zerlegen (aus den Textpositionen von pdf.js).
+   Ergebnis: [{title, kicker, intro, blocks:[{k:'p'|'h'|'cap', runs:[{t,b,i}]}], box:[x0,y0,x1,y1], cols:[[x0,x1]...]}] */
+function zSegment(items, W, H, fontName) {
+  const fname = fontName || (() => '');
+  // 1) Textstücke: Position (oben links), Größe, Schrift
+  const parts = [];
+  for (const it of items) {
+    const s = (it.str || '').replace(/\uFFFD/g, ' ');
+    if (!s.trim()) continue;
+    const [a, b, c, d, x, y] = it.transform;
+    const fs = Math.hypot(c, d);
+    if (fs < 4) continue;
+    let px = x, py = H - y;
+    if (Math.abs(b) > 0.01 || Math.abs(c) > 0.01 || a <= 0) {
+      // gedrehter Text (Fotonachweis) fällt weg – außer ein auf den Kopf gestellter Buchstabe im Schriftzug
+      if (!(s.trim().length === 1 && a < 0 && d < 0 && Math.abs(b) < 0.01)) continue;
+      px = x - it.width; py = H - y + fs * 0.7;
+    }
+    const fn = fname(it.fontName) || '';
+    parts.push({ s, x: px, x1: px + it.width, y: py, fs, fn, bold: /Bold|SemBol|Black|Heavy/i.test(fn), ital: /Italic|Oblique|Kursiv/i.test(fn) });
+  }
+  if (!parts.length) return [];
+  { const seen = new Set();
+    for (let i = parts.length - 1; i >= 0; i--) { const p = parts[i], k = p.s + '|' + Math.round(p.x) + '|' + Math.round(p.y); if (seen.has(k)) parts.splice(i, 1); else seen.add(k); } }
+
+  // 2) Grundschrift der Seite = häufigste Größe (nach Zeichen)
+  const cnt = {};
+  for (const p of parts) { const k = Math.round(p.fs * 2) / 2; cnt[k] = (cnt[k] || 0) + p.s.length; }
+  const body = +Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])[0];
+
+  // 3) Initialen (riesiger Einzelbuchstabe) merken und später vor die erste Zeile daneben setzen
+  const drops = [];
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const p = parts[i];
+    if (p.s.trim().length === 1 && /\p{Lu}/u.test(p.s) && p.fs > body * 3.5) { drops.push(p); parts.splice(i, 1); }
+  }
+
+  // 4) Zeilen bilden: gleiche Grundlinie und dicht nebeneinander
+  parts.sort((a, b) => a.y - b.y || a.x - b.x);
+  const lines = [];
+  for (const p of parts) {
+    let L = null;
+    for (let i = lines.length - 1; i >= 0 && i >= lines.length - 40; i--) {
+      const l = lines[i];
+      if (Math.abs(l.y - p.y) < Math.max(l.fs, p.fs) * 0.35 || (p.fs < l.fs * 0.7 && p.y < l.y && l.y - p.y < l.fs * 0.6)) {
+        const gap = p.x > l.x1 ? p.x - l.x1 : (p.x1 < l.x ? l.x - p.x1 : 0);
+        if (gap > -Math.max(2, p.fs * 0.2) && gap < Math.min(l.fs, p.fs) * (Math.min(l.fs, p.fs) > 20 ? 0.9 : 0.8)) { L = l; break; }
+      }
+    }
+    if (L) {
+      L.ps.push(p); L.x = Math.min(L.x, p.x); L.x1 = Math.max(L.x1, p.x1);
+      if (p.s.length > 2 && !(p.fs < L.fs * 0.7 && L.y - p.y > L.fs * 0.2)) L.chars[p.fs] = (L.chars[p.fs] || 0) + p.s.length;
+    } else {
+      lines.push({ x: p.x, x1: p.x1, y: p.y, fs: p.fs, ps: [p], chars: { [p.fs]: p.s.length } });
+    }
+  }
+  // Blocksatz mit großen Wortabständen (z. B. neben Initialen): Bruchstücke einer Zeile zusammenfügen,
+  // außer die Lücke ist ein Spaltenzwischenraum (rechts beginnt eine Spalte, an deren Kante viele Zeilen starten)
+  {
+    const eL = {}, eR = {};
+    for (const l of lines) { if (Math.abs(l.fs - body) > 1) continue; const a = Math.round(l.x), b = Math.round(l.x1); eL[a] = (eL[a] || 0) + 1; eR[b] = (eR[b] || 0) + 1; }
+    const near = (m, v) => { for (let d = -2; d <= 2; d++) if ((m[Math.round(v) + d] || 0) >= 4) return true; return false; };
+    lines.sort((a, b) => a.y - b.y || a.x - b.x);
+    for (let i = 0; i < lines.length; i++) {
+      const A = lines[i];
+      for (let j = i + 1; j < lines.length && lines[j].y - A.y < A.fs * 0.35; j++) {
+        const B = lines[j];
+        if (Math.abs(B.y - A.y) > A.fs * 0.35 || Math.abs(B.fs - A.fs) > 0.5 || Math.abs(A.fs - body) > 1.5) continue;
+        const gap = B.x - A.x1;
+        if (gap < 0 || gap > A.fs * 2.6) continue;
+        if (near(eL, B.x) && (near(eR, A.x1) || gap > A.fs * 1.2)) continue;
+        A.ps.push(...B.ps); A.x1 = Math.max(A.x1, B.x1);
+        for (const k in B.chars) A.chars[k] = (A.chars[k] || 0) + B.chars[k];
+        lines.splice(j, 1); j = i;
+      }
+    }
+  }
+  for (const L of lines) {
+    L.ps.sort((a, b) => a.x - b.x);
+    L.runs = [];
+    let prev = null;
+    for (const p of L.ps) {
+      let t = p.s;
+      if (prev) {
+        const sup = (p.fs < prev.fs * 0.7 && prev.y - p.y > prev.fs * 0.2) || (prev.fs < p.fs * 0.7 && p.y - prev.y > p.fs * 0.2);   // hochgestelltes o in "N o 48"
+        if (p.x - prev.x1 > Math.min(p.fs, prev.fs) * 0.08 && !sup && !/\s$/.test(prev.s) && !/^\s/.test(t)) t = ' ' + t;
+      }
+      L.runs.push({ t, b: p.bold, i: p.ital, fs: p.fs, x: p.x });
+      prev = p;
+    }
+  }
+  for (const l of lines) {
+    // Zeilengröße = vorherrschende Größe; fett/kursiv, wenn die ganze Zeile so ist
+    l.fs = +Object.keys(l.chars).sort((a, b) => l.chars[b] - l.chars[a])[0] || l.fs;
+    l.text = l.runs.map(r => r.t).join('');
+    l.bold = l.runs.every(r => r.b || !r.t.trim());
+    l.top = l.y - l.fs * 0.8;
+  }
+  // Initiale an die erste Zeile rechts daneben hängen
+  for (const d of drops) {
+    const cand = lines.filter(l => l.x > d.x && l.x - d.x1 < body * 3 && l.y > d.y - d.fs && l.y <= d.y + body).sort((a, b) => a.y - b.y)[0];
+    if (!cand) { lines.push({ x: d.x, x1: d.x1, y: d.y, fs: d.fs, runs: [{ t: d.s, b: d.bold, i: d.ital, fs: d.fs }], chars: { [d.fs]: 1 }, text: d.s, top: d.y - d.fs * 0.8 }); continue; }
+    for (const l of lines) if (l !== cand && l.x > d.x && l.x - d.x1 < body * 3 && l.y > d.y - d.fs && l.y <= d.y + body * 0.5) l.byDrop = true;
+    { cand.runs.unshift({ t: d.s.trim(), b: false, i: false, fs: body }); cand.text = d.s.trim() + cand.text; cand.x = Math.min(cand.x, d.x); cand.drop = true; }
+  }
+
+  // 5) Kopfzeile (Seitenzahl, Ressort, Datum) und Fußzeile weglassen
+  const headBand = H * 0.062, footBand = H * 0.975;
+  const isHead = l => l.y < headBand || l.top > footBand;
+  const use = lines.filter(l => !isHead(l));
+
+  // 6) Überschriften-Gruppen: große Zeilen, die untereinander stehen
+  const big = l => l.fs >= body * 1.3;
+  let ressort = '';
+  for (const l of lines) if (l.y < headBand && l.fs > body * 1.5 && /\p{Lu}{3}/u.test(l.text) && !/ZEIT/.test(l.text)) ressort = l.text.trim();
+  const isLabel = l => { const t = l.text.trim(); return l.fs >= body * 1.9 && t.length > 2 && t === t.toUpperCase() && /\p{Lu}{3}/u.test(t) && t.split(/\s+/).length <= 3; };
+  const isNum = l => !/\p{L}{2}/u.test(l.text);
+  const heads = use.filter(l => big(l) && !isNum(l) && !(isLabel(l) && (ressort = ressort || l.text.trim()))).sort((a, b) => a.y - b.y);
+  const groups = [];
+  for (const l of heads) {
+    let g = null;
+    for (const G of groups) {
+      const last = G.lines[G.lines.length - 1];
+      const ov = Math.min(G.x1, l.x1) - Math.max(G.x, l.x);
+      const gap = l.top - last.y;
+      if (ov > Math.min(l.x1 - l.x, G.x1 - G.x) * 0.25 && gap < Math.max(l.fs, last.fs) * 1.6 && gap > -l.fs) { g = G; }
+    }
+    if (g) { g.lines.push(l); g.x = Math.min(g.x, l.x); g.x1 = Math.max(g.x1, l.x1); g.y1 = l.y; }
+    else groups.push({ lines: [l], x: l.x, x1: l.x1, y0: l.top, y1: l.y });
+  }
+  // Zweizeiliger Titel, dessen zweite Zeile weiter unten steht (Bild dazwischen)
+  for (let i = groups.length - 1; i > 0; i--) {
+    const g = groups[i];
+    const gfs = g.lines[0].fs;
+    if (gfs < Math.max(...g.lines.map(l => l.fs))) continue;
+    const up = groups.slice(0, i).reverse().find(G => Math.min(G.x1, g.x1) - Math.max(G.x, g.x) > 0);
+    if (!up) continue;
+    const ulast = up.lines[up.lines.length - 1];
+    if (Math.abs(ulast.fs - gfs) > gfs * 0.05 || /[.!?«»“"]$/.test(ulast.text.trim())) continue;
+    const sameAxis = Math.abs((ulast.x + ulast.x1) / 2 - (g.lines[0].x + g.lines[0].x1) / 2) < gfs * 0.6;
+    const between = use.some(l => !big(l) && l.y > ulast.y && l.top < g.y0 && Math.min(l.x1, g.x1) - Math.max(l.x, g.x) > 0);
+    if (between && !sameAxis) continue;
+    up.lines.push(...g.lines); up.x = Math.min(up.x, g.x); up.x1 = Math.max(up.x1, g.x1); up.y1 = g.y1;
+    groups.splice(i, 1);
+  }
+  // Titel = größte Schrift der Gruppe; darüber Dachzeile, darunter Vorspann
+  const arts = [];
+  for (const g of groups) {
+    const max = Math.max(...g.lines.map(l => l.fs));
+    if (max < body * 1.9) { g.weak = true; }
+    const ti = g.lines.filter(l => l.fs >= max * 0.9);
+    const firstT = g.lines.indexOf(ti[0]), lastT = g.lines.indexOf(ti[ti.length - 1]);
+    g.title = joinLines(ti);
+    g.kicker = joinLines(g.lines.slice(0, firstT));
+    g.intro = joinLines(g.lines.slice(lastT + 1));
+  }
+  // Schwache Gruppen (nur Vorspann-Größe) an die Gruppe direkt darüber hängen, sonst eigene Artikel
+  for (const g of groups) {
+    if (!g.weak) { arts.push(g); continue; }
+    const up = groups.filter(G => !G.weak && G.y1 < g.y0 && g.y0 - G.y1 < body * 6 && Math.min(G.x1, g.x1) - Math.max(G.x, g.x) > 0).pop();
+    if (up && !up.intro) { up.intro = g.title + (g.intro ? ' ' + g.intro : ''); up.y1 = g.y1; up.x = Math.min(up.x, g.x); up.x1 = Math.max(up.x1, g.x1); }
+    else arts.push(g);
+  }
+
+  // Hervorgehobenes Zitat im Text (»…«) ist kein Artikel
+  const maxT = Math.max(0, ...arts.map(a => Math.max(...a.lines.map(l => l.fs))));
+  for (let i = arts.length - 1; i >= 0; i--) {
+    const g = arts[i], t = g.title;
+    if (!g.intro && !g.kicker && /^[»«"„“]/.test(t) && /[«»"“”]$/.test(t) && Math.max(...g.lines.map(l => l.fs)) < maxT * 0.6) arts.splice(i, 1);
+  }
+  for (let i = arts.length - 1; i >= 0; i--) {
+    const g = arts[i];
+    if (g.intro || g.kicker) continue;
+    const gmax = Math.max(...g.lines.map(l => l.fs));
+    const par = arts.find(P => P !== g && P.y1 < g.y0 && P.x <= g.x + body && P.x1 >= g.x1 - body && Math.max(...P.lines.map(l => l.fs)) > gmax * 1.4);
+    if (par) g.boxOf = par;   // Kasten im Artikel (z. B. Name unter dem Foto + Kurzporträt)
+  }
+
+  // 7) Textblöcke: Zeilen in Grundschrift-Nähe, die bündig untereinander stehen
+  const txt = use.filter(l => !big(l)).sort((a, b) => a.x - b.x || a.y - b.y);
+  const blocks = [];
+  for (const l of txt.sort((a, b) => a.y - b.y)) {
+    let B = null;
+    for (const b of blocks) {
+      const last = b.lines[b.lines.length - 1];
+      const lh = Math.max(last.fs, l.fs) * 1.9;
+      const sameCol = Math.abs(l.x - b.x) < l.fs * 2.2 || (l.x >= b.x - 2 && l.x1 <= b.x1 + l.fs * 1.5 && l.x < b.x + (b.x1 - b.x) * 0.5);
+      const sizeOk = Math.abs(l.fs - last.fs) < body * 0.25 || (l.y - last.y < lh * 0.8 && Math.abs(l.fs - last.fs) < body * 0.4);
+      if (sameCol && l.y - last.y > 0 && l.y - last.y < lh && sizeOk) { B = b; break; }
+    }
+    if (B) { B.lines.push(l); B.x = Math.min(B.x, l.x); B.x1 = Math.max(B.x1, l.x1); B.y1 = l.y; }
+    else blocks.push({ lines: [l], x: l.x, x1: l.x1, y0: l.top, y1: l.y });
+  }
+  for (const b of blocks) {
+    const fsAvg = b.lines.reduce((s, l) => s + l.fs, 0) / b.lines.length;
+    b.fs = fsAvg;
+    b.words = b.lines.reduce((s, l) => s + l.text.split(/\s+/).length, 0);
+    b.cap = fsAvg < body * 0.93 && !b.lines.some(l => l.drop);
+  }
+
+  // Kästen: Spaltenblöcke derselben Zeile direkt unter der Kastenüberschrift gehören dazu
+  for (const g of arts.filter(g => g.boxOf)) {
+    const first = blocks.filter(b => b.y0 >= g.y1 - body && b.y0 < g.y1 + body * 3 && Math.min(b.x1, g.x1) - Math.max(b.x, g.x) > 0).sort((p, q) => p.y0 - q.y0)[0];
+    if (!first) continue;
+    const row = blocks.filter(b => Math.abs(b.y0 - first.y0) < body && Math.abs(b.y1 - first.y1) < body * 3);
+    g.row = new Set(row);
+  }
+  // 8) Blöcke Artikeln zuordnen: tiefste Überschrift darüber, die horizontal überlappt
+  const orphan = { title: '', kicker: '', intro: '', x: 0, x1: W, y0: 0, y1: 0, orphan: true };
+  for (const a of arts) a.blocks = [];
+  orphan.blocks = [];
+  for (const b of blocks) {
+    const mid = (b.x + b.x1) / 2;
+    let best = arts.find(g => g.row && g.row.has(b)) || null;
+    if (best) { best.blocks.push(b); continue; }
+    for (const a of arts) {
+      if (a.boxOf || a.y1 > b.y0 + body) continue;
+      const ov = Math.min(a.x1, b.x1) - Math.max(a.x, b.x);
+      if (ov < (b.x1 - b.x) * 0.3 && !(mid > a.x - body && mid < a.x1 + body)) continue;
+      if (!best || a.y1 > best.y1) best = a;
+    }
+    if (!best) {
+      // Überschrift darüber, die nicht überlappt (ZEIT-Titel sind zentriert und schmaler als der Artikel)
+      const above = arts.filter(a => !a.boxOf && a.y1 <= b.y0 + body);
+      if (above.length) best = above.sort((p, q) => q.y1 - p.y1 || Math.abs((p.x + p.x1) / 2 - mid) - Math.abs((q.x + q.x1) / 2 - mid))[0];
+    }
+    if (!best) {
+      // Spalte neben der Überschrift (Text beginnt links oben, Titel steht rechts daneben)
+      const side = arts.filter(a => !a.boxOf && a.y0 < b.y1 && a.y1 > b.y0 - body * 4);
+      if (side.length) best = side.sort((p, q) => Math.min(Math.abs(p.x - b.x1), Math.abs(b.x - p.x1)) - Math.min(Math.abs(q.x - b.x1), Math.abs(b.x - q.x1)))[0];
+      else if (arts.filter(a => !a.weak).length === 1) best = arts.find(a => !a.weak);
+    }
+    (best || orphan).blocks.push(b);
+  }
+  if (orphan.blocks.length) arts.unshift(orphan);
+
+  // 9) Reihenfolge im Artikel: Spalte für Spalte (links nach rechts), in der Spalte von oben nach unten
+  const out = [];
+  for (const a of arts) {
+    const body_ = a.blocks.filter(b => !b.cap), caps = a.blocks.filter(b => b.cap);
+    if (!body_.length && !a.title) continue;
+    const colX = [];
+    for (const b of [...body_].sort((p, q) => p.x - q.x)) {
+      const c = colX.find(c => Math.abs(c - b.x) < body * 3);
+      if (c == null) colX.push(b.x);
+    }
+    const colOf = b => colX.findIndex(c => Math.abs(c - b.x) < body * 3);
+    body_.sort((p, q) => colOf(p) - colOf(q) || p.y0 - q.y0);
+    const paras = [];
+    for (const b of body_) addParas(paras, b, body);
+    const words = body_.reduce((s, b) => s + b.words, 0);
+    const all = [...a.blocks, ...(a.lines || [])];
+    const box = a.orphan ? [Math.min(...all.map(b => b.x)), Math.min(...all.map(b => b.y0)), Math.max(...all.map(b => b.x1)), Math.max(...all.map(b => b.y1))] : [Math.min(a.x, ...all.map(b => b.x)), Math.min(a.y0 ?? 1e9, ...all.map(b => b.y0 ?? b.top)), Math.max(a.x1, ...all.map(b => b.x1)), Math.max(a.y1, ...all.map(b => b.y1 ?? b.y))];
+    out.push({
+      title: a.title, kicker: a.kicker, intro: a.intro, orphan: !!a.orphan, words,
+      paras, caps: caps.map(b => joinLines(b.lines)).filter(t => t.length > 15), boxOf: a.boxOf, src: a,
+      box: box.map(Math.round),
+      cols: body_.map(b => [Math.round(b.x), Math.round(b.y0), Math.round(b.x1), Math.round(b.y1 + 3)]),
+    });
+  }
+  // Kästen an ihren Artikel hängen
+  for (const o of out.filter(o => o.boxOf)) {
+    const par = out.find(p => p.src === o.boxOf);
+    if (par) { (par.boxes = par.boxes || []).push({ title: o.title, paras: [{ k: 'p', runs: [{ t: o.paras.map(p => p.runs.map(r => r.t).join('')).join(' ') }] }] }); par.words += o.words; }
+    out.splice(out.indexOf(o), 1);
+  }
+  for (const o of out) {
+    delete o.src; delete o.boxOf; o.ressort = ressort; o.by = '';
+    // Autorenzeile ("VON JULIANE SCHÄUBLE") vom Vorspann trennen
+    for (const f of ['intro', 'title', 'kicker']) {
+      const m = o[f].match(/\s*\b(?:VON|Von)\s+((?:[\p{Lu}][\p{Lu}'’.-]*(?:\s+|$)(?:UND\s+)?){1,6})$/u);
+      if (m && m[1].trim().length > 3) {
+        o.by = 'Von ' + m[1].trim().toLowerCase().replace(/(^|[\s-])(\p{L})/gu, (x, a, b) => a + b.toUpperCase()).replace(/\bUnd\b/g, 'und');
+        o[f] = o[f].slice(0, m.index).trim(); break;
+      }
+    }
+  }
+  // Kurze Reste (Kästen, Fotonachweise) nicht als eigene Artikel zeigen
+  return out.filter(a => a.title ? (a.words > 25 || a.intro) : a.words > 60).sort((a, b) => (a.orphan ? -1 : 0) - (b.orphan ? -1 : 0) || a.box[1] - b.box[1] || a.box[0] - b.box[0]);
+}
+
+/* Zeilen zu Fließtext: Trennstriche am Zeilenende entfernen */
+function joinLines(ls) {
+  let s = '';
+  for (const l of ls) s = joinText(s, l.text);
+  return s.trim();
+}
+function joinText(s, t) {
+  t = t.replace(/\s+/g, ' ').trim();
+  if (!s) return t;
+  if (/\p{L}[-‐­]$/u.test(s) && /^\p{Ll}/u.test(t)) return s.replace(/[-‐­]$/, '') + t;
+  if (/[-‐]$/.test(s)) return s + t;   // "US-" + "Politik"
+  return s + ' ' + t;
+}
+/* Absätze eines Blocks: Einzug oder kurze letzte Zeile = neuer Absatz; fette Zeile = Zwischenüberschrift */
+function addParas(paras, b, body) {
+  const minX = Math.min(...b.lines.map(l => l.x)), maxX = Math.max(...b.lines.map(l => l.x1));
+  let cur = paras.length ? paras[paras.length - 1] : null;
+  let prev = null;
+  const L = b.lines;
+  for (let li = 0; li < L.length; li++) {
+    const l = L[li], nx = L[li + 1];
+    // Einzug: gegenüber Zeile davor und danach um 0,6–2,5 Geviert nach rechts gerückt
+    const di = r => r && l.x - r.x > body * 0.6 && l.x - r.x < body * 2.5;
+    const indent = (prev ? di(prev) : true) && (nx ? di(nx) : !!prev) && !(prev && !nx && !di(prev));
+    const centered = l.x - minX > body * 1.5 && maxX - l.x1 > body * 1.5;
+    const sub = !l.byDrop && !l.drop && ((l.bold && l.text.length < 90) || (centered && l.text.length < 70 && !/[.,;]$/.test(l.text) && Math.abs((l.x - minX) - (maxX - l.x1)) < body * 2));
+    // Kurze Zeile mit Satzende davor (Absatzende ohne Einzug, z. B. vor Interview-Fragen)
+    const prevShort = prev && prev.x1 < Math.max(prev.x + (maxX - minX) * 0.7, maxX - (maxX - minX) * 0.3) && /[.!?:«»“”"')]$/.test(prev.text.trim()) && (!nx || Math.abs(l.x - nx.x) < body * 0.6 || di(nx));
+    if (sub) {
+      if (cur && cur.k === 'h' && prev && prev.bold === l.bold) cur.runs.push({ t: ' ' + l.text.trim() });
+      else { cur = { k: 'h', runs: [{ t: l.text.trim() }] }; paras.push(cur); }
+      prev = l; continue;
+    }
+    const speaker = l.runs.length > 1 && l.runs[0].b && !l.bold && /:\s*$/.test(l.runs[0].t);   // Interview: »ZEIT:«
+    const newPara = speaker || !cur || cur.k === 'h' || indent || l.drop || (prev && prevShort) || (!prev && cur && /[.!?«"“]$/.test(lastText(cur)) && false);
+    if (newPara) { cur = { k: 'p', runs: [] }; paras.push(cur); }
+    for (const r of l.runs) {
+      let t = r.t;
+      if (!cur.runs.length) t = t.replace(/^\s+/, '');
+      else if (r === l.runs[0]) {
+        // Zeilenwechsel: Trennung auflösen
+        const lr = cur.runs[cur.runs.length - 1];
+        if (/\p{L}[-‐­]$/u.test(lr.t) && /^\p{Ll}/u.test(t.trim())) { lr.t = lr.t.replace(/[-‐­]$/, ''); t = t.trim(); }
+        else if (/[-‐]$/.test(lr.t)) t = t.trim();
+        else t = ' ' + t.trim();
+      }
+      const lr = cur.runs[cur.runs.length - 1];
+      if (lr && !!lr.b === !!r.b && !!lr.i === !!r.i) lr.t += t;
+      else cur.runs.push({ t, b: r.b, i: r.i });
+    }
+    prev = l;
+  }
+}
+function lastText(p) { return p.runs.length ? p.runs[p.runs.length - 1].t.trim() : ''; }
+
+
 /* Reiter umschalten */
 let curTab=store.get('tab2','music');
 function setTab(t){curTab=t;store.set('tab2',t);
-  $('#main').classList.toggle('hidden',t!=='music');$('#pod').classList.toggle('hidden',t!=='pod');
+  $('#main').classList.toggle('hidden',t!=='music');$('#pod').classList.toggle('hidden',t!=='pod');$('#zt').classList.toggle('hidden',t!=='zt');
   document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
-  if(t==='pod'){pcRenderHome();pcMini();refreshAll(false);}}
+  if(t==='pod'){pcRenderHome();pcMini();refreshAll(false);}
+  if(t==='zt'){ztRenderHome();ztScan(false);}}
 document.querySelectorAll('.seg').forEach(s=>s.onclick=e=>{const b=e.target.closest('[data-tab]');if(b)setTab(b.dataset.tab);});
 setTab(curTab);
 dlSync();

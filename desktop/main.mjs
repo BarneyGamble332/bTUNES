@@ -55,8 +55,8 @@ app.on('window-all-closed', () => app.quit());
 
 ipcMain.handle('getFolders', () => getFolders());
 ipcMain.handle('setFolders', (e, f) => { setFolders(f.filter(x => typeof x === 'string')); return getFolders(); });
-ipcMain.handle('pickFolder', async () => {
-  const r = await dialog.showOpenDialog(win, { title: 'Musikordner wählen', properties: ['openDirectory', 'multiSelections'], defaultPath: os.homedir() });
+ipcMain.handle('pickFolder', async (e, title) => {
+  const r = await dialog.showOpenDialog(win, { title: typeof title === 'string' ? title : 'Musikordner wählen', properties: ['openDirectory', 'multiSelections'], defaultPath: os.homedir() });
   return r.canceled ? [] : r.filePaths;
 });
 
@@ -127,3 +127,57 @@ ipcMain.handle('listDownloads', () => {
   return { files, free };
 });
 ipcMain.handle('openExternal', (e, url) => { if (/^https?:/.test(url)) shell.openExternal(url); });
+
+/* ---------- Zeitungen: Ordner mit PDF-Dateien finden und lesen ---------- */
+const SKIP_DIRS = new Set(['node_modules', 'snap', 'flatpak', '__pycache__', 'site-packages', 'Trash']);
+async function walkPdfDirs(dir, depth, out, st) {
+  if (depth > 8 || st.n++ > 40000) return;
+  let ents;
+  try { ents = await fs.promises.readdir(dir, { withFileTypes: true }); } catch { return; }
+  let count = 0, latest = 0;
+  for (const e of ents) {
+    if (e.name.startsWith('.') || SKIP_DIRS.has(e.name)) continue;
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) await walkPdfDirs(p, depth + 1, out, st);
+    else if (e.isFile() && /\.pdf$/i.test(e.name)) {
+      count++;
+      try { latest = Math.max(latest, (await fs.promises.stat(p)).mtimeMs); } catch { /* egal */ }
+    }
+  }
+  if (count) out.push({ path: dir, count, latest });
+}
+async function walkPdfFiles(dir, depth, out, seen) {
+  if (depth > 6) return;
+  let ents;
+  try { ents = await fs.promises.readdir(dir, { withFileTypes: true }); } catch { return; }
+  for (const e of ents) {
+    if (e.name.startsWith('.')) continue;
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) await walkPdfFiles(p, depth + 1, out, seen);
+    else if (e.isFile() && /\.pdf$/i.test(e.name) && !seen.has(p)) {
+      seen.add(p);
+      try { const s = await fs.promises.stat(p); out.push({ path: p, name: e.name, size: s.size, mtime: s.mtimeMs, dir }); } catch { /* egal */ }
+    }
+  }
+}
+// Durchsucht den persönlichen Ordner (und eingehängte Laufwerke unter /run/media und /media)
+ipcMain.handle('findPdfFolders', async () => {
+  const roots = [os.homedir()];
+  for (const base of [path.join('/run/media', os.userInfo().username), '/media', '/mnt']) {
+    try { for (const n of fs.readdirSync(base)) roots.push(path.join(base, n)); } catch { /* gibt es nicht */ }
+  }
+  const out = [], st = { n: 0 };
+  for (const r of roots) await walkPdfDirs(r, 0, out, st);
+  return { folders: out };
+});
+ipcMain.handle('listPdfs', async (e, folders) => {
+  const out = [], seen = new Set();
+  for (const f of folders || []) if (typeof f === 'string') await walkPdfFiles(f, 0, out, seen);
+  return { files: out };
+});
+ipcMain.handle('readPdf', async (e, p) => {
+  if (typeof p !== 'string' || !/\.pdf$/i.test(p)) throw new Error('Keine PDF-Datei');
+  return fs.promises.readFile(p);
+});
+// Großes Fenster zum Zeitunglesen (und wieder zurück)
+ipcMain.handle('toggleMax', () => { if (win.isMaximized()) win.unmaximize(); else win.maximize(); return win.isMaximized(); });

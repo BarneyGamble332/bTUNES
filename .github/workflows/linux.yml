@@ -31,6 +31,10 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p app && cp ../index.html app/index.html
+          # PDF-Anzeige fuer den Zeitungs-Reiter
+          mkdir -p app/pdfjs /tmp/pdfjs && (cd /tmp/pdfjs && npm init -y >/dev/null && npm i --no-audit --no-fund pdfjs-dist@4.10.38)
+          cp /tmp/pdfjs/node_modules/pdfjs-dist/build/pdf.min.mjs app/pdfjs/pdf.min.js
+          cp /tmp/pdfjs/node_modules/pdfjs-dist/build/pdf.worker.min.mjs app/pdfjs/pdf.worker.min.js
           npm version "1.0.${RUN_NUMBER}" --no-git-tag-version --allow-same-version
           npm install --no-audit --no-fund
           npx electron-builder --linux AppImage rpm --publish never

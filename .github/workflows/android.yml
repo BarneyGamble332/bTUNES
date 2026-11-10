@@ -38,7 +38,11 @@ jobs:
           set -euo pipefail
           mkdir -p www && cp index.html www/index.html
           npm init -y >/dev/null
-          npm i --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/app@6 @capacitor/browser@6
+          npm i --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/app@6 @capacitor/browser@6 pdfjs-dist@4.10.38
+          # PDF-Anzeige fuer den Zeitungs-Reiter (als .js, damit die App sie als JavaScript ausliefert)
+          mkdir -p www/pdfjs
+          cp node_modules/pdfjs-dist/build/pdf.min.mjs www/pdfjs/pdf.min.js
+          cp node_modules/pdfjs-dist/build/pdf.worker.min.mjs www/pdfjs/pdf.worker.min.js
           npx cap init "bTUNES" de.bernhard.musik --web-dir www
           # Internet-Abfragen (Band-News, Wikipedia) ueber Android statt Browser, damit fremde Seiten erlaubt sind
           node -e "const f='capacitor.config.json',c=require('./'+f);c.plugins=Object.assign(c.plugins||{},{CapacitorHttp:{enabled:true}});require('fs').writeFileSync(f,JSON.stringify(c,null,2))"
@@ -75,6 +79,7 @@ jobs:
               <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
               <uses-permission android:name="android.permission.WAKE_LOCK" />
               <uses-permission android:name="android.permission.VIBRATE" />
+              <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
           '''
           svc='''
                   <service android:name=".PlaybackService" android:exported="true" android:foregroundServiceType="mediaPlayback">
