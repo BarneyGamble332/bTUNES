@@ -203,6 +203,19 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .ncard a:first-of-type{border-top:0}
 .ncard a .n{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ncard a .s{color:var(--mute);font-size:12px;margin-top:1px}
+.bphoto{position:absolute;z-index:1;left:-4%;bottom:-5%;width:31%;padding:2.4%;background:#efe6d2;cursor:pointer;
+  transform:rotate(var(--r,-6deg));box-shadow:0 6px 14px #000b,0 1px 2px #0007;
+  -webkit-mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/8px 51% repeat-x,conic-gradient(from 135deg at top,#0000,#000 1deg 89deg,#0000 90deg) top/8px 51% repeat-x;
+  mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/8px 51% repeat-x,conic-gradient(from 135deg at top,#0000,#000 1deg 89deg,#0000 90deg) top/8px 51% repeat-x}
+.bphoto .im{aspect-ratio:1;background:#3a3028 center/cover no-repeat;filter:sepia(.45) saturate(.8) contrast(.95) brightness(1.05)}
+.bphoto.drop{animation:phdrop .7s cubic-bezier(.2,.8,.25,1)}
+@keyframes phdrop{from{opacity:0;transform:translate(-14%,12%) rotate(calc(var(--r,-6deg) - 14deg)) scale(1.3)}}
+.bigph{width:100%;aspect-ratio:4/3;border-radius:6px;background:#2c2621 center/contain no-repeat;margin-top:4px}
+.phcap{margin-top:10px;color:#ddd3c8;line-height:1.45;user-select:text;-webkit-user-select:text}
+.phcap .s{color:var(--mute);font-size:13px;margin:4px 0 6px}
+.phgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.phgrid button{aspect-ratio:1;border-radius:4px;background:#2c2621 center/cover no-repeat;opacity:.75}
+.phgrid button.on{opacity:1;box-shadow:0 0 0 2px var(--acc)}
 .infobtn{position:absolute;z-index:4;left:3.2%;top:3.6%;width:10.5%;aspect-ratio:1;border-radius:50%;padding:0;display:grid;place-items:center;
   background:radial-gradient(circle at 35% 30%,#f0f0f0,#9a9a9a 60%,#5c5c5c);box-shadow:0 2px 5px #000c,inset 0 1px 0 #fff8;color:#2a2a2a;transition:transform .15s}
 .infobtn:active{transform:scale(.92)}
@@ -552,6 +565,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
   <div class="deckwrap">
     <div class="deck" id="deck">
+      <div class="bphoto hidden" id="bphoto"><div class="im"></div></div>
       <div class="platter"><div class="empty" id="emptyTxt">Keine Platte aufgelegt</div></div>
       <div class="record off" id="record">
         <div class="disc" id="disc"><div class="lbl" id="lbl"><div class="txt" id="lblTxt"></div></div><div class="hole"></div></div>
@@ -948,6 +962,7 @@ let deckInstant=false;
 function setDeck(albumId){
   if(albumId===deckAlbum)return;
   const rec=$('#record'),old=deckAlbum;deckAlbum=albumId;
+  if(window.photoForAlbum)photoForAlbum(albumId);
   if(deckInstant&&albumId!=null){                 // Platte kam schon per Animation aus der Kiste
     deckInstant=false;
     const a=albumById.get(albumId);
@@ -1326,7 +1341,7 @@ let mbLast=0;   // MusicBrainz erlaubt höchstens eine Anfrage pro Sekunde
 async function mb(path){const w=mbLast+1100-Date.now();if(w>0)await sleep(w);mbLast=Date.now();return getJSON('https://musicbrainz.org/ws/2/'+path+(path.includes('?')?'&':'?')+'fmt=json',{'User-Agent':UA});}
 
 async function bandInfo(name){
-  const key='bi_'+norm(name),c=store.get(key,null);
+  const key='bi2_'+norm(name),c=store.get(key,null);
   if(c&&Date.now()-c.t<20*864e5)return c.d;
   if(!NET)return demoBand(name);
   const res=await mb('artist?limit=5&query='+encodeURIComponent('artist:"'+name+'"'));
@@ -1337,11 +1352,11 @@ async function bandInfo(name){
   const rgs=await mb('release-group?type=album&limit=100&artist='+a.id);
   const albums=(rgs['release-groups']||[]).filter(g=>!(g['secondary-types']||[]).length&&g['first-release-date'])
     .map(g=>({title:g.title,year:+g['first-release-date'].slice(0,4)})).sort((x,y)=>x.year-y.year);
-  let wiki=null;
+  let wiki=null,qid='';
   try{
     const wd=(full.relations||[]).find(r=>r.type==='wikidata');
     let title=null,lang='de';
-    if(wd){const q=wd.url.resource.split('/').pop();
+    if(wd){const q=wd.url.resource.split('/').pop();qid=q;
       const e=await getJSON('https://www.wikidata.org/w/api.php?action=wbgetentities&props=sitelinks&sitefilter=dewiki|enwiki&format=json&origin=*&ids='+q);
       const sl=(e.entities&&e.entities[q]&&e.entities[q].sitelinks)||{};
       if(sl.dewiki)title=sl.dewiki.title;else if(sl.enwiki){title=sl.enwiki.title;lang='en';}}
@@ -1353,7 +1368,7 @@ async function bandInfo(name){
   }catch(e){}
   const ls=full['life-span']||{};
   const tags=[...(full.genres||[]),...(full.tags||[])].sort((x,y)=>y.count-x.count).map(t=>t.name).filter((t,i,arr)=>arr.indexOf(t)===i).slice(0,5);
-  const d={found:true,name:full.name,type:full.type,area:full.area&&full.area.name,begin:ls.begin||'',end:ls.end||'',ended:!!ls.ended,tags,albums,wiki};
+  const d={found:true,name:full.name,type:full.type,area:full.area&&full.area.name,begin:ls.begin||'',end:ls.end||'',ended:!!ls.ended,tags,albums,wiki,qid};
   store.set(key,{t:Date.now(),d});
   return d;
 }
@@ -3405,6 +3420,86 @@ function demoFeed(u){
   return `<?xml version="1.0"?><rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"><channel><title>${n[0]}</title><itunes:author>${n[2]}</itunes:author><itunes:image href="${art.replace(/"/g,'&quot;')}"/><description>${n[1]}</description>${items}</channel></rss>`;
 }
 function demoItunes(){return Promise.resolve({results:[['Bergfunk','Radio Werdenfels Demo','a','Freizeit'],['Zeitreise','Demo-Verlag','b','Geschichte'],['Technik am Abend','Studio Demo','c','Technologie']].map(x=>({collectionName:x[0],artistName:x[1],feedUrl:'https://demo-'+x[2]+'.example/feed',artworkUrl600:'',primaryGenreName:x[3]}))});}
+
+/* ===== Bandfoto auf dem Plattenspieler (freie Fotos von Wikimedia Commons) =====
+   Bei jedem neu aufgelegten Album klebt ein anderes Foto der Band unten links, die Platte läuft darüber. */
+async function commonsFiles(params){
+  const r=await getJSON('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url|extmetadata|size|mime&iiurlwidth=900&'+params);
+  return Object.values((r.query&&r.query.pages)||{});
+}
+async function bandPhotos(name){
+  const key='bp_'+norm(name),c=store.get(key,null);
+  if(c&&Date.now()-c.t<20*864e5)return c.d;
+  if(!NET)return demoPhotos(name);
+  const d=await bandInfo(name);
+  let pages=[];
+  try{
+    if(d.found&&d.qid){
+      const claim=async p=>{const r=await getJSON(`https://www.wikidata.org/w/api.php?action=wbgetclaims&format=json&origin=*&entity=${d.qid}&property=${p}`);
+        const x=((r.claims&&r.claims[p])||[])[0];return x&&x.mainsnak&&x.mainsnak.datavalue&&x.mainsnak.datavalue.value;};
+      const [cat,p18]=await Promise.all([claim('P373'),claim('P18')]);
+      if(p18)pages.push(...await commonsFiles('titles='+encodeURIComponent('File:'+p18)));
+      if(cat){
+        pages.push(...await commonsFiles('generator=categorymembers&gcmtype=file&gcmlimit=40&gcmtitle='+encodeURIComponent('Category:'+cat)));
+        if(pages.length<12){   // oft liegen die Konzertfotos in Unterkategorien
+          const sc=await getJSON('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&list=categorymembers&cmtype=subcat&cmlimit=20&cmtitle='+encodeURIComponent('Category:'+cat));
+          const subs=((sc.query&&sc.query.categorymembers)||[]).map(x=>x.title).sort((a,b)=>/concert|live|konzert|perform|festival/i.test(b)-/concert|live|konzert|perform|festival/i.test(a)).slice(0,4);
+          for(const s of subs)pages.push(...await commonsFiles('generator=categorymembers&gcmtype=file&gcmlimit=15&gcmtitle='+encodeURIComponent(s)));
+        }
+      }
+    }
+  }catch(e){}
+  const seen=new Set(),list=[];
+  for(const pg of pages){
+    const ii=pg.imageinfo&&pg.imageinfo[0];if(!ii||seen.has(pg.title))continue;seen.add(pg.title);
+    if(!/image\/(jpeg|png)/.test(ii.mime||'')||ii.width<500||ii.height<350)continue;
+    if(/logo|signature|signatur|autogramm|unterschrift|poster|ticket|map|karte|cover/i.test(pg.title))continue;
+    const m=ii.extmetadata||{},g=k=>m[k]&&m[k].value?htmlText(String(m[k].value)):'';
+    list.push({u:ii.thumburl||ii.url,src:ii.descriptionurl,by:g('Artist').slice(0,80),lic:g('LicenseShortName'),year:(g('DateTimeOriginal').match(/(19|20)\d\d/)||[''])[0],desc:g('ImageDescription').slice(0,200)});
+    if(list.length>=40)break;
+  }
+  if(!list.length&&d.found&&d.wiki&&d.wiki.img)list.push({u:d.wiki.img,src:d.wiki.url,by:'',lic:'Wikipedia',year:'',desc:''});
+  store.set(key,{t:Date.now(),d:list});
+  return list;
+}
+let photoList=[],photoIdx=0,photoFor=null;
+async function photoForAlbum(albumId){
+  const el=$('#bphoto');
+  const a=albumId!=null?albumById.get(albumId):null;
+  const name=a?(a.artist==='Verschiedene Interpreten'?(a.tracks[0]&&a.tracks[0].artist):a.artist):'';
+  photoFor=albumId;
+  if(!name){el.classList.add('hidden');return;}
+  try{
+    const list=await bandPhotos(name);if(photoFor!==albumId)return;
+    if(!list.length){el.classList.add('hidden');return;}
+    const cnt=store.get('phi',{}),k=norm(name),i=(cnt[k]||0)%list.length;cnt[k]=(cnt[k]||0)+1;store.set('phi',cnt);  // jedes Mal ein anderes Foto
+    const im=new Image();im.src=list[i].u;await im.decode();if(photoFor!==albumId)return;
+    photoList=list;photoIdx=i;
+    el.querySelector('.im').style.backgroundImage=`url("${list[i].u}")`;
+    el.style.setProperty('--r',(Math.random()*12-8).toFixed(1)+'deg');
+    el.classList.remove('hidden','drop');void el.offsetWidth;el.classList.add('drop');
+  }catch(e){if(photoFor===albumId)el.classList.add('hidden');}
+}
+/* Großansicht mit Quellenangabe, darunter die anderen Fotos der Band */
+function openPhoto(){
+  if(!photoList.length)return;
+  openView('Foto',b=>{
+    const draw=()=>{const p=photoList[photoIdx];
+      b.innerHTML=`<div class="bigph" style="background-image:url('${esc(p.u)}')"></div>
+        <div class="phcap">${p.desc?`<div>${esc(p.desc)}</div>`:''}<div class="s">Foto: ${esc(p.by||'unbekannt')}${p.year?' · '+p.year:''}${p.lic?' · '+esc(p.lic):''}</div>
+        <a href="#" class="wlink" data-src="${esc(p.src)}">Auf Wikimedia Commons ansehen ›</a></div>
+        ${photoList.length>1?`<div class="sec">Weitere Fotos (${photoList.length})</div><div class="phgrid">${photoList.map((x,i)=>`<button data-i="${i}" class="${i===photoIdx?'on':''}" style="background-image:url('${esc(x.u)}')"></button>`).join('')}</div>`:''}`;};
+    draw();
+    b.onclick=e=>{const s=e.target.closest('[data-src]');if(s){e.preventDefault();openUrl(s.dataset.src);return;}
+      const t=e.target.closest('[data-i]');if(t){photoIdx=+t.dataset.i;draw();b.scrollTop=0;
+        $('#bphoto .im').style.backgroundImage=`url("${photoList[photoIdx].u}")`;}};
+  });
+}
+$('#bphoto').onclick=e=>{e.stopPropagation();openPhoto();};
+function demoPhotos(name){
+  const mk=(c1,c2)=>'data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="#140a14"/></linearGradient><linearGradient id="l" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c2}" stop-opacity=".9"/><stop offset="1" stop-color="${c2}" stop-opacity="0"/></linearGradient></defs><rect width="400" height="300" fill="url(#b)"/><path d="M90 0 L40 230 L160 230Z" fill="url(#l)"/><path d="M300 0 L230 230 L360 230Z" fill="url(#l)"/><g fill="#0b0508"><circle cx="120" cy="170" r="14"/><rect x="108" y="182" width="24" height="40" rx="6"/><circle cx="200" cy="160" r="15"/><rect x="186" y="173" width="28" height="48" rx="7"/><circle cx="280" cy="168" r="14"/><rect x="268" y="180" width="24" height="42" rx="6"/></g><rect y="240" width="400" height="60" fill="#050204"/></svg>`);
+  return Promise.resolve([['#1a0d2e','#ffd27a'],['#0d1e2e','#7ab8ff'],['#2e0d0d','#ff8a6a']].map((c,i)=>({u:mk(...c),src:'https://commons.wikimedia.org',by:'Beispiel-Fotograf',lic:'CC BY-SA 4.0',year:String(2015+i*3),desc:name+' live auf der Bühne (Beispiel)'})));
+}
 
 /* Plattenspieler so groß wie möglich, aber alles muss auf den Bildschirm passen */
 function fitMain(){
