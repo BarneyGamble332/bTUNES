@@ -208,6 +208,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .news .s{color:var(--mute);font-size:12.5px;margin-top:3px}
 .tl .row{min-height:44px}
 .tl .yr{width:44px;color:var(--acc);font-weight:700;font-variant-numeric:tabular-nums;flex:none}
+.tl .row.miss{cursor:pointer}
+.tl .row.miss:active{background:#ffffff0a}
+.tl .srch{font-size:11.5px;color:var(--acc);font-weight:700;flex:none;white-space:nowrap}
 .tl .own{font-size:11px;color:#7fdc8f;font-weight:700;flex:none}
 .wlink{display:inline-block;margin-top:2px;color:var(--acc);font-weight:600}
 .src{color:#6d6359;font-size:12px;text-align:center;margin-top:22px}
@@ -1374,7 +1377,10 @@ function openBand(name){
       <h2>${esc(d.name)}</h2><div class="s" style="color:var(--mute)">${esc([d.type==='Group'?'Band':d.type==='Person'?'Musiker:in':'',d.area,yrs].filter(Boolean).join(' · '))}</div>
       <div class="status ${d.ended?'off':'on'}">${esc(statusText(d))}</div>
       ${d.tags.length?`<div class="tags">${d.tags.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}</div>`;
-    const albumsHtml=d.albums.length?`<div class="sec">${d.ended?'Die Alben':'Alben'}</div><div class="list tl">${d.albums.map(a=>`<div class="row"><div class="yr">${a.year}</div><div class="tx"><div class="n">${esc(a.title)}</div></div>${own.has(norm(a.title))?'<div class="own">✓ HAST DU</div>':''}</div>`).join('')}</div>`:'';
+    // Fehlende Alben: Tippen sucht das ganze Album als Playlist auf YouTube
+    const ytUrl=t=>'https://www.youtube.com/results?search_query='+encodeURIComponent(d.name+' '+t+' full album')+'&sp=EgIQAw%253D%253D';
+    const albumsHtml=d.albums.length?`<div class="sec">${d.ended?'Die Alben':'Alben'}</div><div class="list tl">${d.albums.map(a=>{const has=own.has(norm(a.title));
+      return `<div class="row${has?'':' miss'}"${has?'':` data-url="${esc(ytUrl(a.title))}"`}><div class="yr">${a.year}</div><div class="tx"><div class="n">${esc(a.title)}</div></div>${has?'<div class="own">✓ HAST DU</div>':'<div class="srch">Playlist suchen ↗</div>'}</div>`;}).join('')}</div>`:'';
     const wikiLink=d.wiki?`<a class="wlink" href="#" data-url="${esc(d.wiki.url)}">Mehr auf Wikipedia ›</a>`:'';
     if(d.ended){
       h+=`<div class="sec">Highlights</div><div class="ptxt">${paras.slice(0,5).map(p=>`<p>${esc(p)}</p>`).join('')||'<p>Keine Beschreibung gefunden.</p>'}</div>${wikiLink}`+albumsHtml;
