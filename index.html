@@ -174,6 +174,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   background:#f3ece4;color:#14110f;padding:10px 16px;border-radius:12px;font-weight:600;opacity:0;transition:.25s;pointer-events:none;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%)}
 /* Band-Infos */
+.pwt{color:#ff9b6b;font-weight:700;white-space:nowrap}
+.pwbox{background:#3a231a;border:1px solid #6a3a24;color:#ffcfb5;border-radius:12px;padding:10px 12px;font-size:14px;line-height:1.45;margin-bottom:12px}
+.pwbox.maybe{background:#2a241f;border-color:#3a332d;color:var(--mute)}
+.aimg{width:100%;aspect-ratio:16/9;border-radius:12px;background:#2c2621 center/cover no-repeat;margin-top:4px}
+.pwtog{margin:2px 0 6px;padding:5px 12px;border-radius:14px;background:var(--card);color:var(--mute);font-size:12.5px;font-weight:600}
+.pwtog.on{color:var(--acc)}
 .ncard{margin-top:14px;background:linear-gradient(135deg,#2c241d,#221c17);border:1px solid #3a3029;border-radius:14px;padding:10px 12px 4px;animation:nin .5s ease}
 @keyframes nin{from{opacity:0;transform:translateY(8px)}}
 .ncard .nh{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--acc)}
@@ -895,22 +901,103 @@ async function bandInfo(name){
   return d;
 }
 
+/* News: zuerst Bing News (liefert echte Artikel-Adresse und Vorschautext), sonst Google News */
 async function bandNews(name,group){
-  const key='bn_'+norm(name),c=store.get(key,null);
+  const key='bn2_'+norm(name),c=store.get(key,null);
   if(c&&Date.now()-c.t<3*36e5)return c.d;
   if(!NATIVE)return demoNews(name);
-  const q='"'+name+'"'+(group?' Band':'')+' when:1y';
+  const q='"'+name+'"'+(group?' Band':'');
+  let items=[];
+  try{items=await bingNews(q);}catch(e){}
+  if(!items.length)items=await googleNews(q+' when:1y');
+  items=items.filter(n=>n.title&&n.link&&Date.now()-n.date<365*864e5).sort((a,b)=>b.date-a.date).slice(0,12);
+  store.set(key,{t:Date.now(),d:items});
+  return items;
+}
+const tagTxt=(it,n)=>{for(const c of it.children)if(c.tagName===n||c.tagName.toLowerCase()===n.toLowerCase())return c.textContent.trim();return '';};
+async function bingNews(q){
+  const r=await fetch('https://www.bing.com/news/search?format=rss&setlang=de-DE&cc=DE&q='+encodeURIComponent(q));
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const x=new DOMParser().parseFromString(await r.text(),'text/xml');
+  return [...x.getElementsByTagName('item')].map(it=>{
+    const link=tagTxt(it,'link');let real='';
+    try{real=new URL(link).searchParams.get('url')||'';}catch(e){}
+    if(!real&&/^https?:/.test(link)&&!/bing\.com/.test(link))real=link;
+    return{title:tagTxt(it,'title'),src:tagTxt(it,'News:Source'),link:real||link,real,date:Date.parse(tagTxt(it,'pubDate'))||0,desc:htmlText(tagTxt(it,'description')),img:tagTxt(it,'News:Image')};
+  });
+}
+async function googleNews(q){
   const r=await fetch('https://news.google.com/rss/search?hl=de&gl=DE&ceid=DE:de&q='+encodeURIComponent(q));
   if(!r.ok)throw new Error('HTTP '+r.status);
   const x=new DOMParser().parseFromString(await r.text(),'text/xml');
-  const items=[...x.querySelectorAll('item')].map(it=>{
-    const src=(it.querySelector('source')||{}).textContent||'';
+  return [...x.querySelectorAll('item')].map(it=>{
+    const so=it.querySelector('source');const src=so?so.textContent:'';
     let t=(it.querySelector('title')||{}).textContent||'';
     if(src&&t.endsWith(' - '+src))t=t.slice(0,-(src.length+3));
-    return{title:t,src,link:(it.querySelector('link')||{}).textContent||'',date:Date.parse((it.querySelector('pubDate')||{}).textContent||'')||0};
-  }).filter(n=>n.title&&n.link&&Date.now()-n.date<365*864e5).sort((a,b)=>b.date-a.date).slice(0,12);
-  store.set(key,{t:Date.now(),d:items});
-  return items;
+    return{title:t,src,srcUrl:so?so.getAttribute('url')||'':'',link:(it.querySelector('link')||{}).textContent||'',real:'',date:Date.parse((it.querySelector('pubDate')||{}).textContent||'')||0,desc:'',img:''};
+  });
+}
+
+/* Bezahlschranke erkennen + Vorschau holen (Ergebnis wird gemerkt) */
+const PW_DOMAINS=/(^|\.)(wsj\.com|ft\.com|handelsblatt\.com|wiwo\.de|economist\.com|thetimes\.co\.uk|nytimes\.com|bloomberg\.com|faz\.net|sueddeutsche\.de|zeit\.de|spiegel\.de|welt\.de|bild\.de|tagesspiegel\.de|augsburger-allgemeine\.de|merkur\.de|nzz\.ch|derstandard\.at)$/;
+const PW_ALWAYS=/(^|\.)(wsj\.com|ft\.com|handelsblatt\.com|wiwo\.de|economist\.com|thetimes\.co\.uk|bloomberg\.com)$/;
+const hostOf=u=>{try{return new URL(u).hostname.replace(/^www\./,'');}catch(e){return '';}};
+let artInfo=store.get('artinfo',{});
+const artWaits=new Map();
+function articleInfo(x){
+  const u=x.real||'';const k=hash(u||x.link);
+  if(artInfo[k])return Promise.resolve(artInfo[k]);
+  if(artWaits.has(k))return artWaits.get(k);
+  const pr=(async()=>{
+    let info={pw:null,desc:x.desc||'',img:x.img||'',t:Date.now()};
+    const host=hostOf(u)||hostOf(x.srcUrl||'');
+    if(!NATIVE){info.pw=/Zeitung/.test(x.src);}
+    else if(!u){info.pw=PW_ALWAYS.test(host)?true:(PW_DOMAINS.test(host)?null:false);}
+    else{
+      try{
+        const r=await fetch(u,{headers:{'Accept':'text/html'}});
+        const html=(await r.text()).slice(0,800000);
+        const doc=new DOMParser().parseFromString(html,'text/html');
+        const meta=n=>{const m=doc.querySelector(`meta[property="${n}"],meta[name="${n}"]`);return m?m.getAttribute('content')||'':'';};
+        const free=/"isAccessibleForFree"\s*:\s*"?(false|no)"?/i.test(html);
+        const tier=/locked|metered|premium/i.test(meta('article:content_tier'));
+        info.pw=free||tier||PW_ALWAYS.test(host);
+        info.desc=meta('og:description')||meta('description')||info.desc;
+        info.img=meta('og:image')||info.img;
+      }catch(e){info.pw=PW_ALWAYS.test(host)?true:null;}
+    }
+    artInfo[k]=info;
+    const ks=Object.keys(artInfo);if(ks.length>300)ks.sort((a,b)=>artInfo[a].t-artInfo[b].t).slice(0,ks.length-300).forEach(z=>delete artInfo[z]);
+    store.set('artinfo',artInfo);artWaits.delete(k);
+    return info;
+  })();
+  artWaits.set(k,pr);return pr;
+}
+let hidePw=store.get('hidepw',false);
+const pwTag=i=>i&&i.pw===true?'<span class="pwt">🔒 Bezahlartikel</span>':'';
+/* Eine Meldung als Zeile; Bezahl-Hinweis wird nachgetragen, sobald geprüft */
+function newsRow(x,i){
+  return `<a href="#" data-n="${i}"><div class="n">${esc(x.title)}</div><div class="s">${esc(x.src)}${x.src?' · ':''}${ago(x.date)} <span class="pwslot"></span></div></a>`;
+}
+function checkRows(box,list){
+  box.querySelectorAll('[data-n]').forEach(a=>{const x=list[+a.dataset.n];if(!x)return;
+    articleInfo(x).then(info=>{const sl=a.querySelector('.pwslot');if(sl)sl.innerHTML=pwTag(info);
+      a.classList.toggle('hidden',hidePw&&info.pw===true);});});
+}
+/* Vorschau in der App: Bild, Text, Hinweis auf Bezahlschranke */
+function openArticle(x){
+  openView(x.src||'Meldung',async b=>{
+    b.innerHTML=`<div class="spin"></div>`;
+    const info=await articleInfo(x);
+    b.innerHTML=`${info.img?`<div class="aimg" style="background-image:url('${esc(info.img)}')"></div>`:''}
+      <div class="s" style="color:var(--mute);font-size:13px;margin-top:12px">${esc(x.src)}${x.src?' · ':''}${ago(x.date)}</div>
+      <h2 style="font-size:20px;line-height:1.3;margin:6px 0 10px">${esc(x.title)}</h2>
+      ${info.pw===true?`<div class="pwbox">🔒 <b>Bezahlartikel</b> – der ganze Text ist nur mit Abo von ${esc(x.src||'der Zeitung')} lesbar. Hier siehst du die frei verfügbare Vorschau.</div>`:''}
+      ${info.pw===null&&NATIVE?`<div class="pwbox maybe">Ob der Artikel frei lesbar ist, ließ sich nicht prüfen.</div>`:''}
+      <div class="ptxt"><p>${esc(info.desc||'Keine Vorschau verfügbar.')}</p></div>
+      <div class="acts" style="margin-top:14px"><button class="${info.pw===true?'':'pri'}" data-url="${esc(x.link)}"><svg class="i"><use href="#i-link"/></svg>${info.pw===true?'Trotzdem öffnen':'Ganzen Artikel lesen'}</button></div>`;
+    b.onclick=e=>{const a=e.target.closest('[data-url]');if(a)openUrl(a.dataset.url);};
+  });
 }
 
 const ago=d=>{const m=Math.round((Date.now()-d)/6e4);if(m<60)return 'vor '+Math.max(1,m)+' Min.';const h=Math.round(m/60);if(h<24)return 'vor '+h+' Std.';const t=Math.round(h/24);if(t<31)return 'vor '+t+(t===1?' Tag':' Tagen');return new Date(d).toLocaleDateString('de-DE',{day:'numeric',month:'short',year:'numeric'});};
@@ -943,14 +1030,17 @@ function openBand(name){
       h+=`<div class="sec">Aktuelles</div><div class="news" id="newsBox"><div class="spin" style="margin:14px auto"></div></div>`+
         (paras.length?`<div class="sec">Über ${d.type==='Person'?'den Künstler':'die Band'}</div><div class="ptxt"><p>${esc(paras[0])}</p></div>${wikiLink}`:'')+albumsHtml;
     }
-    h+=`<div class="src">Quellen: MusicBrainz${d.wiki?', Wikipedia':''}${d.ended?'':', Google News'}</div>`;
+    h+=`<div class="src">Quellen: MusicBrainz${d.wiki?', Wikipedia':''}${d.ended?'':', Bing/Google News'}</div>`;
     b.innerHTML=h;
     b.onclick=e=>{const a=e.target.closest('[data-url]');if(a){e.preventDefault();openUrl(a.dataset.url);}};
     if(!d.ended){
       const box=b.querySelector('#newsBox');
       try{const n=await bandNews(d.name,d.type!=='Person');
-        box.innerHTML=n.length?n.map(x=>`<a href="#" data-url="${esc(x.link)}"><div class="n">${esc(x.title)}</div><div class="s">${esc(x.src)}${x.src?' · ':''}${ago(x.date)}</div></a>`).join(''):'<div class="hint" style="padding:16px">Keine Meldungen aus dem letzten Jahr.</div>';
-        markSeen(d.name,n);}
+        const draw=()=>{box.innerHTML=n.length?`<button class="pwtog${hidePw?' on':''}" data-pwtog>${hidePw?'✓ ':''}Bezahlartikel ausblenden</button>`+n.map(newsRow).join(''):'<div class="hint" style="padding:16px">Keine Meldungen aus dem letzten Jahr.</div>';checkRows(box,n);};
+        draw();
+        box.onclick=e=>{e.preventDefault();e.stopPropagation();
+          if(e.target.closest('[data-pwtog]')){hidePw=!hidePw;store.set('hidepw',hidePw);draw();return;}
+          const a=e.target.closest('[data-n]');if(a)openArticle(n[+a.dataset.n]);};}
       catch(e){box.innerHTML='<div class="hint" style="padding:16px">News konnten nicht geladen werden.</div>';}
     }
   });
@@ -969,16 +1059,17 @@ async function updateBandBtn(t){
   if(!name)return;
   await sleep(1500);if(bandFor!==name)return;
   try{const d=await bandInfo(name);if(!d.found||d.ended||bandFor!==name)return;
-    const n=(await bandNews(d.name,d.type!=='Person')).filter(x=>Date.now()-x.date<7*864e5);
+    let n=(await bandNews(d.name,d.type!=='Person')).filter(x=>Date.now()-x.date<7*864e5);
+    if(hidePw){const inf=await Promise.all(n.slice(0,6).map(articleInfo));n=n.slice(0,6).filter((x,i)=>inf[i].pw!==true);}
     if(bandFor!==name||!n.length)return;
     newsShown=n;
     const c=$('#ncard');
     c.innerHTML=`<div class="nh"><i class="lv"></i>Aktuell: ${esc(d.name)}<button class="mo" data-more>${n.length>2?'alle '+n.length+' ›':'mehr ›'}</button></div>`+
-      n.slice(0,2).map((x,i)=>`<a href="#" data-n="${i}"><div class="n">${esc(x.title)}</div><div class="s">${esc(x.src)}${x.src?' · ':''}${ago(x.date)}</div></a>`).join('');
-    c.classList.remove('hidden');
+      n.slice(0,2).map(newsRow).join('');
+    c.classList.remove('hidden');checkRows(c,n);
   }catch(e){}
 }
-$('#ncard').onclick=e=>{e.preventDefault();const a=e.target.closest('[data-n]');if(a){openUrl(newsShown[+a.dataset.n].link);return;}openBand(bandFor);};
+$('#ncard').onclick=e=>{e.preventDefault();const a=e.target.closest('[data-n]');if(a){openArticle(newsShown[+a.dataset.n]);return;}openBand(bandFor);};
 $('#tArtist').onclick=()=>{if(bandFor)openBand(bandFor);};
 /* Beim Zurückkehren in die App neu nachsehen (News sind 3 Std. zwischengespeichert) */
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&bandFor){const b=bandFor;bandFor='';updateBandBtn(curTrack());}});
@@ -988,7 +1079,7 @@ function demoBand(name){const ended=/Polarlicht|Ensemble/.test(name);
   return{found:true,name,type:'Group',area:'Deutschland',begin:'1998',end:ended?'2014':'',ended,tags:['rock','alpine rock','folk'],
     albums:albums.filter(a=>a.artist===name).map(a=>({title:a.name,year:a.year})).concat([{title:'Frühe Aufnahmen',year:1999}]).sort((a,b)=>a.year-b.year),
     wiki:{title:name,lang:'de',url:'https://de.wikipedia.org',img:null,text:name+' ist eine Beispielband aus dem Vorführmodus. Sie wurde 1998 gegründet und spielte über viele Jahre in kleinen Clubs, bevor das zweite Album den Durchbruch brachte.\nIn der echten App steht hier der Wikipedia-Text zur Band: Gründung, größte Erfolge, wichtigste Alben und Besetzungswechsel.\nBei aufgelösten Bands erscheint der ganze Einleitungstext als Highlights.'}};}
-function demoNews(name){const n=Date.now();return[{title:name+' kündigen Tour für nächsten Sommer an',src:'Beispiel-Musikmagazin',link:'https://example.org',date:n-2*36e5},{title:'Neues Album von '+name+' im Test',src:'Beispiel-Zeitung',link:'https://example.org',date:n-3*864e5},{title:name+' live: So war das Konzert',src:'Beispiel-Radio',link:'https://example.org',date:n-20*864e5}];}
+function demoNews(name){const n=Date.now();return[{title:name+' kündigen Tour für nächsten Sommer an',src:'Beispiel-Musikmagazin',link:'https://example.org',real:'https://example.org/a',date:n-2*36e5,desc:'Die Band hat heute zwölf neue Termine bekanntgegeben. Los geht es im Juni in München, der Vorverkauf startet am Freitag.'},{title:'Neues Album von '+name+' im Test',src:'Beispiel-Zeitung',link:'https://example.org',real:'https://example.org/b',date:n-3*864e5,desc:'Rockiger als zuletzt: Wir haben das neue Album vorab gehört.'},{title:name+' live: So war das Konzert',src:'Beispiel-Radio',link:'https://example.org',date:n-20*864e5}];}
 
 /* ===================== PODCASTS =====================
    Abos per RSS, Suche im Apple-Podcast-Verzeichnis, Beliebt-Liste, OPML-Import,
