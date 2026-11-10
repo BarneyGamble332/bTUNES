@@ -933,11 +933,12 @@ function setDeck(albumId){
   if(deckInstant&&albumId!=null){                 // Platte kam schon per Animation aus der Kiste
     deckInstant=false;
     const a=albumById.get(albumId);
-    $('#lblTxt').textContent='';$('#lbl').style.backgroundImage='';
-    art(albumId,700).then(u=>{if(deckAlbum!==albumId)return;if(u)$('#lbl').style.backgroundImage=`url("${u}")`;else $('#lblTxt').textContent=a?a.name:'';});
+    const cached=artCache.get(albumId+'@700');
+    $('#lblTxt').textContent=cached?'':(a?a.name:'');$('#lbl').style.backgroundImage=cached?`url("${cached}")`:'';
+    if(!cached)art(albumId,700).then(u=>{if(deckAlbum!==albumId)return;if(u){$('#lbl').style.backgroundImage=`url("${u}")`;$('#lblTxt').textContent='';}});
     rec.style.transition='none';rec.className='record';$('#emptyTxt').classList.add('hidden');void rec.offsetWidth;
     requestAnimationFrame(()=>{rec.style.transition='';});
-    swapping=false;return;
+    return;                                        // swapping bleibt an, bis die fliegende Platte weg ist
   }
   const put=()=>{
     if(albumId==null){rec.className='record off';$('#emptyTxt').classList.remove('hidden');return;}
@@ -3144,7 +3145,7 @@ function crateDraw(){
   const p=crate.pos,R=crate.R;
   for(let i=0;i<crate.els.length;i++){
     const el=crate.els[i];const d=i-p;
-    if(d<-1.02||d>7){if(el.style.display!=='none')el.style.display='none';continue;}   // nur wenige Platten gleichzeitig zeichnen
+    if(d<-2.5||d>7.5){if(el.style.display!=='none')el.style.display='none';continue;}   // nur wenige Platten gleichzeitig zeichnen
     if(el.style.display==='none')el.style.display='';
     let tf,z,shade;
     const L=R*0.17;                              // die vorderste Platte ist etwas herausgezogen
@@ -3153,13 +3154,13 @@ function crateDraw(){
       const lean=10-Math.min(d,1)*6;
       tf=`perspective(${R*3}px) translate3d(0,${(-L-d*R*0.06).toFixed(1)}px,${(-d*R*0.1).toFixed(1)}px) rotateX(${lean.toFixed(2)}deg)`;
       z=1000-Math.round(d*20);shade=Math.min(0.62,d*0.12);
-      op=d<5.5?1:Math.max(0,1-(d-5.5)/1.5);       // hinten sanft einblenden statt plötzlich auftauchen
+      op=d<5.5?1:Math.max(0,1-(d-5.5)/2);       // hinten sanft einblenden statt plötzlich auftauchen
     }else{                                      // nach vorne gekippt (wie beim Durchblättern mit dem Finger)
-      const t=-d,k=Math.min(t,1),e=k*k*(3-2*k);
+      const t=-d,k=Math.min(t,1),e=k*k*(3-2*k);   // ab t=1 bleibt sie ganz abgesunken hinter dem Brett
       const ang=10-e*62;                          // kippt nach vorne bis ca. 52°
       const y=-L*(1-e)+e*R*0.55;                  // und sinkt hinter das vordere Brett
       tf=`perspective(${R*3}px) translate3d(0,${y.toFixed(1)}px,${(e*R*0.06).toFixed(1)}px) rotateX(${ang.toFixed(2)}deg)`;
-      z=1000+Math.round(t*20);shade=Math.min(0.45,e*0.45);
+      z=1000+Math.round(k*20);shade=Math.min(0.45,e*0.45);
     }
     if(el._op!==op){el.style.opacity=op<1?op.toFixed(3):'';el._op=op;}
     if(d<2.5)el.firstChild.style.transform=`translateX(${(d>=0?d*9-5:d*30-5).toFixed(1)}%)`;   // Folienglanz wandert beim Kippen
@@ -3220,17 +3221,24 @@ async function cratePlay(){
   crateClose();
   sl.animate([{transform:'translateY(0)',opacity:1},{transform:`translateY(${S*0.25}px)`,opacity:0}],{duration:350,easing:'ease-in',fill:'forwards'});
   const dk=$('#deck').getBoundingClientRect();
+  const endRot=720+discAngle();                     // Platte landet genau in der Lage der Platte auf dem Teller
   const tw=dk.width*0.73,tcx=dk.left+dk.width*0.055+tw/2,tcy=dk.top+dk.height*0.125+tw/2;
   const fcx=fx+S/2+DX,fcy=fy+S/2+DY;                 // Mitte der (verschobenen, verkleinerten) Hülle
   const tx=(tcx-fcx)/K,ty=(tcy-fcy)/K,sc=tw/(S*0.96*K);
   await disc.animate([{transform:`translateX(${S*0.66}px) rotate(50deg) scale(1)`},
-    {transform:`translate(${tx.toFixed(1)}px,${(ty-tw*0.1/K).toFixed(1)}px) rotate(260deg) scale(${(sc*1.05).toFixed(3)})`,offset:0.82},
-    {transform:`translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) rotate(320deg) scale(${sc.toFixed(3)})`}],
+    {transform:`translate(${tx.toFixed(1)}px,${(ty-tw*0.1/K).toFixed(1)}px) rotate(${(endRot-60).toFixed(1)}deg) scale(${(sc*1.05).toFixed(3)})`,offset:0.82},
+    {transform:`translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) rotate(${endRot.toFixed(1)}deg) scale(${sc.toFixed(3)})`}],
     {duration:1050,easing:'cubic-bezier(.35,.1,.25,1)',fill:'forwards'}).finished;
-  // 4. Landen: echte Platte ohne eigene Einflug-Animation auflegen, dann abspielen
-  deckInstant=true;
+  // 4. Landen: echtes Etikett vorher fertig laden, Platte darunter tauschen, dann die fliegende sanft ausblenden
+  const big=await art(c.a.id,700);
+  if(big){try{const im=new Image();im.src=big;await im.decode();}catch(e){}}
+  deckInstant=true;swapping=true;                   // Teller dreht erst los, wenn die fliegende Platte weg ist
+  setDeck(c.a.id);
   playList(c.a.tracks,0,false);
-  setTimeout(()=>{fly.remove();$('#crateOv').classList.remove('picking');crate.anim=false;},80);
+  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+  await fly.animate([{opacity:1},{opacity:0}],{duration:120,fill:'forwards'}).finished;
+  fly.remove();$('#crateOv').classList.remove('picking');crate.anim=false;
+  swapping=false;render();
 }
 (function crateWire(){
   const st=$('#cvStage');
