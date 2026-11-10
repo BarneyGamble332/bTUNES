@@ -191,7 +191,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .ncard a:first-of-type{border-top:0}
 .ncard a .n{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ncard a .s{color:var(--mute);font-size:12px;margin-top:1px}
-#tArtist{cursor:pointer}
+.infobtn{position:absolute;z-index:4;left:3.2%;top:3.6%;width:10.5%;aspect-ratio:1;border-radius:50%;padding:0;display:grid;place-items:center;
+  background:radial-gradient(circle at 35% 30%,#f0f0f0,#9a9a9a 60%,#5c5c5c);box-shadow:0 2px 5px #000c,inset 0 1px 0 #fff8;color:#2a2a2a;transition:transform .15s}
+.infobtn:active{transform:scale(.92)}
+.infobtn svg{width:62%;height:62%;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.infobtn .dot{position:absolute;right:-2px;top:-2px;width:28%;height:28%;border-radius:50%;background:#ff5a2a;box-shadow:0 0 6px #ff5a2a;animation:blink 1.6s infinite}
 .bandbtn{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:5px 12px;border-radius:16px;background:#ffffff10;color:var(--mute);font-size:13px;font-weight:600}
 .bandbtn .dot{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 6px var(--acc)}
 .bandbtn svg.i{width:16px;height:16px}
@@ -559,6 +563,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           <circle cx="88" cy="14" r="2.4" fill="#d9d9d9" stroke="#666" stroke-width=".4"/>
         </g>
       </svg>
+      <button class="infobtn hidden" id="deckInfo" aria-label="Band-Infos"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 11v6M12 7.2v.1"/></svg><i class="dot hidden" id="deckDot"></i></button>
       <div class="knob" style="left:84.5%;top:79%"></div>
       <div class="rpm">33⅓</div>
       <div class="led"></div>
@@ -1414,7 +1419,7 @@ const newsCtx={};
 async function showNewsCard(sel,name){
   const ctx=newsCtx[sel]||(newsCtx[sel]={name:null,list:[]});
   if(name===ctx.name)return;
-  ctx.name=name;const c=$(sel);c.classList.add('hidden');
+  ctx.name=name;const c=$(sel);c.classList.add('hidden');if(sel==='#ncard')$('#deckDot').classList.add('hidden');
   if(!name)return;
   await sleep(1500);if(ctx.name!==name)return;
   try{const d=await bandInfo(name);if(!d.found||d.ended||ctx.name!==name)return;
@@ -1425,12 +1430,13 @@ async function showNewsCard(sel,name){
     c.innerHTML=`<div class="nh"><i class="lv"></i>Aktuell: ${esc(d.name)}<button class="mo" data-more>${n.length>2?'alle '+n.length+' ›':'mehr ›'}</button></div>`+
       n.slice(0,2).map(newsRow).join('');
     c.classList.remove('hidden');checkRows(c,n);
+    if(sel==='#ncard')$('#deckDot').classList.remove('hidden');
   }catch(e){}
 }
 function wireNewsCard(sel){$(sel).onclick=e=>{e.preventDefault();const ctx=newsCtx[sel];if(!ctx||!ctx.name)return;const a=e.target.closest('[data-n]');if(a){openArticle(ctx.list[+a.dataset.n]);return;}openBand(ctx.name);};}
-function updateBandBtn(t){bandFor=bandOf(t);showNewsCard('#ncard',bandFor);}
+function updateBandBtn(t){bandFor=bandOf(t);$('#deckInfo').classList.toggle('hidden',!bandFor);showNewsCard('#ncard',bandFor);}
 wireNewsCard('#ncard');
-$('#tArtist').onclick=()=>{if(bandFor)openBand(bandFor);};
+$('#deckInfo').onclick=e=>{e.stopPropagation();if(bandFor)openBand(bandFor);};
 /* Beim Zurückkehren in die App neu nachsehen (News sind 3 Std. zwischengespeichert) */
 document.addEventListener('visibilitychange',()=>{if(document.hidden)return;for(const sel in newsCtx){const n=newsCtx[sel].name;newsCtx[sel].name=null;if(n)showNewsCard(sel,n);}});
 
