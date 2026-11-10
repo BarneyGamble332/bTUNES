@@ -69,7 +69,12 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke
   background:conic-gradient(from 300deg,#0000 0deg,#ffffff16 20deg,#0000 45deg,#0000 180deg,#ffffff10 205deg,#0000 230deg);
   mask:radial-gradient(circle,#0000 0 29%,#000 30%);-webkit-mask:radial-gradient(circle,#0000 0 29%,#000 30%)}
 .arm{position:absolute;inset:0;z-index:3;width:100%;height:100%;pointer-events:none;overflow:visible}
-.arm .swing{transform-box:view-box;transform-origin:88px 14px;transition:transform 1s cubic-bezier(.4,.1,.2,1)}
+.armw{position:absolute;inset:0;z-index:3;pointer-events:none;transform-origin:88% 15.22%;will-change:transform;transition:transform 1.1s linear}
+.armw.move{transition:transform 1s cubic-bezier(.45,.05,.25,1)}
+.armw.up{transition:transform .28s ease-out}
+.disc{will-change:transform}
+/* Rillen-Pausen zwischen den Liedern (wie auf einer echten Platte) */
+.disc .gaps{position:absolute;inset:0;border-radius:50%;pointer-events:none}
 .knob{position:absolute;z-index:3;width:9%;aspect-ratio:1;border-radius:50%;
   background:radial-gradient(circle at 35% 30%,#eee,#888 60%,#555);box-shadow:0 2px 4px #000c}
 .scrub{position:absolute;z-index:4;left:42%;top:48%;transform:translate(-50%,-50%) scale(.8);background:#000c;color:#fff;font-weight:800;font-size:18px;padding:8px 14px;border-radius:12px;opacity:0;transition:.15s;pointer-events:none;font-variant-numeric:tabular-nums}
@@ -571,10 +576,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       <div class="bphoto right hidden" id="bphoto3"><div class="im"></div></div>
       <div class="platter"><div class="empty" id="emptyTxt">Keine Platte aufgelegt</div></div>
       <div class="record off" id="record">
-        <div class="disc" id="disc"><div class="lbl" id="lbl"><div class="txt" id="lblTxt"></div></div><div class="hole"></div></div>
+        <div class="disc" id="disc"><div class="gaps" id="gaps"></div><div class="lbl" id="lbl"><div class="txt" id="lblTxt"></div></div><div class="hole"></div></div>
         <div class="sheen"></div>
       </div>
-      <svg class="arm" viewBox="0 0 100 92" aria-hidden="true">
+      <div class="armw" id="armw"><svg class="arm" viewBox="0 0 100 92" aria-hidden="true">
         <defs>
           <linearGradient id="gArm" x1="0" x2="1"><stop offset="0" stop-color="#8d8d8d"/><stop offset=".45" stop-color="#f4f4f4"/><stop offset="1" stop-color="#9a9a9a"/></linearGradient>
           <radialGradient id="gBase" cx=".35" cy=".3"><stop offset="0" stop-color="#e9e9e9"/><stop offset=".6" stop-color="#8a8a8a"/><stop offset="1" stop-color="#4f4f4f"/></radialGradient>
@@ -582,7 +587,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
         </defs>
         <circle cx="88" cy="14" r="7" fill="#1a1a1a" stroke="#000" stroke-width=".6"/>
         <circle cx="88" cy="14" r="5" fill="url(#gBase)"/>
-        <g class="swing" id="arm" filter="url(#sh)">
+        <g id="arm" filter="url(#sh)">
           <rect x="85.3" y="2" width="5.4" height="6.5" rx="1.2" fill="#2b2b2b"/>
           <path d="M88 14 L88 52 Q88 60 84.5 64" fill="none" stroke="url(#gArm)" stroke-width="1.5" stroke-linecap="round"/>
           <g transform="rotate(28 84.5 64)">
@@ -591,7 +596,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           </g>
           <circle cx="88" cy="14" r="2.4" fill="#d9d9d9" stroke="#666" stroke-width=".4"/>
         </g>
-      </svg>
+      </svg></div>
       <button class="infobtn hidden" id="deckInfo" aria-label="Band-Infos"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 11v6M12 7.2v.1"/></svg><i class="dot hidden" id="deckDot"></i></button>
       <div class="knob" style="left:84.5%;top:79%"></div>
       <div class="rpm">33⅓</div>
@@ -966,6 +971,7 @@ function setDeck(albumId){
   if(albumId===deckAlbum)return;
   const rec=$('#record'),old=deckAlbum;deckAlbum=albumId;
   if(window.photoForAlbum)photoForAlbum(albumId);
+  deckGrooves(albumId);
   if(deckInstant&&albumId!=null){                 // Platte kam schon per Animation aus der Kiste
     deckInstant=false;
     const a=albumById.get(albumId);
@@ -1000,14 +1006,46 @@ function tick(){
   $('#tPos').textContent=fmt(seeking?$('#seek').value/1000*dur:pos);$('#tDur').textContent=fmt(dur);
   let ang=0;
   if(t&&deckAlbum!=null&&!swapping&&(S.playing||pos>0)){
-    const a=albumById.get(t.albumId),list=a?a.tracks:[t];
+    const a=albumById.get(t.albumId),list=a?a.tracks:[t],w=trackWeights(list);
     const i=Math.max(0,list.findIndex(x=>x.id===t.id));
-    const total=list.reduce((s,x)=>s+x.dur,0)||1,before=list.slice(0,i).reduce((s,x)=>s+x.dur,0);
-    const f=Math.min(1,(before+pos)/total);
-    ang=17.5+f*11.5;   // 17,5° = äußere Rille, 29° = kurz vor dem Etikett
+    const total=w.reduce((x,y)=>x+y,0),before=w.slice(0,i).reduce((x,y)=>x+y,0);
+    const prog=dur?Math.min(1,pos/dur):0;
+    const f=Math.min(1,(before+w[i]*prog)/total);
+    ang=ARM_OUT+f*(ARM_IN-ARM_OUT);
   }
   if(!S.playing&&pos===0)ang=0;
-  $('#arm').style.transform=`rotate(${ang}deg)`;
+  setArm(ang);
+}
+/* Nadel: 17,5° = äußere Rille, 29° = kurz vor dem Etikett. Jedes Lied hat seinen Abschnitt auf der Platte. */
+const ARM_OUT=17.5,ARM_IN=29;
+function trackWeights(list){
+  const known=list.map(x=>x.dur||0).filter(Boolean),avg=known.length?known.reduce((a,b)=>a+b,0)/known.length:1;
+  return list.map(x=>x.dur||avg);
+}
+/* Großer Sprung (neues Lied, Spulen, Auflegen): Arm anheben, rüberschwenken, absenken */
+let armCur=0,armBusy=0;
+function setArm(ang){
+  const w=$('#armw');
+  if(Math.abs(ang-armCur)<0.02)return;
+  if(Math.abs(ang-armCur)>1.2){
+    const my=++armBusy,from=armCur;armCur=ang;
+    w.className='armw up';w.style.transform=`rotate(${from}deg) scale(1.035)`;            // anheben
+    setTimeout(()=>{if(my!==armBusy)return;w.className='armw move';w.style.transform=`rotate(${ang}deg) scale(1.035)`;   // schwenken
+      setTimeout(()=>{if(my!==armBusy)return;w.className='armw up';w.style.transform=`rotate(${ang}deg)`;               // absenken
+        setTimeout(()=>{if(my===armBusy){w.className='armw';armBusy=0;}},300);},1000);},280);
+    return;
+  }
+  if(armBusy){armCur=ang;return;}
+  armCur=ang;w.style.transform=`rotate(${ang}deg)`;
+}
+/* Pausen zwischen den Liedern als dunkle Ringe, genau dort, wo die Nadel beim Liedwechsel aufsetzt */
+function deckGrooves(albumId){
+  const g=$('#gaps');const a=albumId!=null?albumById.get(albumId):null;
+  if(!a||a.tracks.length<2){g.style.background='';return;}
+  const w=trackWeights(a.tracks),tot=w.reduce((x,y)=>x+y,0);let acc=0;const st=[];
+  for(let i=0;i<w.length-1;i++){acc+=w[i];const f=acc/tot,r=96-f*(96-63);   // gleiche Skala wie die Nadel
+    st.unshift(`#0000 ${(r-0.9).toFixed(2)}%,#000 ${(r-0.6).toFixed(2)}%,#050505 ${(r+0.4).toFixed(2)}%,#ffffff1c ${(r+0.7).toFixed(2)}%,#0000 ${(r+1).toFixed(2)}%`);}
+  g.style.background=`radial-gradient(circle closest-side,#0000 0%,${st.join(',')},#0000 100%)`;
 }
 setInterval(()=>{if(S.playing&&!document.hidden)tick();},500);
 

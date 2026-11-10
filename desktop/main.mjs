@@ -9,6 +9,9 @@ import { scanFolders, findCover } from './lib.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.setName('bTUNES');
+// Grafikkarte auch dann nutzen, wenn Chromium sie vorsichtshalber sperrt (z. B. NVIDIA unter Linux) – sonst ruckelt die drehende Platte
+app.commandLine.appendSwitch('ignore-gpu-blocklist');
+app.commandLine.appendSwitch('enable-gpu-rasterization');
 
 if (!app.requestSingleInstanceLock()) app.quit();
 
