@@ -196,7 +196,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .ncard{margin-top:14px;background:linear-gradient(135deg,#2c241d,#221c17);border:1px solid #3a3029;border-radius:14px;padding:10px 12px 4px;animation:nin .5s ease}
 @keyframes nin{from{opacity:0;transform:translateY(8px)}}
 .ncard .nh{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--acc)}
-.ncard .nh .lv{width:7px;height:7px;border-radius:50%;background:#ff5a2a;box-shadow:0 0 6px #ff5a2a;animation:blink 1.6s infinite}
+.ncard .nh .lv{width:7px;height:7px;border-radius:50%;background:#ff5a2a;box-shadow:0 0 6px #ff5a2a}
 @keyframes blink{50%{opacity:.25}}
 .ncard .nh .mo{margin-left:auto;color:var(--mute);letter-spacing:0;text-transform:none;font-weight:600}
 .ncard a{display:block;padding:7px 0;border-top:1px solid #ffffff0d;color:inherit;text-decoration:none}
@@ -207,7 +207,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   background:radial-gradient(circle at 35% 30%,#f0f0f0,#9a9a9a 60%,#5c5c5c);box-shadow:0 2px 5px #000c,inset 0 1px 0 #fff8;color:#2a2a2a;transition:transform .15s}
 .infobtn:active{transform:scale(.92)}
 .infobtn svg{width:62%;height:62%;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
-.infobtn .dot{position:absolute;right:-2px;top:-2px;width:28%;height:28%;border-radius:50%;background:#ff5a2a;box-shadow:0 0 6px #ff5a2a;animation:blink 1.6s infinite}
+.infobtn .dot{position:absolute;right:-2px;top:-2px;width:28%;height:28%;border-radius:50%;background:#ff5a2a;box-shadow:0 0 6px #ff5a2a}
 .bandbtn{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:5px 12px;border-radius:16px;background:#ffffff10;color:var(--mute);font-size:13px;font-weight:600}
 .bandbtn .dot{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 6px var(--acc)}
 .bandbtn svg.i{width:16px;height:16px}
@@ -3386,7 +3386,8 @@ function setTab(t){curTab=t;store.set('tab2',t);
   document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
   if(t==='pod'){pcRenderHome();pcMini();refreshAll(false);}
   if(t==='zt'){ztRenderHome();ztScan(false);}
-  if(t==='radio')rRender();}
+  if(t==='radio')rRender();
+  if(t==='music')requestAnimationFrame(fitMain);}
 document.querySelectorAll('.seg').forEach(s=>s.onclick=e=>{const b=e.target.closest('[data-tab]');if(b)setTab(b.dataset.tab);});
 rInit();
 setTab(curTab);
@@ -3405,13 +3406,24 @@ function demoFeed(u){
 }
 function demoItunes(){return Promise.resolve({results:[['Bergfunk','Radio Werdenfels Demo','a','Freizeit'],['Zeitreise','Demo-Verlag','b','Geschichte'],['Technik am Abend','Studio Demo','c','Technologie']].map(x=>({collectionName:x[0],artistName:x[1],feedUrl:'https://demo-'+x[2]+'.example/feed',artworkUrl600:'',primaryGenreName:x[3]}))});}
 
+/* Plattenspieler so groß wie möglich, aber alles muss auf den Bildschirm passen */
+function fitMain(){
+  const m=$('#main'),dk=$('#deck');if(!m||m.classList.contains('hidden'))return;
+  dk.style.width='';
+  const pb=parseFloat(getComputedStyle(m).paddingBottom)||0;
+  const last=[...m.children].filter(c=>!c.classList.contains('hidden')).pop();
+  const over=Math.max(m.scrollHeight-m.clientHeight,last?Math.ceil(last.getBoundingClientRect().bottom-(m.getBoundingClientRect().bottom-pb)):0);
+  if(over>0)dk.style.width=Math.max(180,dk.offsetWidth-Math.ceil(over/0.92)-2)+'px';
+}
+window.addEventListener('resize',()=>requestAnimationFrame(fitMain));
+new MutationObserver(()=>requestAnimationFrame(fitMain)).observe($('#ncard'),{attributes:true,attributeFilter:['class']});
 /* ===== Start ===== */
 async function loadLibrary(manual){
   try{
     const r=await Music.scan();buildLibrary(r.tracks||[]);
     if(manual)toast(tracks.length+' Titel gefunden');
   }catch(e){toast(String(e&&e.message||e));}
-  renderLib();render();miniCrate();
+  renderLib();render();miniCrate();requestAnimationFrame(fitMain);
 }
 async function start(){
   Music.addListener('state',onState);
