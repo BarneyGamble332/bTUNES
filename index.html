@@ -3553,7 +3553,7 @@ async function miniCrate(){
 /* ===================== ORGA: Kalender + Notizen =====================
    Termine (eigene, importierte .ics, abonnierte Kalender, Handy-Kalender), Export als .ics,
    Erinnerungen als Benachrichtigung, Notizen mit Diktat. Alles bleibt auf dem Gerät. */
-const OG={view:store.get('og_view','cal'),month:null,sel:null,q:'',folder:store.get('og_folder','Alle')};
+const OG={view:store.get('og_view','cal'),month:new Date(new Date().getFullYear(),new Date().getMonth(),1),sel:null,q:'',folder:store.get('og_folder','Alle')};
 let ogEv=store.get('og_ev',[]),ogSubs=store.get('og_subs',[]),ogNotes=store.get('og_notes',[]),ogFolders=store.get('og_folders',['Ideen','Einkauf']);
 let ogDevOn=store.get('og_dev',false),ogDevCache={};
 const ogSave=()=>{store.set('og_ev',ogEv);ogReminders();};
@@ -3720,7 +3720,8 @@ function ogReminders(){
 }
 
 /* ---------- Ansicht ---------- */
-function orgaShow(){if(!OG.month){const t=new Date();OG.month=new Date(t.getFullYear(),t.getMonth(),1);OG.sel=dkey(t);}ogRender();ogRefreshSubs(false);}
+OG.sel=dkey(new Date());
+function orgaShow(){ogRender();ogRefreshSubs(false);}
 function ogRender(){
   document.querySelectorAll('#ogSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===OG.view));
   $('#ogFab').innerHTML=OG.view==='cal'?'<svg class="i"><use href="#i-plus"/></svg>':'<svg class="i"><use href="#i-mic"/></svg>';
