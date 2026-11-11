@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Taschen-Player, groß: Cover-Stapel zum Durchwischen (Antippen spielt das Album), darunter der laufende Titel -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/tp_root" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/tp_bg" android:orientation="horizontal" android:padding="10dp">
+    <LinearLayout android:id="@+id/tp_scr" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
+        android:background="@drawable/tp_scr" android:orientation="vertical" android:paddingStart="8dp" android:paddingEnd="8dp" android:paddingTop="5dp" android:paddingBottom="7dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+        <TextView android:id="@+id/tp_state" android:layout_width="16dp" android:layout_height="wrap_content" android:textColor="#FFFFB347" android:textSize="9sp" android:shadowColor="#AAFF9A2A" android:shadowRadius="6" />
+        <TextView android:id="@+id/tp_head" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="bTUNES" android:textColor="#FFFFB347" android:textSize="10sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:shadowColor="#AAFF9A2A" android:shadowRadius="6" />
+        <TextView android:layout_width="16dp" android:layout_height="wrap_content" android:gravity="end" android:text="▮" android:textColor="#FFFFB347" android:textSize="9sp" />
+    </LinearLayout>
+    <ImageView android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="3dp" android:layout_marginBottom="5dp" android:background="#55FFB347" />
+        <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+            <StackView android:id="@+id/tp_stack" android:layout_width="match_parent" android:layout_height="match_parent" android:loopViews="true" />
+            <TextView android:id="@+id/tp_stack_empty" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:text="Keine Alben gefunden" android:textColor="#FFFFB347" android:textSize="11sp" />
+        </FrameLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:orientation="horizontal" android:gravity="center_vertical">
+            <ImageView android:id="@+id/tp_cover" android:layout_width="34dp" android:layout_height="34dp" android:background="@drawable/tp_cov" android:padding="1dp" android:scaleType="centerCrop" android:contentDescription="Cover" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="7dp" android:orientation="vertical">
+                <TextView android:id="@+id/tp_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#FFFFB347" android:textSize="12sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:shadowColor="#88FF9A2A" android:shadowRadius="5" />
+                <TextView android:id="@+id/tp_artist" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#DDFFB347" android:textSize="10sp"  android:maxLines="1" android:ellipsize="end" android:shadowColor="#88FF9A2A" android:shadowRadius="5" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:layout_width="wrap_content" android:layout_height="match_parent" android:layout_marginStart="10dp" android:orientation="vertical" android:gravity="center">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="bTUNES" android:textColor="#994A210A" android:textSize="10sp" android:textStyle="bold|italic" android:letterSpacing="0.3" android:layout_marginBottom="8dp" />
+    
+    <!-- Drehrad: Ring zum Antippen (oben MENÜ, links zurück, rechts weiter, unten Play/Pause), Mitte OK -->
+    <FrameLayout android:layout_width="122dp" android:layout_height="122dp" android:layout_gravity="center">
+        <ImageView android:id="@+id/tp_wheel" android:layout_width="match_parent" android:layout_height="match_parent" android:scaleType="fitCenter" android:contentDescription="Drehrad" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="horizontal">
+                <FrameLayout android:id="@+id/tp_z0" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" /><FrameLayout android:id="@+id/tp_menu" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" /><FrameLayout android:id="@+id/tp_z1" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="horizontal">
+                <FrameLayout android:id="@+id/tp_prev" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" /><FrameLayout android:id="@+id/tp_ok" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" /><FrameLayout android:id="@+id/tp_next" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="horizontal">
+                <FrameLayout android:id="@+id/tp_z2" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" /><FrameLayout android:id="@+id/tp_play" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" /><FrameLayout android:id="@+id/tp_z3" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+        <TextView android:id="@+id/tp_nexttxt" android:layout_width="122dp" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:gravity="center" android:textColor="#CC3A1A08" android:textSize="10sp" android:maxLines="2" android:ellipsize="end" />
+    </LinearLayout>
+</LinearLayout>

@@ -28,6 +28,7 @@ public class BtunesWidget extends AppWidgetProvider {
     static final String A_TOGGLE = "de.bernhard.musik.TOGGLE";
     static final String A_NEXT = "de.bernhard.musik.NEXT";
     static final String A_PREV = "de.bernhard.musik.PREV";
+    static final String A_ALBUM = "de.bernhard.musik.ALBUM";
 
     private static String coverFor = "";
     private static Bitmap record;
@@ -43,6 +44,7 @@ public class BtunesWidget extends AppWidgetProvider {
             .putString("title", title).putString("artist", artist).putString("art", art)
             .putBoolean("playing", playing).putLong("track", trackId).apply();
         refreshAsync(ctx);
+        TaschenWidget.refreshAsync(ctx);
     }
 
     static void refreshAsync(Context ctx) {
@@ -112,20 +114,46 @@ public class BtunesWidget extends AppWidgetProvider {
     @Override
     public void onReceive(Context ctx, Intent in) {
         String a = in.getAction();
-        if (A_TOGGLE.equals(a) || A_NEXT.equals(a) || A_PREV.equals(a)) {
+        if (A_TOGGLE.equals(a) || A_NEXT.equals(a) || A_PREV.equals(a) || A_ALBUM.equals(a)) {
             Intent s = new Intent(ctx, PlaybackService.class).setAction(a);
+            if (A_ALBUM.equals(a)) s.putExtra("album", in.getLongExtra("album", -1L));
             try {
                 ctx.startService(s);
             } catch (Exception e) {
                 // Dienst läuft nicht und die App ist im Hintergrund: nur zum Abspielen als Vordergrunddienst starten
                 boolean hasQueue = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString("queue", null) != null;
-                if (A_TOGGLE.equals(a) && hasQueue && Build.VERSION.SDK_INT >= 26) {
+                if (((A_TOGGLE.equals(a) && hasQueue) || A_ALBUM.equals(a)) && Build.VERSION.SDK_INT >= 26) {
                     try { ctx.startForegroundService(s); } catch (Exception ignore) {}
                 }
             }
             return;
         }
         super.onReceive(ctx, in);
+    }
+
+
+    /* Cover des laufenden Titels: vom Handy oder (Podcast/Radio) aus dem Internet */
+    static Bitmap loadCover(Context ctx, long track, String artUrl) {
+        Bitmap art = null;
+        if (track >= 0 && Build.VERSION.SDK_INT >= 29) {
+            try {
+                art = ctx.getContentResolver().loadThumbnail(
+                    ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, track), new Size(300, 300), null);
+            } catch (Exception ignore) {}
+        }
+        if (art == null && artUrl != null && artUrl.startsWith("http")) {
+            // Podcast: Bild aus dem Internet
+            try {
+                java.net.HttpURLConnection con = (java.net.HttpURLConnection) new java.net.URL(artUrl).openConnection();
+                con.setConnectTimeout(8000); con.setReadTimeout(8000); con.setInstanceFollowRedirects(true);
+                try (java.io.InputStream in = con.getInputStream()) {
+                    android.graphics.BitmapFactory.Options o = new android.graphics.BitmapFactory.Options();
+                    o.inSampleSize = 2;
+                    art = android.graphics.BitmapFactory.decodeStream(in, null, o);
+                }
+            } catch (Exception ignore) {}
+        }
+        return art;
     }
 
     /* Schallplatte zeichnen: Rillen, Glanz, rundes Cover als Etikett */
@@ -152,25 +180,7 @@ public class BtunesWidget extends AppWidgetProvider {
         cv.drawCircle(c, c, r, sh);
 
         float lr = r * 0.62f;
-        Bitmap art = null;
-        if (track >= 0 && Build.VERSION.SDK_INT >= 29) {
-            try {
-                art = ctx.getContentResolver().loadThumbnail(
-                    ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, track), new Size(300, 300), null);
-            } catch (Exception ignore) {}
-        }
-        if (art == null && artUrl != null && artUrl.startsWith("http")) {
-            // Podcast: Bild aus dem Internet
-            try {
-                java.net.HttpURLConnection con = (java.net.HttpURLConnection) new java.net.URL(artUrl).openConnection();
-                con.setConnectTimeout(8000); con.setReadTimeout(8000); con.setInstanceFollowRedirects(true);
-                try (java.io.InputStream in = con.getInputStream()) {
-                    android.graphics.BitmapFactory.Options o = new android.graphics.BitmapFactory.Options();
-                    o.inSampleSize = 2;
-                    art = android.graphics.BitmapFactory.decodeStream(in, null, o);
-                }
-            } catch (Exception ignore) {}
-        }
+        Bitmap art = loadCover(ctx, track, artUrl);
         Paint lp = new Paint(Paint.ANTI_ALIAS_FLAG);
         if (art != null) {
             BitmapShader bs = new BitmapShader(art, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);

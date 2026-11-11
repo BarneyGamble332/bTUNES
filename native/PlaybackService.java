@@ -98,6 +98,7 @@ public class PlaybackService extends MediaSessionService {
         String a = intent == null ? null : intent.getAction();
         if (a != null && a.startsWith("de.bernhard.musik.") && session != null) {
             Player p = session.getPlayer();
+            if (BtunesWidget.A_ALBUM.equals(a)) { playAlbum(p, intent.getLongExtra("album", -1L)); return START_NOT_STICKY; }
             if (p.getMediaItemCount() == 0) restoreQueue(p);
             if (p.getMediaItemCount() > 0) {
                 if (BtunesWidget.A_TOGGLE.equals(a)) {
@@ -138,6 +139,31 @@ public class PlaybackService extends MediaSessionService {
         return new MediaItem.Builder().setMediaId(key).setUri(u)
             .setRequestMetadata(new MediaItem.RequestMetadata.Builder().setMediaUri(u).build())
             .setMediaMetadata(md.build()).build();
+    }
+
+    /* Album aus dem Cover-Stapel des Widgets abspielen (Titel in Albumreihenfolge) */
+    private void playAlbum(Player p, long album) {
+        if (album < 0) return;
+        try (android.database.Cursor c = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                new String[]{MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.ALBUM},
+                MediaStore.Audio.Media.IS_MUSIC + " != 0 AND " + MediaStore.Audio.Media.ALBUM_ID + " = ?", new String[]{String.valueOf(album)},
+                MediaStore.Audio.Media.TRACK + " ASC, " + MediaStore.Audio.Media.TITLE + " ASC")) {
+            JSONArray t = new JSONArray();
+            List<MediaItem> items = new ArrayList<>();
+            while (c != null && c.moveToNext()) {
+                JSONObject o = new JSONObject();
+                o.put("id", c.getLong(0)); o.put("title", c.getString(1)); o.put("artist", c.getString(2)); o.put("album", c.getString(3));
+                t.put(o);
+                items.add(itemFrom(o));
+            }
+            if (items.isEmpty()) return;
+            prefs().edit().putString("queue", t.toString()).putInt("index", 0).putLong("pos", 0L).apply();
+            p.setShuffleModeEnabled(false);
+            p.setMediaItems(items, 0, 0);
+            p.setPlaybackSpeed(1f);
+            p.prepare();
+            p.play();
+        } catch (Exception ignore) {}
     }
 
     /* Zuletzt aufgelegte Titel wiederherstellen (wenn die App vorher beendet war) */

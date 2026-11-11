@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Taschen-Player, flach (1 Zeile): kleines Display und drei Tasten -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/tp_root" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/tp_bg" android:orientation="horizontal" android:gravity="center_vertical" android:padding="6dp">
+    <LinearLayout android:id="@+id/tp_scr" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
+        android:background="@drawable/tp_scr" android:orientation="horizontal" android:gravity="center_vertical" android:padding="4dp">
+        <ImageView android:id="@+id/tp_cover" android:layout_width="wrap_content" android:layout_height="match_parent" android:maxWidth="48dp" android:adjustViewBounds="true" android:scaleType="centerCrop" android:contentDescription="Cover" />
+        <LinearLayout android:id="@+id/tp_text" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="7dp" android:orientation="vertical">
+            <TextView android:id="@+id/tp_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#FFFFB347" android:textSize="12sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" android:shadowColor="#88FF9A2A" android:shadowRadius="5" />
+            <TextView android:id="@+id/tp_artist" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#DDFFB347" android:textSize="10sp"  android:maxLines="1" android:ellipsize="end" android:shadowColor="#88FF9A2A" android:shadowRadius="5" />
+        </LinearLayout>
+    </LinearLayout>
+    <ImageView android:id="@+id/tp_prev" android:layout_width="40dp" android:layout_height="30dp" android:layout_marginStart="5dp" android:background="@drawable/tp_btn" android:padding="7dp" android:scaleType="fitCenter" android:src="@drawable/tp_ic_prev" android:contentDescription="tp_prev" /><ImageView android:id="@+id/tp_play" android:layout_width="46dp" android:layout_height="30dp" android:layout_marginStart="5dp" android:background="@drawable/tp_btn" android:padding="7dp" android:scaleType="fitCenter" android:src="@drawable/tp_ic_play" android:contentDescription="tp_play" /><ImageView android:id="@+id/tp_next" android:layout_width="40dp" android:layout_height="30dp" android:layout_marginStart="5dp" android:background="@drawable/tp_btn" android:padding="7dp" android:scaleType="fitCenter" android:src="@drawable/tp_ic_next" android:contentDescription="tp_next" />
+</LinearLayout>

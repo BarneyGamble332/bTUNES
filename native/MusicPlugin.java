@@ -121,6 +121,7 @@ public class MusicPlugin extends Plugin {
                 JSObject r = new JSObject();
                 r.put("tracks", out);
                 call.resolve(r);
+                TaschenWidget.albumsChanged(getContext());
             } catch (SecurityException e) {
                 call.reject("Kein Zugriff auf Musik");
             } catch (Exception e) {

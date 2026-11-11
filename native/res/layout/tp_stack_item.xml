@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ein Album im Cover-Stapel -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/tp_item" android:layout_width="match_parent" android:layout_height="match_parent">
+    <TextView android:id="@+id/tp_item_name" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/tp_cov" android:gravity="center" android:padding="6dp" android:textColor="#FFFFB347" android:textSize="11sp" android:textStyle="bold" />
+    <ImageView android:id="@+id/tp_item_cover" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/tp_cov" android:padding="1dp" android:scaleType="centerCrop" android:contentDescription="Album" />
+</FrameLayout>

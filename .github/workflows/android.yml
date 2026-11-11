@@ -55,7 +55,7 @@ jobs:
           cp native/*.java $PKG/
           # Widget: Layout, Symbole, Beschreibung
           cp -r native/res/* $RES/
-          sed -i 's#</resources>#    <string name="btunes_widget_desc">bTUNES: aktuelle Platte und Tasten</string>\n</resources>#' $RES/values/strings.xml
+          sed -i 's#</resources>#    <string name="btunes_widget_desc">bTUNES: aktuelle Platte und Tasten</string>\n    <string name="tp_widget_desc">bTUNES Taschen-Player: Display, Drehrad und Cover-Stapel</string>\n</resources>#' $RES/values/strings.xml
 
           # Wiedergabe-Bibliothek (Media3) fuer Hintergrund-Musik und Sperrbildschirm
           cat >> $APP/build.gradle <<'GRADLE'
@@ -98,6 +98,11 @@ jobs:
                           <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
                       </intent-filter>
                   </receiver>
+                  <receiver android:name=".TaschenWidget" android:exported="false" android:label="bTUNES Taschen-Player">
+                      <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+                      <meta-data android:name="android.appwidget.provider" android:resource="@xml/tp_widget_info" />
+                  </receiver>
+                  <service android:name=".TpStackService" android:exported="false" android:permission="android.permission.BIND_REMOTEVIEWS" />
                   <receiver android:name=".BtunesWidget" android:exported="false">
                       <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
                       <meta-data android:name="android.appwidget.provider" android:resource="@xml/btunes_widget_info" />
