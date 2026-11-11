@@ -42,7 +42,9 @@ import org.json.JSONObject;
 @CapacitorPlugin(name = "Music", permissions = {
     @Permission(alias = "audio", strings = { Manifest.permission.READ_MEDIA_AUDIO }),
     @Permission(alias = "storage", strings = { Manifest.permission.READ_EXTERNAL_STORAGE }),
-    @Permission(alias = "notify", strings = { Manifest.permission.POST_NOTIFICATIONS })
+    @Permission(alias = "notify", strings = { Manifest.permission.POST_NOTIFICATIONS }),
+    @Permission(alias = "mic", strings = { Manifest.permission.RECORD_AUDIO }),
+    @Permission(alias = "cal", strings = { Manifest.permission.READ_CALENDAR })
 })
 public class MusicPlugin extends Plugin {
     private final Handler main = new Handler(Looper.getMainLooper());
@@ -295,6 +297,146 @@ public class MusicPlugin extends Plugin {
         });
     }
 
+    /* ---------- Orga: Erinnerungen, Handy-Kalender, Datei speichern, Diktieren ---------- */
+    @PluginMethod
+    public void setReminders(PluginCall call) {
+        JSONArray l = call.getData().optJSONArray("list");
+        ReminderReceiver.schedule(getContext(), l == null ? new JSONArray() : l);
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void calendarEvents(PluginCall call) {
+        if (!has(Manifest.permission.READ_CALENDAR)) { requestPermissionForAlias("cal", call, "calDone"); return; }
+        readCalendar(call);
+    }
+    @PermissionCallback
+    private void calDone(PluginCall call) {
+        if (has(Manifest.permission.READ_CALENDAR)) readCalendar(call); else call.reject("Kein Zugriff auf den Kalender");
+    }
+    private void readCalendar(PluginCall call) {
+        final long from = call.getData().optLong("from"), to = call.getData().optLong("to");
+        pool.execute(() -> {
+            JSArray out = new JSArray();
+            android.net.Uri.Builder b = android.provider.CalendarContract.Instances.CONTENT_URI.buildUpon();
+            ContentUris.appendId(b, from);
+            ContentUris.appendId(b, to);
+            String[] proj = { android.provider.CalendarContract.Instances.EVENT_ID, android.provider.CalendarContract.Instances.TITLE,
+                android.provider.CalendarContract.Instances.BEGIN, android.provider.CalendarContract.Instances.END,
+                android.provider.CalendarContract.Instances.ALL_DAY, android.provider.CalendarContract.Instances.EVENT_LOCATION,
+                android.provider.CalendarContract.Instances.CALENDAR_DISPLAY_NAME, android.provider.CalendarContract.Instances.DISPLAY_COLOR };
+            try (Cursor c = getContext().getContentResolver().query(b.build(), proj, null, null, android.provider.CalendarContract.Instances.BEGIN)) {
+                while (c != null && c.moveToNext()) {
+                    JSObject o = new JSObject();
+                    o.put("id", c.getLong(0)); o.put("title", c.getString(1)); o.put("begin", c.getLong(2)); o.put("end", c.getLong(3));
+                    o.put("allDay", c.getInt(4) == 1); o.put("loc", c.getString(5)); o.put("cal", c.getString(6));
+                    o.put("color", String.format("#%06X", 0xFFFFFF & c.getInt(7)));
+                    out.put(o);
+                }
+            } catch (Exception e) { call.reject("Kalender konnte nicht gelesen werden"); return; }
+            JSObject r = new JSObject(); r.put("events", out); call.resolve(r);
+        });
+    }
+
+    /* Textdatei (z. B. .ics-Export) im Ordner Download ablegen */
+    @PluginMethod
+    public void saveText(PluginCall call) {
+        String name = call.getString("name", "bTUNES.txt"), text = call.getString("text", ""), mime = call.getString("mime", "text/plain");
+        try {
+            if (Build.VERSION.SDK_INT >= 29) {
+                android.content.ContentValues v = new android.content.ContentValues();
+                v.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+                v.put(MediaStore.MediaColumns.MIME_TYPE, mime);
+                v.put(MediaStore.MediaColumns.RELATIVE_PATH, android.os.Environment.DIRECTORY_DOWNLOADS);
+                Uri u = getContext().getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, v);
+                try (java.io.OutputStream os = getContext().getContentResolver().openOutputStream(u)) { os.write(text.getBytes("UTF-8")); }
+                JSObject r = new JSObject(); r.put("where", "Download/" + name); call.resolve(r);
+            } else {
+                java.io.File f = new java.io.File(getContext().getExternalFilesDir(null), name);
+                try (java.io.FileOutputStream os = new java.io.FileOutputStream(f)) { os.write(text.getBytes("UTF-8")); }
+                JSObject r = new JSObject(); r.put("where", f.getAbsolutePath()); call.resolve(r);
+            }
+        } catch (Exception e) { call.reject("Speichern fehlgeschlagen: " + e.getMessage()); }
+    }
+
+    /* Diktieren mit der Spracherkennung von Android. Läuft weiter, bis "Fertig" gedrückt wird. */
+    private android.speech.SpeechRecognizer sr;
+    private volatile boolean srOn = false;
+    private long lastRms = 0;
+    private String srLang = "de-DE";
+
+    @PluginMethod
+    public void speechStart(PluginCall call) {
+        srLang = call.getString("lang", "de-DE");
+        if (!has(Manifest.permission.RECORD_AUDIO)) { requestPermissionForAlias("mic", call, "micDone"); return; }
+        startSpeech(call);
+    }
+    @PermissionCallback
+    private void micDone(PluginCall call) {
+        if (has(Manifest.permission.RECORD_AUDIO)) startSpeech(call); else call.reject("Ohne Mikrofon-Freigabe kann nicht diktiert werden");
+    }
+    private void startSpeech(PluginCall call) {
+        main.post(() -> {
+            if (!android.speech.SpeechRecognizer.isRecognitionAvailable(getContext())) { call.reject("Auf diesem Handy ist keine Spracherkennung verfügbar"); return; }
+            if (sr == null) {
+                sr = android.speech.SpeechRecognizer.createSpeechRecognizer(getContext());
+                sr.setRecognitionListener(new android.speech.RecognitionListener() {
+                    public void onReadyForSpeech(android.os.Bundle b) { JSObject o = new JSObject(); o.put("ready", true); notifyListeners("speech", o); }
+                    public void onBeginningOfSpeech() {}
+                    public void onRmsChanged(float rms) {
+                        long now = System.currentTimeMillis();
+                        if (now - lastRms > 90) { lastRms = now; JSObject o = new JSObject(); o.put("rms", rms); notifyListeners("speech", o); }
+                    }
+                    public void onBufferReceived(byte[] b) {}
+                    public void onEndOfSpeech() {}
+                    public void onError(int code) {
+                        boolean silence = code == android.speech.SpeechRecognizer.ERROR_NO_MATCH || code == android.speech.SpeechRecognizer.ERROR_SPEECH_TIMEOUT;
+                        if (srOn && (silence || code == android.speech.SpeechRecognizer.ERROR_RECOGNIZER_BUSY)) { main.postDelayed(() -> { if (srOn) listen(); }, 150); return; }
+                        if (srOn) {
+                            srOn = false;
+                            JSObject o = new JSObject();
+                            o.put("error", code == android.speech.SpeechRecognizer.ERROR_NETWORK || code == android.speech.SpeechRecognizer.ERROR_NETWORK_TIMEOUT
+                                ? "Spracherkennung braucht gerade Internet" : code == android.speech.SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS
+                                ? "Kein Zugriff aufs Mikrofon" : "Spracherkennung abgebrochen (Fehler " + code + ")");
+                            notifyListeners("speech", o);
+                        }
+                    }
+                    public void onResults(android.os.Bundle b) {
+                        java.util.ArrayList<String> l = b.getStringArrayList(android.speech.SpeechRecognizer.RESULTS_RECOGNITION);
+                        if (l != null && !l.isEmpty()) { JSObject o = new JSObject(); o.put("final", l.get(0)); notifyListeners("speech", o); }
+                        if (srOn) listen();   // weiter zuhören, bis "Fertig"
+                    }
+                    public void onPartialResults(android.os.Bundle b) {
+                        java.util.ArrayList<String> l = b.getStringArrayList(android.speech.SpeechRecognizer.RESULTS_RECOGNITION);
+                        if (l != null && !l.isEmpty()) { JSObject o = new JSObject(); o.put("partial", l.get(0)); notifyListeners("speech", o); }
+                    }
+                    public void onEvent(int t, android.os.Bundle b) {}
+                });
+            }
+            srOn = true;
+            listen();
+            call.resolve();
+        });
+    }
+    private void listen() {
+        android.content.Intent i = new android.content.Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        i.putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL, android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        i.putExtra(android.speech.RecognizerIntent.EXTRA_LANGUAGE, srLang);
+        i.putExtra(android.speech.RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+        i.putExtra(android.speech.RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 3000L);
+        i.putExtra(android.speech.RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 3000L);
+        try { sr.startListening(i); } catch (Exception ignore) {}
+    }
+    @PluginMethod
+    public void speechStop(PluginCall call) {
+        final boolean cancel = call.getBoolean("cancel", false);
+        main.post(() -> {
+            srOn = false;
+            if (sr != null) { try { if (cancel) sr.cancel(); else sr.stopListening(); } catch (Exception ignore) {} }
+            call.resolve();
+        });
+    }
+
     /* ---------- Podcast-Downloads (App-Ordner, keine Berechtigung nötig) ---------- */
     private final ExecutorService dlPool = Executors.newFixedThreadPool(2);
     private final java.util.Set<String> cancelled = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
@@ -544,6 +686,7 @@ public class MusicPlugin extends Plugin {
 
     @Override
     protected void handleOnDestroy() {
+        main.post(() -> { if (sr != null) { try { sr.destroy(); } catch (Exception ignore) {} sr = null; } });
         if (future != null) MediaController.releaseFuture(future);
         future = null; ctl = null;
         pool.shutdown();

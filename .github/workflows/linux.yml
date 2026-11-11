@@ -31,6 +31,11 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p app && cp ../index.html app/index.html
+          # Spracherkennung (Whisper) für das Diktieren: nur die zwei benötigten Programmteile mitnehmen
+          mkdir -p app/asr /tmp/asr
+          npm i --prefix /tmp/asr --ignore-scripts --no-audit --no-fund @huggingface/transformers@4.3.2
+          cp /tmp/asr/node_modules/@huggingface/transformers/dist/transformers.min.js app/asr/
+          cp /tmp/asr/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.mjs /tmp/asr/node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.wasm app/asr/
           # PDF-Anzeige fuer den Zeitungs-Reiter
           mkdir -p app/pdfjs /tmp/pdfjs && (cd /tmp/pdfjs && npm init -y >/dev/null && npm i --no-audit --no-fund pdfjs-dist@4.10.38)
           cp /tmp/pdfjs/node_modules/pdfjs-dist/build/pdf.min.mjs app/pdfjs/pdf.min.js

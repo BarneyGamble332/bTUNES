@@ -3,7 +3,10 @@
   "productName": "bTUNES",
   "version": "1.0.0",
   "description": "Musik- und Podcast-Player im Plattenspieler-Look",
-  "author": { "name": "Bernhard", "email": "btunes@users.noreply.github.com" },
+  "author": {
+    "name": "Bernhard",
+    "email": "btunes@users.noreply.github.com"
+  },
   "homepage": "https://github.com/BarneyGamble332/bTUNES",
   "license": "UNLICENSED",
   "private": true,
@@ -23,15 +26,35 @@
     "appId": "de.bernhard.btunes",
     "productName": "bTUNES",
     "artifactName": "bTUNES-${version}.${ext}",
-    "files": ["main.mjs", "lib.mjs", "preload.cjs", "app/**", "build/icon.png"],
-    "directories": { "output": "dist" },
+    "files": [
+      "main.mjs",
+      "lib.mjs",
+      "preload.cjs",
+      "app/**",
+      "build/icon.png"
+    ],
+    "directories": {
+      "output": "dist"
+    },
     "linux": {
-      "target": ["AppImage", "rpm"],
+      "target": [
+        "AppImage",
+        "rpm"
+      ],
       "category": "AudioVideo;Audio;Player",
       "icon": "build/icon.png",
       "executableName": "btunes",
       "synopsis": "Musik- und Podcast-Player im Plattenspieler-Look",
-      "desktop": { "entry": { "Name": "bTUNES", "Comment": "Musik- und Podcast-Player", "StartupWMClass": "bTUNES" } }
-    }
+      "desktop": {
+        "entry": {
+          "Name": "bTUNES",
+          "Comment": "Musik- und Podcast-Player",
+          "StartupWMClass": "bTUNES"
+        }
+      }
+    },
+    "asarUnpack": [
+      "app/asr/**"
+    ]
   }
 }

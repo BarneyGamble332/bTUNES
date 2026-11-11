@@ -519,6 +519,79 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .cv-acts button.pri{background:linear-gradient(180deg,#f2b65d,var(--acc2));color:#1a120b}
 .cv-hint{color:#7a6e62;font-size:12.5px;margin-top:8px}
 .cv-load{position:absolute;left:0;right:0;top:30%;text-align:center;color:var(--mute)}
+
+/* ---------- Reiter-Leiste unten ---------- */
+:root{--navh:calc(60px + var(--safe-b))}
+#main,#radio,#pod,#zt,#orga{bottom:var(--navh)!important}
+#main{padding-bottom:12px!important}
+.ttl{margin:0;font-size:15px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);font-weight:700}
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:var(--navh);padding-bottom:var(--safe-b);z-index:9;display:flex;
+  background:#1b1714;border-top:1px solid #2e2722}
+.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#7d7268;font-size:11px;font-weight:600}
+.tabbar button svg.i{width:23px;height:23px}
+.tabbar button.on{color:var(--acc)}
+.pmini{bottom:10px!important}
+
+/* ---------- Orga ---------- */
+#orga{position:absolute;inset:0;display:flex;flex-direction:column;background:radial-gradient(120% 70% at 50% 15%,#2a221c 0%,var(--bg) 70%);padding-top:calc(var(--safe-t) + 10px)}
+#orga .top{padding:0 16px}
+.ogseg{display:flex;margin:6px 16px 8px;background:#ffffff12;border-radius:20px;padding:3px}
+.ogseg button{flex:1;padding:7px 0;border-radius:17px;font-size:14px;font-weight:700;color:var(--mute)}
+.ogseg button.on{background:var(--txt);color:var(--bg)}
+.ognew{margin:0 16px 4px;align-self:flex-start;display:flex;align-items:center;gap:6px;color:var(--acc);font-weight:700;font-size:13.5px;padding:4px 2px}
+.ognew svg.i{width:17px;height:17px}
+.ogbody{flex:1;overflow-y:auto;padding:0 14px 96px}
+.ogmh{display:flex;align-items:center;justify-content:space-between;margin:2px 0 6px}
+.ogmh b{font-size:18px}.ogmh .ibtn{font-size:26px;color:var(--mute)}
+.ogmh .today{margin-left:8px;padding:3px 9px;border-radius:10px;background:var(--card);color:var(--acc);font-size:12px;font-weight:700;vertical-align:2px}
+.oggrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+.oggrid .wd{font-size:11px;color:#7d7268;font-weight:700;padding-bottom:3px}
+.oggrid .d{height:42px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:600;font-size:15px}
+.oggrid .d.o{color:#4a423b}.oggrid .d.t{box-shadow:inset 0 0 0 1.5px var(--acc)}.oggrid .d.s{background:var(--acc);color:#1a120b}
+.oggrid .d .dt{display:flex;gap:2px;height:5px;margin-top:2px}.oggrid .d .dt i{width:5px;height:5px;border-radius:50%}
+.oggrid .d.s .dt i{background:#1a120b!important}
+.ogev{background:var(--card);border-radius:14px;padding:11px 12px;margin-bottom:8px;display:flex;gap:12px;align-items:center;border-left:4px solid var(--acc);cursor:pointer}
+.ogev .tm{width:50px;flex:none;font-weight:800;font-variant-numeric:tabular-nums}.ogev .tm small{display:block;color:var(--mute);font-weight:600;font-size:12px}
+.ogev .tx{min-width:0}.ogev .tx b{display:block}.ogev .tx span{color:var(--mute);font-size:12.5px}
+.ogfab{position:absolute;right:18px;bottom:18px;width:58px;height:58px;border-radius:50%;background:linear-gradient(180deg,#f2b65d,var(--acc2));color:#1a120b;display:grid;place-items:center;box-shadow:0 8px 18px #c9762e66;z-index:2}
+.ogfab svg.i{width:28px;height:28px;stroke-width:2.4}
+.ogfab.micfab{right:calc(50% - 36px);width:72px;height:72px}
+.ogfab.micfab svg.i{width:32px;height:32px}
+.ognote{background:var(--card);border-radius:14px;padding:12px 13px;margin-bottom:9px;cursor:pointer}
+.ognote b{display:block;margin-bottom:3px}
+.ognote p{margin:0;color:#cfc5ba;font-size:13.5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ognote .m{display:flex;gap:8px;margin-top:7px;font-size:12px;color:var(--mute);align-items:center;flex-wrap:wrap}
+.ognote .m .tg{padding:2px 8px;border-radius:10px;background:#3a2f22;color:var(--acc)}
+.ogform .fld{display:block;background:#1c1714;border-radius:12px;padding:9px 12px;margin-bottom:10px}
+.ogform .fld small{display:block;color:var(--mute);font-size:12px;margin-bottom:2px}
+.ogform input,.ogform select,.ogform textarea{width:100%;background:none;border:0;outline:0;color:var(--txt);font:inherit;padding:2px 0;color-scheme:dark}
+.ogform select option{background:#26201b}
+.ogform .fr{display:flex;align-items:center;gap:6px}.ogform .fr .ibtn{flex:none;color:var(--acc)}
+.ogform .row2{display:flex;gap:10px}.ogform .row2 .fld{flex:1;min-width:0}
+.ogform .fld.sw{flex:0 0 110px;display:flex;flex-direction:column}.ogform .fld.sw input{width:22px;height:22px;accent-color:var(--acc);margin-top:4px}
+.ogform .cols{display:flex;gap:12px;margin:2px 4px 12px}.ogform .cols button{width:28px;height:28px;border-radius:50%}
+.ogform .cols button.on{box-shadow:0 0 0 3px var(--bg),0 0 0 5px currentColor;color:#fff}
+.acts button.del{color:#ff7b6b}
+.ogdet .bar{height:6px;border-radius:3px;margin:4px 0 12px}.ogdet h2{margin:0 0 6px;font-size:21px}.ogdet .s{color:var(--mute);margin-top:3px}
+.ogtitle{width:100%;background:none;border:0;outline:0;color:var(--txt);font:800 21px/1.3 system-ui,sans-serif;padding:4px 2px 8px}
+.ogtools{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.ogtools select,.ogtools button{height:36px;border-radius:10px;background:var(--card);border:0;color:var(--txt);font:600 13.5px system-ui,sans-serif;padding:0 10px;display:flex;align-items:center;gap:6px;color-scheme:dark}
+.ogtools button svg.i{width:17px;height:17px;color:var(--acc)}
+.ogtext{width:100%;min-height:46vh;background:#1c1714;border:0;border-radius:14px;color:var(--txt);font:15.5px/1.55 system-ui,sans-serif;padding:14px;outline:0;resize:vertical;user-select:text;-webkit-user-select:text}
+.dict{position:absolute;inset:0;z-index:45;background:#120f0df2;display:flex;flex-direction:column;align-items:center;padding:calc(var(--safe-t) + 50px) 24px calc(var(--safe-b) + 20px);
+  opacity:0;pointer-events:none;transition:opacity .25s}
+.dict.show{opacity:1;pointer-events:auto}
+.dst{color:var(--mute);font-weight:700;letter-spacing:.06em;font-size:13px;text-align:center;min-height:18px}
+.dpulse{width:120px;height:120px;border-radius:50%;margin-top:22px;display:grid;place-items:center;background:radial-gradient(circle,#ff5a2a 0 34%,#ff5a2a44 35% 60%,#ff5a2a18 61%);animation:dp 1.6s ease-in-out infinite}
+.dpulse svg.i{width:40px;height:40px;color:#fff}
+@keyframes dp{50%{transform:scale(1.07)}}
+.dwave{display:flex;gap:4px;align-items:center;height:60px;margin:24px 0}.dwave i{width:5px;height:6px;border-radius:3px;background:var(--acc);transition:height .1s}
+.dtxt{background:var(--card);border-radius:16px;padding:14px;font-size:16.5px;line-height:1.5;width:100%;max-width:520px;min-height:90px;max-height:34vh;overflow-y:auto}
+.dtxt u{text-decoration:none;color:var(--mute)}.dtxt .ph{color:#6d6359}
+.dacts{display:flex;gap:10px;width:100%;max-width:520px;margin-top:20px}
+.dacts button{flex:1;height:50px;border-radius:14px;background:var(--card);font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
+.dacts button.pri{flex:1.3;background:linear-gradient(180deg,#f2b65d,var(--acc2));color:#1a120b}
+.dhint{color:var(--mute);font-size:12.5px;margin-top:14px;text-align:center}
 .welcome{text-align:center;color:var(--mute);margin-top:18px}
 .welcome button{margin-top:12px;height:48px;padding:0 24px;border-radius:14px;background:linear-gradient(180deg,#f2b65d,var(--acc2));color:#1a120b;font-weight:700}
 </style>
@@ -562,6 +635,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></symbol>
   <symbol id="i-radio" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="13" rx="2"/><path d="M6 8l11-5"/><circle cx="16" cy="14.5" r="3"/><path d="M5.5 12.5h5M5.5 16.5h5"/></symbol>
   <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M7.5 13.5h2M11 13.5h2M14.5 13.5h2M7.5 17h2M11 17h2"/></symbol>
+  <symbol id="i-dl2" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></symbol>
   <symbol id="i-queue" viewBox="0 0 24 24"><path d="M3 6h12M3 12h12M3 18h8"/><path d="M17 13l5 3-5 3z"/></symbol>
 </svg>
 
@@ -569,7 +644,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <div id="main">
   <div class="top">
     <button class="ibtn" id="btnQueue" aria-label="Warteschlange"><svg class="i"><use href="#i-queue"/></svg></button>
-    <div class="seg"><button data-tab="music">Platten</button><button data-tab="radio">Radio</button><button data-tab="pod">Podcasts</button><button data-tab="zt">Zeitung</button></div>
+    <h1 class="ttl">Platten</h1>
     <button class="ibtn" id="btnLib" aria-label="Bibliothek"><svg class="i"><use href="#i-lib"/></svg></button>
   </div>
 
@@ -641,7 +716,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <div id="radio" class="hidden">
   <div class="top">
     <button class="ibtn" id="rFavBtn" aria-label="Meine Sender"><svg class="i"><use href="#i-heart"/></svg></button>
-    <div class="seg"><button data-tab="music">Platten</button><button data-tab="radio">Radio</button><button data-tab="pod">Podcasts</button><button data-tab="zt">Zeitung</button></div>
+    <h1 class="ttl">Radio</h1>
     <button class="ibtn" id="rSearchBtn" aria-label="Sender suchen"><svg class="i"><use href="#i-search"/></svg></button>
   </div>
   <div class="rbody">
@@ -668,7 +743,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <div id="pod" class="hidden">
   <div class="top">
     <button class="ibtn" id="pcListBtn" aria-label="Meine Liste"><svg class="i"><use href="#i-queue"/></svg></button>
-    <div class="seg"><button data-tab="music">Platten</button><button data-tab="radio">Radio</button><button data-tab="pod">Podcasts</button><button data-tab="zt">Zeitung</button></div>
+    <h1 class="ttl">Podcasts</h1>
     <button class="ibtn" id="pcAddBtn" aria-label="Podcast hinzufügen"><svg class="i"><use href="#i-plus"/></svg></button>
   </div>
   <label class="search psearch"><svg class="i" style="width:20px;height:20px"><use href="#i-search"/></svg>
@@ -687,7 +762,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <div id="zt" class="hidden">
   <div class="top">
     <button class="ibtn" id="ztFoldBtn" aria-label="Zeitungsordner"><svg class="i"><use href="#i-folder"/></svg></button>
-    <div class="seg"><button data-tab="music">Platten</button><button data-tab="radio">Radio</button><button data-tab="pod">Podcasts</button><button data-tab="zt">Zeitung</button></div>
+    <h1 class="ttl">Zeitung</h1>
     <button class="ibtn" id="ztScanBtn" aria-label="Neu einlesen"><svg class="i"><use href="#i-refresh"/></svg></button>
   </div>
   <label class="search psearch"><svg class="i" style="width:20px;height:20px"><use href="#i-search"/></svg>
@@ -696,6 +771,36 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 </div>
 <input type="file" id="ztFile" accept="application/pdf,.pdf" multiple class="hidden">
 <input type="file" id="opmlFile" accept=".opml,.xml,text/xml,text/x-opml,application/xml,*/*" class="hidden">
+<!-- Reiter-Leiste unten -->
+<nav class="tabbar" id="tabbar">
+  <button data-tab="music"><svg class="i"><use href="#i-vinyl"/></svg><span>Platten</span></button>
+  <button data-tab="radio"><svg class="i"><use href="#i-radio"/></svg><span>Radio</span></button>
+  <button data-tab="pod"><svg class="i"><use href="#i-mic"/></svg><span>Podcasts</span></button>
+  <button data-tab="zt"><svg class="i"><use href="#i-news"/></svg><span>Zeitung</span></button>
+  <button data-tab="orga"><svg class="i"><use href="#i-cal"/></svg><span>Orga</span></button>
+</nav>
+<!-- Orga: Kalender und Notizen -->
+<div id="orga" class="hidden">
+  <div class="top">
+    <button class="ibtn" id="ogImp" aria-label="Importieren und exportieren"><svg class="i"><use href="#i-dl2"/></svg></button>
+    <h1 class="ttl">Orga</h1>
+    <button class="ibtn" id="ogSearch" aria-label="Notizen durchsuchen"><svg class="i"><use href="#i-search"/></svg></button>
+  </div>
+  <div class="ogseg" id="ogSeg"><button data-v="cal">Kalender</button><button data-v="notes">Notizen</button></div>
+  <button class="ognew hidden" id="ogNewNote"><svg class="i"><use href="#i-edit"/></svg>Notiz schreiben</button>
+  <div class="ogbody" id="ogBody"></div>
+  <button class="ogfab" id="ogFab" aria-label="Neu"></button>
+</div>
+<input type="file" id="icsFile" accept=".ics,text/calendar,*/*" class="hidden">
+<!-- Diktieren -->
+<div class="dict" id="dict">
+  <div class="dst" id="dictSt">Starte…</div>
+  <div class="dpulse"><svg class="i"><use href="#i-mic"/></svg></div>
+  <div class="dwave" id="dictWave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="dtxt" id="dictTxt"></div>
+  <div class="dacts"><button id="dictNo">Abbrechen</button><button class="pri" id="dictOk"><svg class="i"><use href="#i-check"/></svg>Fertig</button></div>
+  <div class="dhint">Sprich einfach drauflos – der Text erscheint live und lässt sich danach bearbeiten.</div>
+</div>
 <!-- Bibliothek -->
 <div class="sheet" id="lib">
   <div class="shead">
@@ -1360,6 +1465,7 @@ $('#dim').onclick=hideMenu;
 let nav=[];
 function pushNav(x){nav.push(x);}
 function back(){
+  if($('#dict').classList.contains('show')){$('#dictNo').click();return true;}
   const x=nav.pop();
   if(!x)return false;
   if(x==='crate'){$('#crateOv').classList.remove('show');crate.open=false;crate.loadId++;clearTimeout(crate.hideT);$('#main').style.visibility='';}
@@ -3444,16 +3550,467 @@ async function miniCrate(){
   for(const el of els){while(k<pool.length){const u=await art(pool[k++].id,150);if(u){el.style.backgroundImage=`url("${u}")`;break;}}}
 }
 
+/* ===================== ORGA: Kalender + Notizen =====================
+   Termine (eigene, importierte .ics, abonnierte Kalender, Handy-Kalender), Export als .ics,
+   Erinnerungen als Benachrichtigung, Notizen mit Diktat. Alles bleibt auf dem Gerät. */
+const OG={view:store.get('og_view','cal'),month:null,sel:null,q:'',folder:store.get('og_folder','Alle')};
+let ogEv=store.get('og_ev',[]),ogSubs=store.get('og_subs',[]),ogNotes=store.get('og_notes',[]),ogFolders=store.get('og_folders',['Ideen','Einkauf']);
+let ogDevOn=store.get('og_dev',false),ogDevCache={};
+const ogSave=()=>{store.set('og_ev',ogEv);ogReminders();};
+const ogSaveNotes=()=>store.set('og_notes',ogNotes);
+const OG_COL=['#e8a547','#7fdc8f','#6aa8ff','#ff7b6b','#c88bff','#5fd4d4'];
+const pad=n=>String(n).padStart(2,'0');
+const dkey=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const dparse=k=>{const [y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d);};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
+const WD=['So','Mo','Di','Mi','Do','Fr','Sa'],WDL=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+
+/* ---------- .ics lesen ---------- */
+function icsUnesc(v){return v.replace(/\\n/gi,'\n').replace(/\\([,;\\])/g,'$1');}
+function icsDate(v,params){
+  // liefert {d:'YYYY-MM-DD', t:'HH:MM' oder ''}
+  const m=String(v).match(/^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2})?(Z)?)?/);if(!m)return null;
+  if(!m[4]||/VALUE=DATE(?!-)/.test(params||''))return{d:`${m[1]}-${m[2]}-${m[3]}`,t:''};
+  if(m[7]){const x=new Date(Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5],+(m[6]||0)));return{d:dkey(x),t:pad(x.getHours())+':'+pad(x.getMinutes())};}
+  return{d:`${m[1]}-${m[2]}-${m[3]}`,t:`${m[4]}:${m[5]}`};
+}
+function icsDur(v){const m=String(v).match(/P(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?)?/);if(!m)return 0;return ((+m[1]||0)*7*1440+(+m[2]||0)*1440+(+m[3]||0)*60+(+m[4]||0));}
+function parseICS(text,src){
+  const lines=text.replace(/\r?\n[ \t]/g,'').split(/\r?\n/);
+  const out=[],mods=[];let cur=null,inAlarm=false;
+  for(const ln of lines){
+    if(ln==='BEGIN:VEVENT'){cur={id:uid(),src:src||'',ex:[]};continue;}
+    if(ln==='BEGIN:VALARM'){inAlarm=true;continue;}
+    if(ln==='END:VALARM'){inAlarm=false;continue;}
+    if(ln==='END:VEVENT'){if(cur&&cur.d&&!cur.cancel){if(cur.rid)mods.push(cur);out.push(cur);}cur=null;continue;}
+    if(!cur)continue;
+    const i=ln.indexOf(':');if(i<0)continue;
+    const head=ln.slice(0,i),val=ln.slice(i+1),name=head.split(';')[0].toUpperCase(),params=head.slice(name.length);
+    if(inAlarm){if(name==='TRIGGER'&&cur.rem==null){const neg=/^-/.test(val),mins=icsDur(val);cur.rem=neg||mins===0?mins:null;}continue;}
+    switch(name){
+      case 'SUMMARY':cur.t=icsUnesc(val);break;
+      case 'LOCATION':cur.loc=icsUnesc(val);break;
+      case 'DESCRIPTION':cur.note=icsUnesc(val).slice(0,2000);break;
+      case 'UID':cur.uid=val;break;
+      case 'STATUS':if(/CANCELLED/i.test(val))cur.cancel=true;break;
+      case 'DTSTART':{const x=icsDate(val,params);if(x){cur.d=x.d;cur.s=x.t;}break;}
+      case 'DTEND':{const x=icsDate(val,params);if(x){cur._ed=x;}break;}
+      case 'DURATION':cur._dur=icsDur(val);break;
+      case 'RECURRENCE-ID':{const x=icsDate(val,params);if(x)cur.rid=x.d;break;}
+      case 'EXDATE':for(const v of val.split(',')){const x=icsDate(v,params);if(x)cur.ex.push(x.d);}break;
+      case 'RRULE':{const r={};for(const kv of val.split(';')){const [k,v]=kv.split('=');r[k]=v;}
+        cur.rr={freq:r.FREQ,interval:+r.INTERVAL||1,count:+r.COUNT||0,until:r.UNTIL?icsDate(r.UNTIL,'').d:'',byday:r.BYDAY?r.BYDAY.split(',').map(x=>x.replace(/^[+-]?\d+/,'')):null};break;}
+    }
+  }
+  for(const e of out){
+    if(e._ed){if(!e.s){const last=addDays(dparse(e._ed.d),-1);if(dkey(last)>e.d)e.ed=dkey(last);}else{e.e=e._ed.t;if(e._ed.d>e.d)e.ed=e._ed.d;}}
+    else if(e._dur&&e.s){const st=dparse(e.d);const [h,m]=e.s.split(':').map(Number);const en=new Date(st.getFullYear(),st.getMonth(),st.getDate(),h,m+e._dur);e.e=pad(en.getHours())+':'+pad(en.getMinutes());if(dkey(en)>e.d)e.ed=dkey(en);}
+    delete e._ed;delete e._dur;if(!e.t)e.t='(ohne Titel)';if(e.rem==null)e.rem=-1;
+  }
+  // geänderte Einzeltermine einer Serie: Original an dem Tag ausblenden
+  for(const m of mods){const master=out.find(e=>e.uid&&e.uid===m.uid&&!e.rid);if(master)master.ex.push(m.rid);}
+  return out;
+}
+
+/* ---------- Wiederholungen ausrechnen ---------- */
+const BYD={SU:0,MO:1,TU:2,WE:3,TH:4,FR:5,SA:6};
+function evRule(e){if(e.rr)return e.rr;if(e.rep&&e.rep!=='none')return{freq:e.rep.toUpperCase(),interval:1};return null;}
+function occurrences(e,from,to){   // Tage (YYYY-MM-DD), an denen der Termin im Bereich liegt
+  const res=[],fk=dkey(from),tk=dkey(to),span=e.ed?Math.round((dparse(e.ed)-dparse(e.d))/864e5):0;
+  const push=k=>{for(let i=0;i<=span;i++){const x=dkey(addDays(dparse(k),i));if(x>=fk&&x<=tk)res.push(x);}};
+  const r=evRule(e);
+  if(!r){push(e.d);return res;}
+  const start=dparse(e.d),ex=new Set(e.ex||[]);let n=0,guard=0;
+  const ok=k=>{if(r.until&&k>r.until)return false;if(r.count&&n>=r.count)return false;return true;};
+  const emit=k=>{if(k<e.d)return true;if(!ok(k))return false;n++;if(!ex.has(k))push(k);return true;};
+  if(r.freq==='DAILY'){for(let d=new Date(start);guard++<5000&&dkey(d)<=tk;d=addDays(d,r.interval))if(!emit(dkey(d)))break;}
+  else if(r.freq==='WEEKLY'){
+    const days=(r.byday&&r.byday.length?r.byday.map(x=>BYD[x]).filter(x=>x!=null):[start.getDay()]).sort((a,b)=>((a+6)%7)-((b+6)%7));
+    let wk=addDays(start,-((start.getDay()+6)%7));
+    outer:for(;guard++<3000&&dkey(wk)<=tk;wk=addDays(wk,7*r.interval))for(const wd of days){const d=addDays(wk,(wd+6)%7);if(dkey(d)>tk)break outer;if(!emit(dkey(d)))break outer;}
+  }
+  else if(r.freq==='MONTHLY'){for(let i=0;guard++<1200;i+=r.interval){const d=new Date(start.getFullYear(),start.getMonth()+i,start.getDate());if(dkey(d)>tk)break;if(d.getDate()!==start.getDate())continue;if(!emit(dkey(d)))break;}}
+  else if(r.freq==='YEARLY'){for(let i=0;guard++<200;i+=r.interval){const d=new Date(start.getFullYear()+i,start.getMonth(),start.getDate());if(dkey(d)>tk)break;if(d.getMonth()!==start.getMonth())continue;if(!emit(dkey(d)))break;}}
+  else push(e.d);
+  return res;
+}
+function allEvents(){
+  const subEv=ogSubs.filter(s=>s.on!==false).flatMap(s=>store.get('og_se_'+s.id,[]).map(e=>({...e,col:e.col||s.col,src:s.id})));
+  const dev=ogDevOn?[...new Map(Object.values(ogDevCache).flat().map(e=>[e.id,e])).values()]:[];
+  return [...ogEv,...subEv,...dev];
+}
+function eventsByDay(from,to){
+  const map={};
+  for(const e of allEvents())for(const k of occurrences(e,from,to))(map[k]=map[k]||[]).push(e);
+  for(const k in map)map[k].sort((a,b)=>(a.s||'').localeCompare(b.s||''));
+  return map;
+}
+
+/* ---------- Handy-Kalender (nur Android) ---------- */
+async function ogLoadDevice(month){
+  if(!NATIVE||!ogDevOn)return;
+  const key=month.getFullYear()+'-'+month.getMonth();if(ogDevCache[key])return;
+  try{const from=addDays(month,-7),to=addDays(new Date(month.getFullYear(),month.getMonth()+1,1),7);
+    const r=await Music.calendarEvents({from:from.getTime(),to:to.getTime()});
+    ogDevCache[key]=(r.events||[]).map(x=>{const b=new Date(x.begin),en=new Date(x.end);
+      if(x.allDay){const ub=new Date(x.begin),d=`${ub.getUTCFullYear()}-${pad(ub.getUTCMonth()+1)}-${pad(ub.getUTCDate())}`;const ue=new Date(x.end-864e5);const ed=`${ue.getUTCFullYear()}-${pad(ue.getUTCMonth()+1)}-${pad(ue.getUTCDate())}`;
+        return{id:'dev'+x.id+'_'+x.begin,t:x.title||'(ohne Titel)',d,ed:ed>d?ed:'',s:'',e:'',loc:x.loc||'',src:'device',cal:x.cal,col:x.color||'#9aa0a6',rem:-1};}
+      return{id:'dev'+x.id+'_'+x.begin,t:x.title||'(ohne Titel)',d:dkey(b),s:pad(b.getHours())+':'+pad(b.getMinutes()),e:pad(en.getHours())+':'+pad(en.getMinutes()),ed:dkey(en)>dkey(b)?dkey(en):'',loc:x.loc||'',src:'device',cal:x.cal,col:x.color||'#9aa0a6',rem:-1};});
+    // nur einmal pro Termin (die Abfrage liefert einzelne Vorkommen)
+    ogRender();
+  }catch(e){toast('Kein Zugriff auf den Handy-Kalender');ogDevOn=false;store.set('og_dev',false);}
+}
+
+/* ---------- Abonnierte Kalender ---------- */
+async function ogRefreshSub(s,force){
+  if(!force&&Date.now()-(s.upd||0)<6*36e5)return;
+  try{const url=s.url.replace(/^webcal:/i,'https:');
+    const txt=NET?await (await fetch(url)).text():'';
+    const ev=parseICS(txt,s.id);if(!ev.length&&!/BEGIN:VCALENDAR/.test(txt))throw new Error('kein Kalender');
+    store.set('og_se_'+s.id,ev);s.upd=Date.now();s.n=ev.length;store.set('og_subs',ogSubs);
+  }catch(e){if(force)toast('Kalender konnte nicht geladen werden');}
+}
+async function ogRefreshSubs(force){for(const s of ogSubs)await ogRefreshSub(s,force);ogRender();ogReminders();}
+
+/* ---------- Export als .ics ---------- */
+function icsEsc(t){return String(t||'').replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/([,;])/g,'\\$1');}
+function icsFold(l){let out='';while(l.length>74){out+=l.slice(0,74)+'\r\n ';l=l.slice(74);}return out+l;}
+function exportICS(list){
+  const now=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'');
+  const dt=(d,t)=>d.replace(/-/g,'')+(t?'T'+t.replace(':','')+'00':'');
+  const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//bTUNES//Orga//DE','CALSCALE:GREGORIAN','X-WR-CALNAME:bTUNES Orga'];
+  for(const e of list){
+    L.push('BEGIN:VEVENT','UID:'+(e.uid||e.id+'@btunes'),'DTSTAMP:'+now);
+    if(e.s){L.push('DTSTART:'+dt(e.d,e.s));L.push('DTEND:'+dt(e.ed||e.d,e.e||e.s));}
+    else{L.push('DTSTART;VALUE=DATE:'+dt(e.d));L.push('DTEND;VALUE=DATE:'+dt(dkey(addDays(dparse(e.ed||e.d),1))));}
+    L.push('SUMMARY:'+icsEsc(e.t));if(e.loc)L.push('LOCATION:'+icsEsc(e.loc));if(e.note)L.push('DESCRIPTION:'+icsEsc(e.note));
+    const r=evRule(e);if(r){let s='RRULE:FREQ='+r.freq+(r.interval>1?';INTERVAL='+r.interval:'')+(r.count?';COUNT='+r.count:'')+(r.until?';UNTIL='+r.until.replace(/-/g,''):'')+(r.byday?';BYDAY='+r.byday.join(','):'');L.push(s);}
+    if(e.ex&&e.ex.length)L.push('EXDATE;VALUE=DATE:'+e.ex.map(x=>x.replace(/-/g,'')).join(','));
+    if(e.rem>=0)L.push('BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+icsEsc(e.t),'TRIGGER:-PT'+e.rem+'M','END:VALARM');
+    L.push('END:VEVENT');
+  }
+  L.push('END:VCALENDAR');
+  return L.map(icsFold).join('\r\n')+'\r\n';
+}
+async function saveText(name,text,mime){
+  try{
+    if(NATIVE){const r=await Music.saveText({name,text,mime});toast('Gespeichert in '+(r.where||'Downloads'));return;}
+    if(DESKTOP){const r=await window.desktop.saveFile(name,text);if(r)toast('Gespeichert: '+r);return;}
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:mime}));a.download=name;a.click();
+  }catch(e){toast('Speichern fehlgeschlagen');}
+}
+
+/* ---------- Erinnerungen ---------- */
+let ogRemT=[];
+function ogReminders(){
+  const now=Date.now(),list=[];
+  const map=eventsByDay(new Date(),addDays(new Date(),60));
+  for(const k of Object.keys(map).sort())for(const e of map[k]){
+    if(!(e.rem>=0))continue;
+    const [y,m,d]=k.split('-').map(Number);const [h,mi]=(e.s||'09:00').split(':').map(Number);
+    const at=new Date(y,m-1,d,h,mi).getTime()-e.rem*6e4;if(at<=now)continue;
+    list.push({id:(parseInt(hash(e.id+k),36)%2000000000)+1,at,title:e.t,text:(e.s?e.s+' Uhr':'Ganztägig')+(e.loc?' · '+e.loc:'')});
+    if(list.length>=150)break;
+  }
+  if(NATIVE){Music.setReminders({list}).catch(()=>{});return;}
+  // Linux: Benachrichtigung, solange die App offen ist (für die nächsten 24 Stunden)
+  ogRemT.forEach(clearTimeout);ogRemT=[];
+  for(const r of list)if(r.at-now<864e5)ogRemT.push(setTimeout(()=>{try{new Notification(r.title,{body:r.text});}catch(e){toast('⏰ '+r.title);}},r.at-now));
+}
+
+/* ---------- Ansicht ---------- */
+function orgaShow(){if(!OG.month){const t=new Date();OG.month=new Date(t.getFullYear(),t.getMonth(),1);OG.sel=dkey(t);}ogRender();ogRefreshSubs(false);}
+function ogRender(){
+  document.querySelectorAll('#ogSeg button').forEach(b=>b.classList.toggle('on',b.dataset.v===OG.view));
+  $('#ogFab').innerHTML=OG.view==='cal'?'<svg class="i"><use href="#i-plus"/></svg>':'<svg class="i"><use href="#i-mic"/></svg>';
+  $('#ogFab').classList.toggle('micfab',OG.view!=='cal');
+  $('#ogNewNote').classList.toggle('hidden',OG.view==='cal');
+  if(OG.view==='cal')ogRenderCal();else ogRenderNotes();
+}
+function evTimeHtml(e,k){
+  if(!e.s)return `<div class="tm">Ganz<small>tägig</small></div>`;
+  if(e.ed&&k>e.d)return `<div class="tm">bis<small>${e.ed===k?e.e:'…'}</small></div>`;
+  return `<div class="tm">${e.s}${e.e?`<small>${e.e}</small>`:''}</div>`;
+}
+function srcName(e){if(!e.src)return '';if(e.src==='device')return e.cal||'Handy-Kalender';const s=ogSubs.find(x=>x.id===e.src);return s?s.name:'importiert';}
+function ogRenderCal(){
+  const B=$('#ogBody'),m=OG.month;
+  ogLoadDevice(m);
+  const first=addDays(m,-((m.getDay()+6)%7)),last=addDays(first,41);
+  const map=eventsByDay(first,last),today=dkey(new Date());
+  let g='';for(let i=0;i<42;i++){const d=addDays(first,i),k=dkey(d),ev=map[k]||[];
+    g+=`<button class="d${d.getMonth()!==m.getMonth()?' o':''}${k===today?' t':''}${k===OG.sel?' s':''}" data-day="${k}">${d.getDate()}<span class="dt">${ev.slice(0,3).map(e=>`<i style="background:${e.col||OG_COL[0]}"></i>`).join('')}</span></button>`;}
+  const sd=dparse(OG.sel),list=map[OG.sel]||eventsByDay(sd,sd)[OG.sel]||[];
+  B.innerHTML=`<div class="ogmh"><button class="ibtn" data-mon="-1">‹</button><div><b>${MON[m.getMonth()]} ${m.getFullYear()}</b>${dkey(new Date(m.getFullYear(),m.getMonth(),1))!==dkey(new Date(new Date().getFullYear(),new Date().getMonth(),1))?'<button class="today" data-today>Heute</button>':''}</div><button class="ibtn" data-mon="1">›</button></div>
+    <div class="oggrid">${['Mo','Di','Mi','Do','Fr','Sa','So'].map(x=>`<div class="wd">${x}</div>`).join('')}${g}</div>
+    <div class="sec">${WDL[sd.getDay()]}, ${sd.getDate()}. ${MON[sd.getMonth()]}</div>
+    ${list.length?list.map(e=>`<div class="ogev" data-ev="${esc(e.id)}" style="border-color:${e.col||OG_COL[0]}">${evTimeHtml(e,OG.sel)}<div class="tx"><b>${esc(e.t)}</b><span>${esc([e.loc,e.rem>=0?'🔔 '+remLabel(e.rem):'',evRule(e)?'↻ '+repLabel(e):'',srcName(e)].filter(Boolean).join(' · '))}</span></div></div>`).join('')
+      :`<div class="hint" style="padding:16px">Keine Termine. Tippe auf + für einen neuen.</div>`}`;
+}
+function remLabel(m){return m===0?'zur Zeit':m<60?m+' Min. vorher':m<1440?(m/60)+' Std. vorher':(m/1440)+' Tag vorher';}
+function repLabel(e){const r=evRule(e);return {DAILY:'täglich',WEEKLY:'wöchentlich',MONTHLY:'monatlich',YEARLY:'jährlich'}[r.freq]||'wiederholt';}
+$('#ogBody').addEventListener('click',e=>{
+  if(OG.view!=='cal')return;
+  const mo=e.target.closest('[data-mon]');if(mo){OG.month=new Date(OG.month.getFullYear(),OG.month.getMonth()+ +mo.dataset.mon,1);ogRender();return;}
+  if(e.target.closest('[data-today]')){const t=new Date();OG.month=new Date(t.getFullYear(),t.getMonth(),1);OG.sel=dkey(t);ogRender();return;}
+  const d=e.target.closest('[data-day]');if(d){OG.sel=d.dataset.day;const dd=dparse(OG.sel);if(dd.getMonth()!==OG.month.getMonth())OG.month=new Date(dd.getFullYear(),dd.getMonth(),1);ogRender();return;}
+  const ev=e.target.closest('[data-ev]');if(ev){const x=allEvents().find(z=>z.id===ev.dataset.ev);if(x)openEvent(x);}
+});
+/* Wischen im Kalender wechselt den Monat */
+(function(){let sx=0,sy=0;$('#ogBody').addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
+  $('#ogBody').addEventListener('touchend',e=>{if(OG.view!=='cal')return;const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
+    if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.5&&e.target.closest('.oggrid')){OG.month=new Date(OG.month.getFullYear(),OG.month.getMonth()+(dx<0?1:-1),1);ogRender();}},{passive:true});})();
+
+/* ---------- Termin anlegen / bearbeiten ---------- */
+function openEvent(ev){
+  const own=!ev||!ev.src;
+  if(ev&&!own){   // importiert: nur ansehen
+    openView(srcName(ev),b=>{b.innerHTML=`<div class="ogdet"><div class="bar" style="background:${ev.col||OG_COL[0]}"></div><h2>${esc(ev.t)}</h2>
+      <div class="s">${esc(fmtEvWhen(ev))}</div>${ev.loc?`<div class="s">📍 ${esc(ev.loc)}</div>`:''}${evRule(ev)?`<div class="s">↻ ${repLabel(ev)}</div>`:''}
+      ${ev.note?`<div class="pdesc" style="margin-top:12px">${esc(ev.note)}</div>`:''}<div class="s" style="margin-top:14px">Aus: ${esc(srcName(ev))} (nur ansehen)</div></div>
+      <div class="acts"><button data-go="copy"><svg class="i"><use href="#i-plus"/></svg>Als eigenen Termin kopieren</button></div>`;
+      b.onclick=e=>{if(e.target.closest('[data-go=copy]')){back();openEvent({...ev,id:null,src:'',rr:null,uid:null,_new:true});}};});
+    return;
+  }
+  const isNew=!ev||ev._new;
+  const e0=ev&&!ev._new?ev:{id:uid(),t:ev?ev.t:'',d:ev?ev.d:OG.sel||dkey(new Date()),s:ev&&ev._new?ev.s:'10:00',e:ev&&ev._new?ev.e:'11:00',loc:ev?ev.loc||'':'',rem:60,rep:'none',col:OG_COL[0],note:ev?ev.note||'':''};
+  const e={...e0};if(!e.s&&!isNew){}
+  openView(isNew?'Neuer Termin':'Termin',(b,v)=>{
+    const draw=()=>{b.innerHTML=`<div class="ogform">
+      <label class="fld"><small>Titel</small><div class="fr"><input id="fT" value="${esc(e.t)}" placeholder="Was steht an?"><button class="ibtn" data-go="dict" aria-label="Diktieren"><svg class="i"><use href="#i-mic"/></svg></button></div></label>
+      <div class="row2"><label class="fld"><small>Datum</small><input id="fD" type="date" value="${e.d}"></label>
+        <label class="fld sw"><small>Ganztägig</small><input id="fA" type="checkbox" ${e.s?'':'checked'}></label></div>
+      <div class="row2${e.s?'':' hidden'}" id="fTimes"><label class="fld"><small>Beginn</small><input id="fS" type="time" value="${e.s||'10:00'}"></label><label class="fld"><small>Ende</small><input id="fE" type="time" value="${e.e||''}"></label></div>
+      <label class="fld"><small>Ort</small><input id="fL" value="${esc(e.loc||'')}" placeholder="optional"></label>
+      <div class="row2"><label class="fld"><small>Erinnern</small><select id="fR">${[[-1,'Nicht erinnern'],[0,'Zur Startzeit'],[10,'10 Min. vorher'],[30,'30 Min. vorher'],[60,'1 Std. vorher'],[120,'2 Std. vorher'],[1440,'1 Tag vorher']].map(([v,t])=>`<option value="${v}"${+e.rem===v?' selected':''}>${t}</option>`).join('')}</select></label>
+        <label class="fld"><small>Wiederholen</small><select id="fP">${[['none','Nie'],['daily','Täglich'],['weekly','Wöchentlich'],['monthly','Monatlich'],['yearly','Jährlich']].map(([v,t])=>`<option value="${v}"${e.rep===v?' selected':''}>${t}</option>`).join('')}</select></label></div>
+      <div class="cols">${OG_COL.map(c=>`<button data-col="${c}" class="${e.col===c?'on':''}" style="background:${c}"></button>`).join('')}</div>
+      <label class="fld"><small>Notiz</small><textarea id="fN" rows="3" placeholder="optional">${esc(e.note||'')}</textarea></label>
+      <div class="acts">${isNew?'':'<button data-go="del" class="del"><svg class="i"><use href="#i-trash"/></svg>Löschen</button>'}<button class="pri" data-go="save">Speichern</button></div></div>`;};
+    draw();
+    const read=()=>{e.t=$('#fT').value.trim();e.d=$('#fD').value||e.d;const all=$('#fA').checked;e.s=all?'':$('#fS').value;e.e=all?'':$('#fE').value;
+      e.loc=$('#fL').value.trim();e.rem=+$('#fR').value;e.rep=$('#fP').value;e.note=$('#fN').value;};
+    b.onchange=ev2=>{if(ev2.target.id==='fA'){read();$('#fTimes').classList.toggle('hidden',ev2.target.checked);}};
+    b.onclick=ev2=>{
+      const c=ev2.target.closest('[data-col]');if(c){read();e.col=c.dataset.col;draw();return;}
+      const g=ev2.target.closest('[data-go]');if(!g)return;
+      if(g.dataset.go==='dict'){read();dictate(t=>{e.t=(e.t?e.t+' ':'')+t;draw();},{short:true});return;}
+      if(g.dataset.go==='del'){if(confirm('Termin „'+e.t+'“ löschen?')){ogEv=ogEv.filter(x=>x.id!==e.id);ogSave();back();ogRender();}return;}
+      if(g.dataset.go==='save'){read();if(!e.t){toast('Bitte einen Titel eingeben');return;}
+        if(e.s&&e.e&&e.e<=e.s)e.e='';
+        const i=ogEv.findIndex(x=>x.id===e.id);if(i>=0)ogEv[i]=e;else ogEv.push(e);
+        ogSave();OG.sel=e.d;const dd=dparse(e.d);OG.month=new Date(dd.getFullYear(),dd.getMonth(),1);back();ogRender();toast('Termin gespeichert');}
+    };
+  });
+}
+function fmtEvWhen(e){const d=dparse(e.d);let s=WD[d.getDay()]+', '+d.getDate()+'. '+MON[d.getMonth()]+' '+d.getFullYear();
+  if(e.ed){const x=dparse(e.ed);s+=' – '+WD[x.getDay()]+', '+x.getDate()+'. '+MON[x.getMonth()];}
+  return s+(e.s?' · '+e.s+(e.e?'–'+e.e:'')+' Uhr':' · ganztägig');}
+
+/* ---------- Import / Export ---------- */
+function ogImportMenu(){
+  const items=[
+    ['i-upload','.ics-Datei öffnen',()=>$('#icsFile').click()],
+    ['i-link','Kalender-Link abonnieren…',ogAddSub],
+  ];
+  if(NATIVE)items.push([ogDevOn?'i-check':'i-cal',ogDevOn?'Handy-Kalender: wird angezeigt':'Handy-Kalender anzeigen',()=>{ogDevOn=!ogDevOn;store.set('og_dev',ogDevOn);ogDevCache={};ogRender();}]);
+  items.push(['i-dl2','Meine Termine exportieren (.ics)',()=>{if(!ogEv.length){toast('Noch keine eigenen Termine');return;}saveText('bTUNES-Termine.ics',exportICS(ogEv),'text/calendar');}]);
+  items.push(['i-dl2','Alles exportieren (inkl. Abos)',()=>{const ev=[...ogEv,...ogSubs.flatMap(s=>store.get('og_se_'+s.id,[]))];if(!ev.length){toast('Keine Termine');return;}saveText('bTUNES-Kalender.ics',exportICS(ev),'text/calendar');}]);
+  for(const s of ogSubs)items.push([s.on===false?'i-x':'i-check',`${s.name} (${s.n||0} Termine)`,()=>setTimeout(()=>ogSubMenu(s),260)]);
+  menu('Kalender importieren & exportieren',items);
+}
+function ogSubMenu(s){
+  menu(s.name,[
+    [s.on===false?'i-check':'i-x',s.on===false?'Wieder anzeigen':'Ausblenden',()=>{s.on=s.on===false;store.set('og_subs',ogSubs);ogRender();ogReminders();}],
+    ['i-refresh','Jetzt aktualisieren',async()=>{if(!s.url){toast('Aus Datei importiert – kein Link');return;}await ogRefreshSub(s,true);ogRender();toast('Aktualisiert');}],
+    ['i-edit','Umbenennen',()=>{const n=prompt('Name',s.name);if(n&&n.trim()){s.name=n.trim();store.set('og_subs',ogSubs);ogRender();}}],
+    ['i-trash','Entfernen',()=>{if(confirm('„'+s.name+'“ mit allen Terminen entfernen?')){ogSubs=ogSubs.filter(x=>x!==s);store.set('og_subs',ogSubs);try{localStorage.removeItem('mp_og_se_'+s.id);}catch(e){}ogRender();ogReminders();}},'del']]);
+}
+async function ogAddSub(){
+  const u=prompt('Adresse des Kalenders (.ics oder webcal://…)\n\nTipp Google-Kalender: Einstellungen → Kalender → „Privatadresse im iCal-Format“');
+  if(!u||!u.trim())return;
+  const s={id:uid(),url:u.trim(),name:'Kalender',col:OG_COL[(ogSubs.length+2)%OG_COL.length],on:true};
+  toast('Lade Kalender…');
+  ogSubs.push(s);await ogRefreshSub(s,true);
+  if(!s.upd){ogSubs=ogSubs.filter(x=>x!==s);store.set('og_subs',ogSubs);return;}
+  const n=prompt('Name für diesen Kalender',/google/i.test(u)?'Google-Kalender':'Abo');s.name=(n&&n.trim())||'Abo';
+  store.set('og_subs',ogSubs);ogRender();ogReminders();toast(s.n+' Termine übernommen');
+}
+$('#icsFile').onchange=async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  const ev=parseICS(await f.text(),'');if(!ev.length){toast('Keine Termine in der Datei');return;}
+  const ask=confirm(`${ev.length} Termine gefunden.\n\nOK = als eigene Termine übernehmen (bearbeitbar)\nAbbrechen = als eigenen Kalender „${f.name.replace(/\.ics$/i,'')}“ anlegen`);
+  if(ask){for(const x of ev){x.src='';x.col=x.col||OG_COL[0];ogEv.push(x);}ogSave();}
+  else{const s={id:uid(),url:'',name:f.name.replace(/\.ics$/i,''),col:OG_COL[(ogSubs.length+2)%OG_COL.length],on:true,upd:Date.now(),n:ev.length};
+    ev.forEach(x=>x.src=s.id);store.set('og_se_'+s.id,ev);ogSubs.push(s);store.set('og_subs',ogSubs);ogReminders();}
+  const first=ev.map(x=>x.d).sort().find(d=>d>=dkey(new Date()))||ev[0].d;OG.sel=first;const dd=dparse(first);OG.month=new Date(dd.getFullYear(),dd.getMonth(),1);
+  ogRender();toast(ev.length+' Termine importiert');
+};
+
+/* ---------- Notizen ---------- */
+function noteTitle(t){const l=(t||'').trim().split('\n')[0];return l.length>48?l.slice(0,46)+'…':l||'Neue Notiz';}
+function ogRenderNotes(){
+  const B=$('#ogBody'),q=norm(OG.q);
+  const fl=['Alle',...ogFolders];if(!fl.includes(OG.folder))OG.folder='Alle';
+  let list=ogNotes.filter(n=>(OG.folder==='Alle'||n.folder===OG.folder)&&(!q||norm(n.title+' '+n.text).includes(q))).sort((a,b)=>(b.pin?1:0)-(a.pin?1:0)||b.updated-a.updated);
+  const today=dkey(new Date()),wk=Date.now()-7*864e5,groups={Angeheftet:[],Heute:[],'Diese Woche':[],Älter:[]};
+  for(const n of list)(n.pin?groups.Angeheftet:dkey(new Date(n.updated))===today?groups.Heute:n.updated>wk?groups['Diese Woche']:groups.Älter).push(n);
+  const when=n=>{const d=new Date(n.updated);return dkey(d)===today?pad(d.getHours())+':'+pad(d.getMinutes()):n.updated>wk?WD[d.getDay()]:d.getDate()+'.'+(d.getMonth()+1)+'.';};
+  B.innerHTML=`<div class="chips" style="margin:2px 0 6px">${fl.map(f=>`<button data-folder="${esc(f)}" class="${f===OG.folder?'on':''}">${f==='Alle'?'Alle':'📁 '+esc(f)}</button>`).join('')}<button data-go="newfolder">＋ Ordner</button></div>
+    ${Object.entries(groups).filter(([,l])=>l.length).map(([g,l])=>`<div class="sec">${g}</div>`+l.map(n=>`<div class="ognote" data-note="${n.id}"><b>${esc(n.title||noteTitle(n.text))}</b><p>${esc(n.text.replace(/\n+/g,' · '))}</p>
+      <div class="m">${n.folder?`<span class="tg">${esc(n.folder)}</span>`:''}${n.dictated?'🎤 diktiert':'✎'} · ${when(n)}${n.eventId?' · 📅 Termin':''}</div></div>`).join('')).join('')
+      ||`<div class="hint" style="padding:30px 16px">${q?'Nichts gefunden.':'Noch keine Notizen.<br>Tippe auf das Mikrofon und sprich einfach los – oder auf „Notiz schreiben“.'}</div>`}`;
+}
+$('#ogBody').addEventListener('click',e=>{
+  if(OG.view!=='notes')return;
+  const f=e.target.closest('[data-folder]');if(f){OG.folder=f.dataset.folder;store.set('og_folder',OG.folder);ogRender();return;}
+  if(e.target.closest('[data-go=newfolder]')){const n=prompt('Name des Ordners');if(n&&n.trim()&&!ogFolders.includes(n.trim())){ogFolders.push(n.trim());store.set('og_folders',ogFolders);OG.folder=n.trim();ogRender();}return;}
+  const n=e.target.closest('[data-note]');if(n)openNote(ogNotes.find(x=>x.id===n.dataset.note));
+});
+function newNote(text,dictated){
+  const n={id:uid(),title:'',text:text||'',folder:OG.folder!=='Alle'?OG.folder:'',created:Date.now(),updated:Date.now(),dictated:!!dictated};
+  ogNotes.push(n);ogSaveNotes();return n;
+}
+function openNote(n){
+  if(!n)return;
+  const v=openView('Notiz',(b)=>{
+    b.innerHTML=`<input class="ogtitle" id="nT" value="${esc(n.title)}" placeholder="${esc(noteTitle(n.text))}">
+      <div class="ogtools"><select id="nF"><option value="">Kein Ordner</option>${ogFolders.map(f=>`<option${n.folder===f?' selected':''}>${esc(f)}</option>`).join('')}<option value="__new">＋ Neuer Ordner…</option></select>
+        <button data-go="dict"><svg class="i"><use href="#i-mic"/></svg>Weiter diktieren</button></div>
+      <textarea class="ogtext" id="nX" placeholder="Schreib los…">${esc(n.text)}</textarea>
+      <div class="acts"><button data-go="event"><svg class="i"><use href="#i-cal"/></svg>Als Termin</button><button data-go="copy"><svg class="i"><use href="#i-list"/></svg>Kopieren</button></div>
+      <div class="s" style="color:var(--mute);font-size:12px;margin-top:8px">Erstellt ${new Date(n.created).toLocaleString('de-DE',{dateStyle:'medium',timeStyle:'short'})} · wird automatisch gespeichert</div>`;
+    let t;const save=()=>{n.title=$('#nT').value.trim();n.text=$('#nX').value;n.updated=Date.now();ogSaveNotes();};
+    b.oninput=()=>{clearTimeout(t);t=setTimeout(()=>{save();ogRender();},400);};
+    b.onchange=e=>{if(e.target.id==='nF'){if(e.target.value==='__new'){const f=prompt('Name des Ordners');if(f&&f.trim()){if(!ogFolders.includes(f.trim())){ogFolders.push(f.trim());store.set('og_folders',ogFolders);}n.folder=f.trim();
+          e.target.insertAdjacentHTML('afterbegin',`<option selected>${esc(n.folder)}</option>`);}else e.target.value=n.folder||'';}else n.folder=e.target.value;save();ogRender();}};
+    b.onclick=e=>{const g=e.target.closest('[data-go]');if(!g)return;
+      if(g.dataset.go==='dict'){save();dictate(txt=>{const x=$('#nX');x.value=(x.value.trim()?x.value.replace(/\s*$/,'')+' ':'')+txt;n.dictated=true;save();ogRender();});}
+      if(g.dataset.go==='copy'){save();try{navigator.clipboard.writeText((n.title?n.title+'\n':'')+n.text);toast('Kopiert');}catch(err){toast('Kopieren nicht möglich');}}
+      if(g.dataset.go==='event'){save();back();OG.view='cal';store.set('og_view','cal');ogRender();openEvent({_new:true,t:n.title||noteTitle(n.text),d:dkey(new Date()),s:'10:00',e:'11:00',note:n.text});}
+    };
+  });
+  const ex=v.querySelector('.ex');ex.innerHTML=`<button class="ibtn"><svg class="i"><use href="#i-more"/></svg></button>`;
+  ex.firstChild.onclick=()=>menu(n.title||noteTitle(n.text),[
+    [n.pin?'i-x':'i-up',n.pin?'Nicht mehr anheften':'Oben anheften',()=>{n.pin=!n.pin;ogSaveNotes();ogRender();}],
+    ['i-dl2','Als Textdatei speichern',()=>saveText((n.title||noteTitle(n.text)).replace(/[^\wäöüÄÖÜß -]/g,'').trim()+'.txt',(n.title?n.title+'\n\n':'')+n.text,'text/plain')],
+    ['i-trash','Notiz löschen',()=>{if(confirm('Notiz löschen?')){ogNotes=ogNotes.filter(x=>x!==n);ogSaveNotes();back();ogRender();}},'del']]);
+}
+
+/* ---------- Diktieren ---------- */
+let dictOn=null;
+function dictate(onDone,opt={}){
+  const ov=$('#dict');if(dictOn)return;
+  let committed='',partial='',secs=0,closed=false;
+  const show=()=>{$('#dictTxt').innerHTML=esc(committed)+(partial?` <u>${esc(partial)}</u>`:'')||'<span class="ph">Sprich einfach los…</span>';};
+  const level=v=>{const bars=document.querySelectorAll('#dictWave i');bars.forEach((b,i)=>{const h=Math.max(6,Math.min(56,v*56*(0.5+Math.abs(Math.sin(i*1.7+Date.now()/180))*0.7)));b.style.height=h+'px';});};
+  $('#dictSt').textContent='Starte…';show();ov.classList.add('show');
+  const tm=setInterval(()=>{secs++;if(!closed)$('#dictSt').textContent='● Nimmt auf · '+Math.floor(secs/60)+':'+pad(secs%60);},1000);
+  const finish=async(ok)=>{if(closed)return;closed=true;clearInterval(tm);
+    $('#dictSt').textContent=ok?'Wird fertig erkannt…':'Abgebrochen';
+    let text='';try{text=await dictOn.stop(ok);}catch(e){}
+    dictOn=null;ov.classList.remove('show');
+    const all=((text!=null&&text!==''?text:(committed+' '+partial))).replace(/\s+/g,' ').trim();
+    if(ok&&all)onDone(all.charAt(0).toUpperCase()+all.slice(1));};
+  $('#dictOk').onclick=()=>finish(true);$('#dictNo').onclick=()=>finish(false);
+  const cb={partial:t=>{partial=t;show();},final:t=>{committed=(committed+' '+t).trim();partial='';show();},level,
+    status:t=>{if(!closed)$('#dictSt').textContent=t;},error:m=>{toast(m);finish(false);}};
+  dictOn=NATIVE?dictNative(cb):DESKTOP?dictWhisper(cb):dictDemo(cb);
+}
+function dictNative(cb){
+  let finals='',lastPartial='';
+  const h=Music.addListener('speech',ev=>{
+    if(ev.rms!=null)cb.level(Math.max(0,Math.min(1,(ev.rms+2)/12)));
+    if(ev.partial!=null){lastPartial=ev.partial;cb.partial(ev.partial);}
+    if(ev.final!=null){finals=(finals+' '+ev.final).trim();lastPartial='';cb.final(ev.final);}
+    if(ev.error)cb.error(ev.error);
+    if(ev.ready)cb.status('● Nimmt auf');
+  });
+  Music.speechStart({lang:'de-DE'}).catch(e=>cb.error(String(e&&e.message||e)));
+  return{stop:async ok=>{try{await Music.speechStop({cancel:!ok});}catch(e){}
+    if(ok)await sleep(700);try{h.remove&&h.remove();}catch(e){}
+    return (finals+' '+lastPartial).trim();}};
+}
+function dictDemo(cb){
+  const words='Für Samstag noch Kettenöl und neue Bremsbeläge besorgen und das Wetter für die Alm checken'.split(' ');let i=0;
+  const t=setInterval(()=>{cb.level(Math.random());if(i<words.length){cb.partial(words.slice(Math.max(0,i-3),i+1).join(' '));if(i%4===3){cb.final(words.slice(i-3,i+1).join(' '));}i++;}},260);
+  cb.status('● Nimmt auf (Vorführung)');
+  return{stop:async()=>{clearInterval(t);return words.slice(0,i).join(' ');}};
+}
+/* Linux: Whisper-Spracherkennung läuft direkt auf dem PC (Sprachpaket wird beim ersten Mal geladen) */
+const W={pipe:null,loading:null};
+async function whisperLoad(cb){
+  if(W.pipe)return W.pipe;
+  if(!W.loading)W.loading=(async()=>{
+    const P=await window.desktop.asrPaths();
+    const T=await import(P.lib);
+    T.env.allowLocalModels=false;
+    // Rechenkern lokal mitliefern statt aus dem Internet zu laden
+    T.env.backends.onnx.wasm.wasmPaths={mjs:P.mjs,wasm:P.wasm};
+    try{const bin=await window.desktop.asrWasm();T.env.backends.onnx.wasm.wasmBinary=bin.buffer?bin.buffer.slice(bin.byteOffset,bin.byteOffset+bin.byteLength):bin;}catch(e){}
+    T.env.backends.onnx.wasm.numThreads=1;
+    const files={};
+    W.pipe=await T.pipeline('automatic-speech-recognition',P.model||'onnx-community/whisper-base',{dtype:'q8',device:'wasm',
+      progress_callback:p=>{if(p.status==='progress'&&p.total){files[p.file]=[p.loaded,p.total];const a=Object.values(files),l=a.reduce((s,x)=>s+x[0],0),t=a.reduce((s,x)=>s+x[1],0);
+        W.onProg&&W.onProg(`Sprachpaket wird geladen (einmalig)… ${Math.round(l/t*100)} % von ${Math.round(t/1e6)} MB`);}}});
+    return W.pipe;
+  })();
+  try{return await W.loading;}catch(e){W.loading=null;throw e;}
+}
+function dictWhisper(cb){
+  let stream=null,ctx=null,proc=null,buf=[],len=0,busy=false,stopped=false,done='',timer=null;
+  const RATE=16000;
+  const flat=()=>{const a=new Float32Array(len);let o=0;for(const b of buf){a.set(b,o);o+=b.length;}return a;};
+  const run=async(final)=>{
+    if(busy&&!final)return;while(busy)await sleep(80);
+    if(!len)return;busy=true;
+    try{const audio=flat();
+      const r=await W.pipe(audio,{language:'german',task:'transcribe'});const t=(r&&r.text||'').trim();
+      if(final||len>RATE*24){done=(done+' '+t).trim();buf=[];len=0;cb.final(t);}else cb.partial(t);}
+    catch(e){}busy=false;};
+  (async()=>{
+    try{
+      W.onProg=t=>cb.status(t);
+      if(!W.pipe)cb.status('Sprachpaket wird vorbereitet…');
+      await whisperLoad();
+      stream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true}});
+      if(stopped){stream.getTracks().forEach(t=>t.stop());return;}
+      ctx=new AudioContext({sampleRate:RATE});
+      const src=ctx.createMediaStreamSource(stream);proc=ctx.createScriptProcessor(4096,1,1);
+      proc.onaudioprocess=e=>{const d=new Float32Array(e.inputBuffer.getChannelData(0));buf.push(d);len+=d.length;
+        let s=0;for(let i=0;i<d.length;i+=8)s+=d[i]*d[i];cb.level(Math.min(1,Math.sqrt(s/(d.length/8))*6));};
+      src.connect(proc);proc.connect(ctx.destination);
+      cb.status('● Nimmt auf');
+      timer=setInterval(()=>{if(len>RATE*1.5)run(false);},2500);
+    }catch(e){cb.error(/Permission|NotAllowed/i.test(String(e))?'Kein Zugriff aufs Mikrofon':'Spracherkennung konnte nicht starten: '+(e.message||e));}
+  })();
+  return{stop:async ok=>{stopped=true;clearInterval(timer);
+    try{proc&&proc.disconnect();}catch(e){}try{stream&&stream.getTracks().forEach(t=>t.stop());}catch(e){}try{ctx&&ctx.close();}catch(e){}
+    if(ok&&W.pipe){await run(true);}
+    return done;}};
+}
+
+/* ---------- Bedienung ---------- */
+$('#ogSeg').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;OG.view=b.dataset.v;store.set('og_view',OG.view);ogRender();};
+$('#ogFab').onclick=()=>{if(OG.view==='cal')openEvent(null);else dictate(t=>{const n=newNote(t,true);ogRender();openNote(n);});};
+$('#ogNewNote').onclick=()=>{const n=newNote('',false);ogRender();openNote(n);};
+$('#ogImp').onclick=()=>{if(OG.view==='cal')ogImportMenu();else menu('Notizen',[['i-dl2','Alle Notizen als Textdatei speichern',()=>saveText('bTUNES-Notizen.txt',ogNotes.map(n=>'### '+(n.title||noteTitle(n.text))+(n.folder?' ['+n.folder+']':'')+'\n'+n.text).join('\n\n'),'text/plain')]]);};
+$('#ogSearch').onclick=()=>{if(OG.view==='cal'){OG.view='notes';store.set('og_view','notes');}const q=prompt('Notizen durchsuchen',OG.q);if(q!=null){OG.q=q.trim();ogRender();if(OG.q)toast('Filter: „'+OG.q+'“ – leer suchen zum Zurücksetzen');}};
+setTimeout(()=>{ogReminders();ogRefreshSubs(false);},4000);
+setInterval(()=>ogReminders(),60*6e4);
+
 /* Reiter umschalten */
 let curTab=store.get('tab2','music');
 function setTab(t){curTab=t;store.set('tab2',t);
-  $('#main').classList.toggle('hidden',t!=='music');$('#radio').classList.toggle('hidden',t!=='radio');$('#pod').classList.toggle('hidden',t!=='pod');$('#zt').classList.toggle('hidden',t!=='zt');
-  document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  $('#main').classList.toggle('hidden',t!=='music');$('#radio').classList.toggle('hidden',t!=='radio');$('#pod').classList.toggle('hidden',t!=='pod');$('#zt').classList.toggle('hidden',t!=='zt');$('#orga').classList.toggle('hidden',t!=='orga');
+  document.querySelectorAll('#tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  if(t==='orga')orgaShow();
   if(t==='pod'){pcRenderHome();pcMini();refreshAll(false);}
   if(t==='zt'){ztRenderHome();ztScan(false);}
   if(t==='radio')rRender();
   if(t==='music')requestAnimationFrame(fitMain);}
-document.querySelectorAll('.seg').forEach(s=>s.onclick=e=>{const b=e.target.closest('[data-tab]');if(b)setTab(b.dataset.tab);});
+$('#tabbar').onclick=e=>{const b=e.target.closest('[data-tab]');if(b)setTab(b.dataset.tab);};
 rInit();
 setTab(curTab);
 dlSync();

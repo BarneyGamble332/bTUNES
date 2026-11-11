@@ -4,7 +4,7 @@ import { app, BrowserWindow, ipcMain, dialog, shell, nativeImage } from 'electro
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { scanFolders, findCover } from './lib.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -213,3 +213,27 @@ ipcMain.handle('icy', async (e, url) => {
     return '';
   } catch { return ''; } finally { clearTimeout(timer); }
 });
+
+/* ---------- Orga: Datei speichern (z. B. Kalender-Export) ---------- */
+ipcMain.handle('saveFile', async (e, name, text) => {
+  const r = await dialog.showSaveDialog(win, { defaultPath: path.join(app.getPath('downloads'), name) });
+  if (r.canceled || !r.filePath) return '';
+  fs.writeFileSync(r.filePath, text, 'utf8');
+  return r.filePath;
+});
+
+/* ---------- Diktieren: Whisper-Spracherkennung läuft lokal; die Programmteile liegen in app/asr ---------- */
+ipcMain.handle('asrPaths', () => {
+  const dir = path.join(__dirname, 'app', 'asr').replace('app.asar' + path.sep, 'app.asar.unpacked' + path.sep);
+  return {
+    lib: pathToFileURL(path.join(dir, 'transformers.min.js')).href,
+    mjs: pathToFileURL(path.join(dir, 'ort-wasm-simd-threaded.asyncify.mjs')).href,
+    wasm: pathToFileURL(path.join(dir, 'ort-wasm-simd-threaded.asyncify.wasm')).href,
+    model: 'onnx-community/whisper-base',
+  };
+});
+ipcMain.handle('asrWasm', () => {
+  const dir = path.join(__dirname, 'app', 'asr').replace('app.asar' + path.sep, 'app.asar.unpacked' + path.sep);
+  return fs.readFileSync(path.join(dir, 'ort-wasm-simd-threaded.asyncify.wasm'));
+});
+
