@@ -54,9 +54,12 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke
     repeating-radial-gradient(circle,#161616 0 1px,#0c0c0c 1px 2.2px,#1b1b1b 2.2px 3px),
     #0d0d0d;
   box-shadow:0 0 0 1px #000,0 6px 14px #000d;
-  animation:spin 3.2s linear infinite;animation-play-state:paused}
+  animation:spinlong 3200s linear infinite;animation-play-state:paused}
 .playing .disc{animation-play-state:running}
 @keyframes spin{to{transform:rotate(360deg)}}
+/* Platte: 1000 Umdrehungen pro Durchlauf – der Neustart der Animation verursachte einmal pro Umdrehung einen kleinen Ruckler */
+@keyframes spin10{to{transform:rotate(3600deg)}}
+@keyframes spinlong{to{transform:rotate(360000deg)}}
 .disc .lbl{position:absolute;left:21%;top:21%;width:58%;height:58%;border-radius:50%;overflow:hidden;
   background:#3b3b3b center/cover no-repeat;box-shadow:0 0 0 2px #0008}
 .disc .lbl::after{content:"";position:absolute;inset:0;border-radius:50%;
@@ -171,7 +174,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   box-shadow:0 8px 20px #0009;transform:translateY(140%);transition:transform .3s}
 .mini.show{transform:none}
 .mini .mr{width:46px;height:46px;border-radius:50%;flex:none;position:relative;
-  background:repeating-radial-gradient(circle,#161616 0 1px,#0c0c0c 1px 2px);animation:spin 1.8s linear infinite;animation-play-state:paused}
+  background:repeating-radial-gradient(circle,#161616 0 1px,#0c0c0c 1px 2px);animation:spin10 18s linear infinite;animation-play-state:paused}
 .mini.playing .mr{animation-play-state:running}
 .mini .mr i{position:absolute;inset:24%;border-radius:50%;background:#444 center/cover}
 .mini .tx{flex:1;min-width:0}
