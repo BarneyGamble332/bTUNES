@@ -730,7 +730,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .minicas i{position:absolute;width:30px;height:19px;border-radius:3px;background:#2b2b2e;box-shadow:0 1px 2px #000a;overflow:hidden}
 .minicas i::before{content:"";position:absolute;left:3px;right:3px;top:2px;height:11px;border-radius:2px;background:var(--c)}
 .minicas i::after{content:"";position:absolute;left:8px;right:8px;top:6px;height:4px;border-radius:2px;background:#1a1a1a}
-#main.kbmode .minicrate{display:none}#main.kbmode .minicas{display:block}
+#main.kbmode .minicrate,#main.automode .minicrate{display:none}#main.kbmode .minicas,#main.automode .minicas{display:block}
 </style>
 </head>
 <body>
@@ -993,7 +993,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <div class="cv-hint">Wischen zum Durchblättern · Tippen zum Auflegen</div>
 </div>
 <div class="pileov" id="pileOv">
-  <div class="pl-top"><h2>Kassettenhaufen<small id="plSub">Wühlen, schieben, eine rausziehen</small></h2>
+  <div class="pl-top"><h2><span id="plTitle">Kassettenhaufen</span><small id="plSub">Wühlen, schieben, eine rausziehen</small></h2>
     <button class="ibtn" id="plClose" aria-label="Haufen schließen"><svg class="i"><use href="#i-x"/></svg></button></div>
   <div class="pl-stage" id="plStage"><div class="pl-dim" id="plDim"></div></div>
   <div class="pl-bot" id="plBot"><div class="pl-acts"><button id="plShake"><svg class="i"><use href="#i-shuf"/></svg>Wühlen</button><button id="plNew"><svg class="i"><use href="#i-shuf"/></svg>Neuer Haufen</button></div>
@@ -1123,7 +1123,7 @@ function demoPlugin(){
     ['Neon Nights','Kaspar & die Synths','#a02db0'],['Seidenstraße','Ensemble Orient','#c09a2d'],['Loisach Blues','Ferdl Huber Trio','#2d9ab0'],
     ['Kaffeehaus','Nora Lindqvist','#7a4a2d'],['Schneefall','Polarlicht','#8aa0b0'],['Wilde Jahre','Kaspar & die Synths','#b02d4a'],['Alpenglühen','Polarlicht','#d0702d']];
   const tr=[];let id=1;
-  names.forEach((a,ai)=>{const n=7+ai%5;for(let i=1;i<=n;i++)tr.push([id++,['Intro','Morgenlicht','Über den Grat','Nachtzug','Leise','Heimweg','Sturm','Echo','Finale','Zugabe','Bonus'][i-1]||('Titel '+i),a[1],a[0],ai+1,150000+((id*7919)%160000),i,2015+ai,'Music/'+a[1]+'/'+a[0]+'/','',a[1]]);});
+  names.forEach((a,ai)=>{const n=7+ai%5;for(let i=1;i<=n;i++)tr.push([id++,['Intro','Morgenlicht','Über den Grat','Nachtzug','Leise','Heimweg','Sturm','Echo','Finale','Zugabe','Bonus'][i-1]||('Titel '+i),a[1],a[0],ai+1,150000+((id*7919)%160000),i,[1971,1977,1984,1989,1995,1999,2003,2008,1974,2016][ai],'Music/'+a[1]+'/'+a[0]+'/','',a[1]]);});
   const cov=ai=>{const a=names[ai-1];const s=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a[2]}"/><stop offset="1" stop-color="#111"/></linearGradient></defs><rect width="300" height="300" fill="url(#g)"/><circle cx="${80+ai*17%140}" cy="${90+ai*29%120}" r="${40+ai*9%50}" fill="#fff2"/><path d="M0 ${200+ai*7%60} L${100+ai*11%80} ${130+ai*13%50} L300 ${210+ai*5%40} V300 H0z" fill="#0005"/><text x="20" y="270" font-family="sans-serif" font-size="26" font-weight="700" fill="#fff">${a[0]}</text></svg>`;return 'data:image/svg+xml;utf8,'+encodeURIComponent(s);};
   let st={ready:true,playing:false,index:0,count:0,id:'',pos:0,dur:0,shuffle:false,repeat:0},q=[],L={};
   setInterval(()=>{if(st.playing){st.pos+=500;if(st.pos>=st.dur){if(st.index<q.length-1){st.index++;st.id=String(q[st.index].id);st.dur=q[st.index].dur;st.pos=0;}else{st.playing=false;st.pos=st.dur;}emit();}}},500);
@@ -1224,6 +1224,7 @@ function render(){
   setDeck(t?t.albumId:null);
   updateBandBtn(t);
   if(window.tpRender&&TP.on)tpRender();
+  if(window.autoCheck)autoCheck();
   if(window.KB&&KB.on)kbSync();
   if(window.pcRender)pcRender();
   if(window.rRender)rRender();
@@ -3709,7 +3710,7 @@ async function cratePlay(){
   $('#cvClose').onclick=crateClose;
   $('#cvPlay').onclick=cratePlay;
   $('#cvShuffle').onclick=()=>{crateIdx=-1;$('#cvLoad').textContent='Suche Platten…';crateFill();};
-  $('#btnCrate').onclick=()=>{if(window.KB&&KB.on)plOpen();else crateOpen();};
+  $('#btnCrate').onclick=()=>{if((window.KB&&KB.on)||PMODE==='auto')plOpen();else crateOpen();};
   window.addEventListener('resize',()=>{if(crate.open){crateSize();crateDraw();}});
 })();
 /* Kleine Kiste auf dem Plattenspieler-Reiter: drei Cover schauen heraus */
@@ -4464,8 +4465,8 @@ function tpSet(on){setMode(on?'tp':'deck');}
   ['pointerup','pointercancel','pointerleave'].forEach(ev=>$('#modeBtn').addEventListener(ev,()=>clearTimeout(lpT)));
   $('#modeBtn').oncontextmenu=e=>e.preventDefault();
   $('#modeBtn').onclick=()=>{if(lpDone){lpDone=false;return;}
-    const o=['deck','tp','kass'],m=o[(o.indexOf(store.get('pmode','deck'))+1)%3];setMode(m);
-    toast({deck:'Plattenspieler',tp:'Taschen-Player',kass:'Kassettenradio'}[m]);};
+    const o=['deck','tp','kass','auto'],m=o[(o.indexOf(PMODE)+1)%4];setMode(m);
+    toast({deck:'Plattenspieler',tp:'Taschen-Player',kass:'Kassettenradio',auto:'Automatisch: Gerät nach Erscheinungsjahr'}[m]);};
   const w=$('#tpWheel');let g=null;
   const ang=e=>{const r=w.getBoundingClientRect();return Math.atan2(e.clientY-(r.top+r.height/2),e.clientX-(r.left+r.width/2))*180/Math.PI;};
   w.addEventListener('pointerdown',e=>{if(e.target.closest('#tpOk'))return;w.setPointerCapture(e.pointerId);g={last:ang(e),acc:0};w.classList.add('turn');});
@@ -4669,17 +4670,27 @@ function kbScale(){
   addEventListener('resize',kbScale);
 })();
 /* Ansicht im Platten-Reiter: Plattenspieler → Taschen-Player → Kassettenradio */
-function setMode(m){
-  if(!['deck','tp','kass'].includes(m))m='deck';
-  store.set('pmode',m);
-  TP.on=m==='tp';KB.on=m==='kass';
+/* Automatisch: Gerät passend zum Erscheinungsjahr des Albums */
+var PMODE=store.get('pmode','deck'),PVIEW=null;
+function yearView(y){y=+y||0;if(!y)return null;return y<=1979?'deck':y<=2000?'kass':'tp';}
+function autoView(){const t=curTrack(),a=t&&albumById.get(t.albumId);return yearView(a&&a.year);}
+function applyView(v){
+  PVIEW=v;TP.on=v==='tp';KB.on=v==='kass';
   $('#main').classList.toggle('tpmode',TP.on);$('#tpwrap').classList.toggle('hidden',!TP.on);
   $('#main').classList.toggle('kbmode',KB.on);$('#kbwrap').classList.toggle('hidden',!KB.on);
-  $('#modeLbl').textContent={deck:'Platten',tp:'Player',kass:'Kassette'}[m];
+  $('#main').classList.toggle('automode',PMODE==='auto');
+  const nm={deck:'Platten',tp:'Player',kass:'Kassette'}[v];
+  $('#modeLbl').textContent=PMODE==='auto'?'Auto · '+nm:nm;
   if(TP.on){TP.stack=[tpRoot()];if(curTrack())tpOpen(tpNow());tpRender(true);}
   if(KB.on){KB.album=undefined;kbScale();kbSync();}
   requestAnimationFrame(fitMain);
 }
+function setMode(m){
+  if(!['deck','tp','kass','auto'].includes(m))m='deck';
+  store.set('pmode',m);PMODE=m;
+  applyView(m==='auto'?(autoView()||PVIEW||'deck'):m);
+}
+function autoCheck(){if(PMODE!=='auto')return;const v=autoView();if(v&&v!==PVIEW)applyView(v);}
 /* ===================== KASSETTENHAUFEN =====================
    Im Kassettenmodus öffnet die Kiste einen Haufen zufälliger Alben als bedruckte Kassetten.
    Man kann sie mit dem Finger verschieben und anschubsen, „Wühlen“ wirft alles durcheinander,
@@ -4688,18 +4699,35 @@ const PL={open:false,items:[],z:10,pick:null,load:0,raf:0};
 const PL_N=16;
 function plSize(){const st=$('#plStage');return{W:st.clientWidth,H:st.clientHeight,cw:Math.round(Math.min(st.clientWidth*.5,230))};}
 function plApply(it){it.el.style.transform=`translate(${it.x.toFixed(1)}px,${it.y.toFixed(1)}px) rotate(${it.r.toFixed(1)}deg)`;}
-function plClamp(it,sz){const ch=it.cw*190/300;it.x=Math.max(-it.cw*.25,Math.min(sz.W-it.cw*.75,it.x));it.y=Math.max(-ch*.2,Math.min(sz.H-ch*.8,it.y));}
-function plSpot(sz){const ch=sz.cw*190/300,gs=()=>(Math.random()+Math.random()+Math.random()-1.5)/1.5;   // eher zur Mitte hin: ein Haufen
-  const x=(sz.W-sz.cw)/2+gs()*sz.W*.42,y=(sz.H-ch)/2+gs()*sz.H*.4;
-  return{x:Math.max(-sz.cw*.15,Math.min(sz.W-sz.cw*.85,x)),y:Math.max(0,Math.min(sz.H-ch,y)),r:Math.random()*80-40};}
+function plClamp(it,sz){const ch=it.cw*it.ar;it.x=Math.max(-it.cw*.25,Math.min(sz.W-it.cw*.75,it.x));it.y=Math.max(-ch*.2,Math.min(sz.H-ch*.8,it.y));}
+function plSpot(sz,w,ar){w=w||sz.cw;const ch=w*(ar||190/300),gs=()=>(Math.random()+Math.random()+Math.random()-1.5)/1.5;   // eher zur Mitte hin: ein Haufen
+  const x=(sz.W-w)/2+gs()*sz.W*.42,y=(sz.H-ch)/2+gs()*sz.H*.4;
+  return{x:Math.max(-w*.15,Math.min(sz.W-w*.85,x)),y:Math.max(0,Math.min(sz.H-ch,y)),r:Math.random()*80-40};}
+/* Schallplatte in matt bedruckter Hülle, die Platte schaut seitlich heraus */
+const PL_REC_AR=250/310;
+function plRecord(a,img){
+  const id='pr'+(++kbId),lab=['#c0542d','#2f4f9a','#2f6f3a','#8a3a8a','#b8862b','#e8a547'][(a.name.length*7+a.artist.length)%6];
+  let grooves='';for(let r=44;r<112;r+=4)grooves+=`<circle cx="192" cy="125" r="${r}" fill="none" stroke="#ffffff${r%12===0?'14':'09'}" stroke-width="1"/>`;
+  return `<svg viewBox="0 0 310 250"><defs><radialGradient id="${id}v" cx=".5" cy=".5" r=".5"><stop offset=".3" stop-color="#1c1c1e"/><stop offset="1" stop-color="#0b0b0c"/></radialGradient></defs>
+   <circle cx="192" cy="125" r="115" fill="url(#${id}v)"/>${grooves}
+   <path d="M120 45 A115 115 0 0 1 300 95" fill="none" stroke="#ffffff1c" stroke-width="10"/>
+   <circle cx="192" cy="125" r="36" fill="${lab}"/><circle cx="192" cy="125" r="4" fill="#0b0b0c"/>
+   <rect x="2" y="7" width="236" height="236" rx="3" fill="#d9cdb6"/>
+   ${img?`<image href="${img}" x="2" y="7" width="236" height="236" preserveAspectRatio="xMidYMid slice"/>`:
+     `<text x="120" y="118" text-anchor="middle" font-family="system-ui" font-weight="800" font-size="17" fill="#3a2e1a">${esc(kbCut(a.name,22))}</text><text x="120" y="142" text-anchor="middle" font-family="system-ui" font-size="13" fill="#5b4a2a">${esc(kbCut(a.artist,26))}</text>`}
+   <rect x="2.5" y="7.5" width="235" height="235" rx="3" fill="none" stroke="#ffffff30"/>
+   <path d="M2 7 h236 v236" fill="none" stroke="#00000055" stroke-width="1.5"/></svg>`;
+}
 async function plOpen(){
   if(!albums.length){toast('Noch keine Musik eingelesen');return;}
   PL.open=true;$('#pileOv').classList.add('show');pushNav('pile');
-  if(!PL.items.length)plFill();
+  const mixed=PMODE==='auto';$('#plTitle').textContent=mixed?'Wühlhaufen':'Kassettenhaufen';
+  document.querySelector('#pileOv .pl-hint').textContent=(mixed?'Kassetten und Platten':'Kassetten')+' mit dem Finger verschieben · Antippen zum Rausnehmen';
+  if(!PL.items.length||PL.mixed!==mixed)plFill();
 }
 function plClose(){PL.open=false;$('#pileOv').classList.remove('show');nav=nav.filter(x=>x!=='pile');plUnpick(true);}
 async function plFill(){
-  const id=++PL.load,st=$('#plStage');
+  const id=++PL.load,st=$('#plStage');PL.mixed=PMODE==='auto';
   // alte Kassetten nach oben rauswerfen
   const old=PL.items;PL.items=[];
   old.forEach((it,i)=>it.el.animate([{transform:it.el.style.transform,opacity:1},{transform:`translate(${it.x}px,${-st.clientHeight}px) rotate(${it.r+90}deg)`,opacity:0}],{duration:420,delay:i*15,easing:'ease-in',fill:'forwards'}).finished.then(()=>it.el.remove()));
@@ -4713,20 +4741,23 @@ async function plFill(){
   if(id!==PL.load)return;
   const sz=plSize();st.style.setProperty('--cw',sz.cw+'px');
   pool.forEach((a,i)=>{
-    const el=document.createElement('div');el.className='pc';el.innerHTML=kbCassette(a,imgs[i]);
+    const rec=PL.mixed&&yearView(a.year)==='deck';     // im gemischten Haufen: alte Alben als Schallplatte
+    const el=document.createElement('div');el.className='pc'+(rec?' rec':'');el.innerHTML=rec?plRecord(a,imgs[i]):kbCassette(a,imgs[i]);
     el.querySelectorAll('.khub').forEach(h=>h.style.transform=`rotate(${Math.random()*360}deg)`);
-    const it={a,el,cw:sz.cw,...plSpot(sz),vx:0,vy:0,vr:0};el.style.zIndex=++PL.z;plApply(it);
+    const w=rec?Math.round(sz.cw*1.15):sz.cw,ar=rec?PL_REC_AR:190/300;if(rec)el.style.width=w+'px';
+    const it={a,el,rec,cw:w,ar,...plSpot(sz,w,ar),vx:0,vy:0,vr:0};el.style.zIndex=++PL.z;plApply(it);
     st.insertBefore(el,$('#plDim'));PL.items.push(it);
     el.animate([{transform:`translate(${it.x}px,${it.y-sz.H-200}px) rotate(${it.r-40}deg)`},{transform:`translate(${it.x}px,${it.y+6}px) rotate(${it.r}deg)`,offset:.85},{transform:el.style.transform}],
       {duration:620,delay:120+i*55,easing:'cubic-bezier(.5,0,.6,1)',fill:'backwards'});
     setTimeout(()=>kbNoise(.035,1200+Math.random()*900,.22),120+i*55+520);
   });
-  $('#plSub').textContent=pool.length+' Kassetten · zufällig gemischt';
+  const nr=PL.items.filter(x=>x.rec).length;
+  $('#plSub').textContent=PL.mixed?`${pool.length-nr} Kassetten und ${nr} Platten · nach Erscheinungsjahr`:pool.length+' Kassetten · zufällig gemischt';
 }
 /* alles kräftig durchwühlen */
 function plShake(){
   const sz=plSize();
-  PL.items.forEach((it,i)=>{const from=it.el.style.transform;Object.assign(it,plSpot(sz));it.el.style.zIndex=10+Math.floor(Math.random()*PL_N);plApply(it);
+  PL.items.forEach((it,i)=>{const from=it.el.style.transform;Object.assign(it,plSpot(sz,it.cw,it.ar));it.el.style.zIndex=10+Math.floor(Math.random()*PL_N);plApply(it);
     it.el.animate([{transform:from},{transform:it.el.style.transform}],{duration:520+Math.random()*260,easing:'cubic-bezier(.2,.9,.3,1)'});
     if(i%3===0)setTimeout(()=>kbNoise(.04,900+Math.random()*1500,.2),Math.random()*400);});
 }
@@ -4768,8 +4799,9 @@ function plStep(){
 }
 /* eine Kassette aus dem Haufen nehmen */
 function plPickUp(it){
-  PL.pick=it;const sz=plSize(),s=Math.min(1.75,(sz.W*.88)/it.cw),ch=it.cw*190/300;
-  const tx=(sz.W-it.cw)/2,ty=Math.max(10,sz.H*.36-ch/2);
+  PL.pick=it;const sz=plSize(),s=Math.min(1.75,(sz.W*.88)/it.cw,(sz.H*.62)/(it.cw*it.ar)),ch=it.cw*it.ar;
+  const tx=(sz.W-it.cw)/2,ty=Math.max(10,sz.H*.38-ch/2);
+  $('#plIn').lastChild.textContent=it.rec?'Auflegen':'Einlegen';
   it.el.style.zIndex=1000;$('#plDim').style.zIndex=999;$('#plDim').classList.add('show');
   const to=`translate(${tx}px,${ty}px) rotate(0deg) scale(${s.toFixed(3)})`;
   it.el.animate([{transform:it.el.style.transform},{transform:to}],{duration:380,easing:'cubic-bezier(.2,.9,.3,1.1)',fill:'forwards'});
