@@ -29,12 +29,29 @@ public class TpStackService extends RemoteViewsService {
     static synchronized List<Album> albums(Context ctx, boolean fresh) {
         if (!fresh && cache != null && System.currentTimeMillis() - cacheAt < 10 * 60 * 1000) return cache;
         LinkedHashMap<Long, Album> m = new LinkedHashMap<>();
-        String[] proj = {MediaStore.Audio.Media._ID, MediaStore.Audio.Media.ALBUM_ID, MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.ARTIST};
+        boolean q = Build.VERSION.SDK_INT >= 29;
+        String[] proj = {MediaStore.Audio.Media._ID, MediaStore.Audio.Media.ALBUM_ID, MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.ARTIST,
+            q ? MediaStore.MediaColumns.RELATIVE_PATH : MediaStore.MediaColumns.DATA};
+        // nur die in der App ausgewählten Musikordner (leer = alle)
+        List<String> sel = new ArrayList<>();
+        try {
+            org.json.JSONArray f = new org.json.JSONArray(ctx.getSharedPreferences(BtunesWidget.PREFS, Context.MODE_PRIVATE).getString("mfolders", "[]"));
+            for (int i = 0; i < f.length(); i++) sel.add(f.getString(i));
+        } catch (Exception ignore) {}
         try (Cursor c = ctx.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, proj,
                 MediaStore.Audio.Media.IS_MUSIC + " != 0", null, null)) {
             while (c != null && c.moveToNext()) {
                 long aid = c.getLong(1);
                 if (m.containsKey(aid)) continue;
+                if (!sel.isEmpty()) {
+                    String p = c.getString(4) == null ? "" : c.getString(4);
+                    if (!q && p.lastIndexOf('/') > 0) p = p.substring(0, p.lastIndexOf('/') + 1);
+                    p = p.replaceFirst("^/storage/(emulated/\\d+|[^/]+)/", "").replaceFirst("^/+", "");
+                    if (!p.isEmpty() && !p.endsWith("/")) p += "/";
+                    boolean ok = false;
+                    for (String f : sel) if (p.startsWith(f)) { ok = true; break; }
+                    if (!ok) continue;
+                }
                 Album a = new Album();
                 a.id = aid; a.track = c.getLong(0);
                 a.name = c.getString(2) == null ? "" : c.getString(2);

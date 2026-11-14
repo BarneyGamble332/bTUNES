@@ -648,6 +648,16 @@ public class MusicPlugin extends Plugin {
         }
     }
 
+    /* Ausgewählte Musikordner merken (für den Cover-Stapel im Widget) */
+    @PluginMethod
+    public void setMusicFolders(PluginCall call) {
+        JSONArray f = call.getData().optJSONArray("folders");
+        getContext().getSharedPreferences(BtunesWidget.PREFS, android.content.Context.MODE_PRIVATE).edit()
+            .putString("mfolders", f == null ? "[]" : f.toString()).apply();
+        TaschenWidget.albumsChanged(getContext());
+        call.resolve();
+    }
+
     /* PDFs in den gewählten Ordnern (mit Unterordnern): [{path, name, size, mtime, dir}] */
     @PluginMethod
     public void listPdfs(PluginCall call) {

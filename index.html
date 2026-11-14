@@ -731,6 +731,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .minicas i::before{content:"";position:absolute;left:3px;right:3px;top:2px;height:11px;border-radius:2px;background:var(--c)}
 .minicas i::after{content:"";position:absolute;left:8px;right:8px;top:6px;height:4px;border-radius:2px;background:#1a1a1a}
 #main.kbmode .minicrate,#main.automode .minicrate{display:none}#main.kbmode .minicas,#main.automode .minicas{display:block}
+.row.mf{display:flex;align-items:center;gap:12px;min-height:52px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid #2a241f;color:var(--txt);font:inherit;padding:8px 2px}
+.mfbox{flex:none;width:24px;height:24px;border-radius:7px;border:2px solid #5a4e44;display:grid;place-items:center}
+.mfbox .i{width:16px;height:16px;opacity:0;stroke:#1a120b;stroke-width:3}
+.mfbox.on{background:var(--acc);border-color:var(--acc)}.mfbox.on .i{opacity:1}
 </style>
 </head>
 <body>
@@ -1101,7 +1105,56 @@ function desktopPlugin(){
   });
   return api;
 }
-/* Musikordner verwalten (nur Linux-Version) */
+/* Musikordner am Handy: Android liefert alle Musik aus der Medienbibliothek,
+   hier kann man auf bestimmte Ordner (mit Unterordnern) einschränken. */
+let RAWLIB=[];
+const mfNorm=p=>{p=String(p||'').replace(/^\/storage\/(emulated\/\d+|[^/]+)\//,'').replace(/^\/+/,'');return p&&!p.endsWith('/')?p+'/':p;};
+function mfFilter(raw){
+  if(DESKTOP)return raw;const sel=store.get('mfolders',[]);if(!sel.length)return raw;
+  return raw.filter(r=>{const p=mfNorm(r[8]);return sel.some(f=>p.startsWith(f));});
+}
+function mfSync(){try{Music.setMusicFolders&&Music.setMusicFolders({folders:store.get('mfolders',[])}).catch(()=>{});}catch(e){}}
+function openFoldersPhone(){
+  openView('Musikordner',(b,v)=>{
+    let sel=store.get('mfolders',[]).slice(),all=!sel.length;
+    // Ordnerbaum aus den gefundenen Titeln (zwei Ebenen, Anzahl inklusive Unterordner)
+    const cnt=new Map();
+    for(const r of RAWLIB){const parts=mfNorm(r[8]).split('/').filter(Boolean);
+      for(let d=1;d<=Math.min(2,parts.length);d++){const k=parts.slice(0,d).join('/')+'/';cnt.set(k,(cnt.get(k)||0)+1);}
+      if(!parts.length)cnt.set('',(cnt.get('')||0)+1);}
+    const tops=[...cnt.keys()].filter(k=>k&&k.split('/').length===2).sort((a,b)=>a.localeCompare(b,'de'));
+    const kids=t=>[...cnt.keys()].filter(k=>k.startsWith(t)&&k!==t&&k.split('/').length===3).sort((a,b)=>a.localeCompare(b,'de'));
+    const on=k=>sel.some(f=>k.startsWith(f));
+    const draw=()=>{
+      const n=all?RAWLIB.length:RAWLIB.filter(r=>on(mfNorm(r[8]))).length;
+      const row=(k,lvl)=>{const by=!sel.includes(k)&&on(k);const nm=k.split('/').filter(Boolean).pop();
+        return `<button class="row mf" data-f="${esc(k)}" style="padding-left:${2+lvl*26}px${all||by?';opacity:.55':''}">
+          <span class="mfbox${on(k)||all?' on':''}"><svg class="i"><use href="#i-check"/></svg></span>
+          <div class="tx"><div class="n">${esc(nm)}</div><div class="s">${cnt.get(k)} Titel${by?' · über den Oberordner':''}</div></div></button>`;};
+      b.innerHTML=`<div style="color:var(--mute);font-size:13.5px;margin:4px 2px 12px">Android findet die Musik in allen Ordnern. Hier kannst du festlegen, welche Ordner bTUNES zeigt – Unterordner sind immer dabei.</div>
+        <button class="row mf" data-all="1"><span class="mfbox${all?' on':''}"><svg class="i"><use href="#i-check"/></svg></span><div class="tx"><div class="n">Alle Ordner</div><div class="s">${RAWLIB.length} Titel</div></div></button>
+        <div class="list">${tops.map(t=>row(t,0)+kids(t).map(k=>row(k,1)).join('')).join('')||'<div class="hint">Noch keine Musik gefunden.</div>'}</div>
+        <div style="color:var(--mute);font-size:13px;margin:12px 2px">${all?'Es werden alle Ordner eingelesen.':`Ausgewählt: ${n} von ${RAWLIB.length} Titeln`}</div>
+        <div class="acts"><button class="pri" data-go="ok"${!all&&!sel.length?' disabled style="opacity:.5"':''}><svg class="i"><use href="#i-check"/></svg>Übernehmen</button><button data-go="scan"><svg class="i"><use href="#i-refresh"/></svg>Neu einlesen</button></div>`;
+    };
+    b.onclick=async e=>{
+      if(e.target.closest('[data-all]')){all=!all;if(all)sel=[];draw();return;}
+      const r=e.target.closest('[data-f]');
+      if(r){const k=r.dataset.f;
+        if(all){all=false;sel=[k];}
+        else if(sel.includes(k))sel=sel.filter(x=>x!==k);
+        else if(on(k)){toast('Der Oberordner ist schon ausgewählt');return;}
+        else sel=[...sel.filter(x=>!x.startsWith(k)),k];
+        draw();return;}
+      const g=e.target.closest('[data-go]');if(!g)return;
+      if(g.dataset.go==='ok'){if(!all&&!sel.length)return;store.set('mfolders',all?[]:sel);mfSync();buildLibrary(mfFilter(RAWLIB));renderLib();render();miniCrate();
+        PL.items.forEach(it=>it.el.remove());PL.items=[];toast(tracks.length+' Titel in '+albums.length+' Alben');back();}
+      else{toast('Lese Musik ein…');await loadLibrary(true);draw();}
+    };
+    draw();
+  });
+}
+/* Musikordner verwalten (Linux-Version) */
 function openFolders(){
   openView('Musikordner',async(b,v)=>{
     const draw=async()=>{const f=await window.desktop.getFolders();
@@ -1403,7 +1456,7 @@ function closeLib(){$('#lib').classList.remove('open');$('#mini').classList.remo
 $('#libClose').onclick=()=>{closeLib();nav=nav.filter(x=>x!=='lib');};
 $('#tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;tab=b.dataset.t;store.set('tab',tab);renderLib();$('#libBody').scrollTop=0;};
 $('#q').oninput=()=>{query=norm($('#q').value.trim());renderLib();};
-if(DESKTOP){$('#libFolders').classList.remove('hidden');$('#libFolders').onclick=openFolders;}
+$('#libFolders').classList.remove('hidden');$('#libFolders').onclick=()=>DESKTOP?openFolders():openFoldersPhone();
 $('#libScan').onclick=async()=>{await loadLibrary(true);};
 
 const albumCard=a=>`<button class="alb" data-alb="${a.id}"><div class="cv" data-art="${a.id}" data-size="300"><div class="ph"><svg class="i" style="width:40px;height:40px"><use href="#i-vinyl"/></svg></div></div><div class="n">${esc(a.name)}</div><div class="s">${esc(a.artist)}</div></button>`;
@@ -1416,7 +1469,7 @@ function trackRow(t,o={}){
 function renderLib(){
   document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
   const B=$('#libBody');
-  if(!tracks.length){B.innerHTML=DESKTOP?`<div class="hint">Keine Musik gefunden.<br>Wähle oben über das Ordner-Symbol aus, welche Ordner bTUNES einlesen soll.</div><div class="acts"><button class="pri" onclick="openFolders()"><svg class="i"><use href="#i-folder"/></svg>Musikordner wählen</button></div>`:`<div class="hint">Keine Musik gefunden.<br>Lege MP3-, FLAC- oder M4A-Dateien z. B. in den Ordner <b>Music</b> auf dem Handy und tippe oben auf ↻.</div>`;return;}
+  if(!tracks.length){B.innerHTML=DESKTOP?`<div class="hint">Keine Musik gefunden.<br>Wähle oben über das Ordner-Symbol aus, welche Ordner bTUNES einlesen soll.</div><div class="acts"><button class="pri" onclick="openFolders()"><svg class="i"><use href="#i-folder"/></svg>Musikordner wählen</button></div>`:`<div class="hint">Keine Musik gefunden.<br>Lege MP3-, FLAC- oder M4A-Dateien z. B. in den Ordner <b>Music</b> auf dem Handy und tippe oben auf ↻.${store.get('mfolders',[]).length?'<br><br>Es sind nur bestimmte Ordner ausgewählt – prüfe die Auswahl über das Ordner-Symbol oben.':''}</div>`;return;}
   let h='';
   if(query){
     const al=albums.filter(a=>a.key.includes(query)).slice(0,30);
@@ -4855,7 +4908,7 @@ function jingleAtStart(){
 /* ===== Start ===== */
 async function loadLibrary(manual){
   try{
-    const r=await Music.scan();buildLibrary(r.tracks||[]);
+    const r=await Music.scan();RAWLIB=r.tracks||[];buildLibrary(mfFilter(RAWLIB));mfSync();
     if(manual)toast(tracks.length+' Titel gefunden');
   }catch(e){toast(String(e&&e.message||e));}
   renderLib();render();miniCrate();requestAnimationFrame(fitMain);
