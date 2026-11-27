@@ -5095,13 +5095,26 @@ function dnBeat(now){
   if(DN.onsets.length>=4){const s=[...DN.onsets].sort((a,b)=>a-b);let bpm=60000/s[s.length>>1];while(bpm<85)bpm*=2;while(bpm>170)bpm/=2;DN.bpm=DN.bpm*.8+bpm*.2;}
   return true;
 }
+/* Tanzschritte je nach Musik; einmal pro Lied ein Spezial-Move */
+const DN_MOVES={ruhig:['wippen','huefte','gitarre','wippen'],mittel:['huefte','zeigen','roboter','sprinkler','lasso','klatschen','gitarre'],laut:['huepfen','drehen','klatschen','gitarre','lasso','roboter']};
+const DN_SPECIAL={trucker:'🚚 TRUCKER!',propeller:'🌀 PROPELLER!'};
 function dnPick(){
-  const vol=(LO.b+LO.lm+LO.hm+LO.t)/4;let n;
-  if(!S.playing||vol<.18)n='wippen';
-  else{const r=Math.random();
-    if(vol>.55&&LO.b>.6)n=r<.4?'huepfen':r<.6?'drehen':r<.8?'zeigen':'huefte';
-    else n=r<.45?'huefte':r<.8?'zeigen':'wippen';}
+  if(DN.special)return;
+  const vol=(LO.b+LO.lm+LO.hm+LO.t)/4;
+  const pool=!S.playing||vol<.18?DN_MOVES.ruhig:vol>.5&&LO.b>.55?DN_MOVES.laut:DN_MOVES.mittel;
+  let n=pool[Math.floor(Math.random()*pool.length)];if(n===DN.actName&&pool.length>1)n=pool[(pool.indexOf(n)+1)%pool.length];
   dnPlay(n);
+}
+function dnSpecialCheck(){
+  const t=curTrack();if(!t||!S.playing||DN.busy||DN.special)return;
+  if(DN.spTrack!==t.id){DN.spTrack=t.id;DN.spDone=false;let h=0;for(const c of String(t.id))h=(h*31+c.charCodeAt(0))>>>0;DN.spName=h%3===2?'propeller':'trucker';}
+  if(DN.spDone)return;
+  const dur=S.dur||t.dur||0;if(!dur)return;let pos=S.pos||0;pos+=Date.now()-lastPosAt;const f=pos/dur;
+  const vol=(LO.b+LO.lm+LO.hm+LO.t)/4;
+  if((f>.3&&f<.8&&vol>.42&&DN.beatN%8===0)||f>.6){
+    DN.spDone=true;DN.special=true;dnPlay(DN.spName,.3,true);KC.banner={text:DN_SPECIAL[DN.spName],t0:performance.now()};
+    const a=DN.acts[DN.spName];const end=e=>{if(e.action===a){DN.mixer.removeEventListener('finished',end);DN.special=false;dnPick();}};DN.mixer.addEventListener('finished',end);
+  }
 }
 function dnDraw(t){
   if(!DN.ready)return;DN.holder.visible=DN.on;
@@ -5125,8 +5138,8 @@ function dnDraw(t){
   DN.yaw+=DN.yawV;DN.yawV*=.92;if(Math.abs(DN.yawV)<.001)DN.yaw*=.97;
   DN.holder.rotation.set(.12,DN.yaw-.25*(land&&!DN.seq?1:0)+turn,0);
   // Tempo und Taktgefühl
-  if(dnBeat(now)&&DN.act&&!DN.busy){if(DN.beatN%8===0)dnPick();
-    const err=((DN.act.time-.25)%.5+.5)%.5;DN.act.time-= (err>.25?err-.5:err)*.35;}
+  if(dnBeat(now)&&DN.act&&!DN.busy){dnSpecialCheck();if(DN.beatN%8===0)dnPick();
+    if(!DN.special){const err=((DN.act.time-.25)%.5+.5)%.5;DN.act.time-= (err>.25?err-.5:err)*.35;}}
   if(DN.beatN===0&&!DN.picked){DN.picked=1;dnPick();}
   DN.mixer.timeScale=DN.busy?1:S.playing?DN.bpm/120:.5;
   DN.mixer.update(dt);
@@ -5251,6 +5264,11 @@ function loKinoDraw(t){
   const ti=KC.titleImg,tsc=Math.min(1,(W*.92)/ti.width);
   g.globalCompositeOperation='source-over';g.globalAlpha=.75+LO.lm*.25;
   g.drawImage(ti,cx-ti.width*tsc/2,floorY+(H-floorY)*.12,ti.width*tsc,ti.height*tsc);
+  // Einblendung beim Spezial-Move
+  if(KC.banner){const e=(performance.now()-KC.banner.t0)/1000;if(e>2.6)KC.banner=null;else{
+    const a=Math.min(1,e*4)*Math.min(1,(2.6-e)*2),fs=m*.075*(1+.08*Math.sin(e*12));
+    g.globalCompositeOperation='source-over';g.globalAlpha=a;g.font=`900 ${fs}px system-ui,sans-serif`;g.textAlign='center';g.textBaseline='middle';
+    g.shadowColor=P[0];g.shadowBlur=fs*.4;g.fillStyle='#fff';g.fillText(KC.banner.text,cx,H*.33);g.shadowBlur=0;g.globalAlpha=1;}}
   // Oszilloskop ganz unten
   g.globalCompositeOperation='lighter';g.globalAlpha=.8;g.strokeStyle=P[(Math.floor(t/2000))%4];g.lineWidth=Math.max(2,m*.004);g.beginPath();
   const y0=H*.955;for(let i=0;i<64;i++){const x=i/63*W,y=y0+LO.wave[i]*H*.035;i?g.lineTo(x,y):g.moveTo(x,y);}g.stroke();

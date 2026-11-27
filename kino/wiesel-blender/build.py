@@ -37,7 +37,7 @@ SEG={'rumpf':[(V(T[a][0]),V(T[b][0]),TB[(a,b)]) for a,b in TE]}
 # ---------- Arme (Vorderbeine) und Hinterbeine ----------
 LIMB={}
 for s,x in (('L',1),('R',-1)):
-  A={'sh':((x*0.058,-0.028,0.628),.039),'el':((x*0.094,-0.075,0.548),.03),'wr':((x*0.09,-0.122,0.497),.023),'pw':((x*0.088,-0.148,0.482),(.028,.024))}
+  A={'sh':((x*0.058,-0.028,0.628),.04),'el':((x*0.1,-0.07,0.52),.031),'wr':((x*0.098,-0.13,0.46),.024),'pw':((x*0.096,-0.158,0.444),(.029,.025))}
   AE=[('sh','el'),('el','wr'),('wr','pw')]
   objs.append(skinpart('arm'+s,A,AE,'sh'))
   SEG['arm'+s]=[(V(A['sh'][0]),V(A['el'][0]),'arm.'+s),(V(A['el'][0]),V(A['wr'][0]),'fore.'+s),(V(A['wr'][0]),V(A['pw'][0]),'fore.'+s)]
@@ -54,7 +54,7 @@ for s,x in (('L',1),('R',-1)):
   LIMB[s]=(A,Lg)
   # kleine Zehen an Vorder- und Hinterpfoten
   for k in (-1,0,1):
-    objs.append(ball('zeheA'+s,(x*0.088+k*0.013,-0.163,0.478),(.011,.012,.009),seg=6,kind='zehe',grp='P_zeheA'+s))
+    objs.append(ball('zeheA'+s,(x*0.096+k*0.013,-0.173,0.44),(.011,.012,.009),seg=6,kind='zehe',grp='P_zeheA'+s))
     objs.append(ball('zeheB'+s,(x*0.072+k*0.015,-0.1,0.017),(.012,.013,.009),seg=6,kind='zehe',grp='P_zeheB'+s))
 # ---------- Ohren, Augen, Nase ----------
 for s,x in (('L',1),('R',-1)):
@@ -220,6 +220,83 @@ def druecken(f,ph):
   for s,x in (('L',1),('R',-1)):d[('arm.'+s,'rotation_euler')]=(R(30+45*k),0,R(x*-8*k));d[('fore.'+s,'rotation_euler')]=(R(55-45*k),0,0)
   key(f,d);keyobj(f)
 acts.append(dance('druecken',24,druecken))
+# ---------- weitere Tanzschritte ----------
+def armpose(d,s,ax,az,fx):d[('arm.'+s,'rotation_euler')]=(R(ax),0,R(az if s=='L' else -az));d[('fore.'+s,'rotation_euler')]=(R(fx),0,0)
+# Roboter: steife Posen, die auf jeden Schlag springen
+ROB=[(80,10,90, 30,10,10),(30,10,10, 80,10,90),(90,60,0, 90,60,0),(140,20,10, 20,5,90)]
+def roboter(f,ph):
+  b=int(f//12)%4;fr=f%12;q=ss(0,3,fr)                     # schnell in die neue Pose, dann stillhalten
+  p0=ROB[(b-1)%4];p1=ROB[b];m=[p0[i]+(p1[i]-p0[i])*q for i in range(6)]
+  d=base(f,ph,bob=.02,tail=6,nod=0)
+  armpose(d,'L',m[0],m[1],m[2]);armpose(d,'R',m[3],m[4],m[5])
+  d[('head','rotation_euler')]=(0,R([20,-20,0,0][b])*q+R([0,20,-20,0][b])*(1-q),0)
+  d[('spine','rotation_euler')]=(0,R([10,-10,0,0][b]),0)
+  key(f,d);keyobj(f)
+acts.append(dance('roboter',48,roboter))
+# Rasensprenger: eine Pfote hinterm Kopf, der andere Arm tickt zur Seite
+def sprinkler(f,ph):
+  b=f/12;tick=ss(0,2,f%6)                                     # 8 Ticks
+  d=base(f,ph,bob=.03,tail=15)
+  armpose(d,'L',140,55,110)
+  side=(int(f//6)%8)/7.0 if f<48 else 1-((int((f-48)//6)%8)/7.0)
+  d[('spine','rotation_euler')]=(0,R(-35+70*side),0)
+  armpose(d,'R',95,0,5)
+  key(f,d);keyobj(f)
+acts.append(dance('sprinkler',96,sprinkler))
+# Klatschen über dem Kopf, auf jeden Schlag
+def klatschen(f,ph):
+  c=(1+math.cos(2*ph))/2                                      # 1 = Pfoten zusammen
+  d=base(f,ph,bob=.04)
+  for s in 'LR':armpose(d,s,118,40*(1-c)-6*c,25)
+  d[('head','rotation_euler')]=(R(6),0,0)
+  key(f,d);keyobj(f)
+acts.append(dance('klatschen',24,klatschen))
+# Lasso: ein Arm kreist über dem Kopf, Hüfte schwingt
+def lasso(f,ph):
+  d=base(f,ph,bob=.03,sway=.02*math.sin(ph))
+  d[('root','rotation_euler')]=(R(4),0,R(7)*math.sin(ph))
+  d[('arm.R','rotation_euler')]=(R(145+12*math.sin(2*ph)),R(0),R(-45-25*math.cos(2*ph)))
+  d[('fore.R','rotation_euler')]=(R(30+20*math.sin(2*ph)),0,0)
+  armpose(d,'L',40,15,60)
+  key(f,d);keyobj(f)
+acts.append(dance('lasso',24,lasso))
+# Luftgitarre: linke Pfote hält den Hals, rechte schrammelt, Kopf nickt kräftig
+def gitarre(f,ph):
+  d=base(f,ph,bob=.045,nod=18)
+  armpose(d,'L',70,45,20)
+  d[('arm.R','rotation_euler')]=(R(45),0,R(-5));d[('fore.R','rotation_euler')]=(R(70+30*math.sin(4*ph)),0,0)
+  d[('spine','rotation_euler')]=(R(8),R(12),0)
+  key(f,d);keyobj(f)
+acts.append(dance('gitarre',24,gitarre))
+# SPEZIAL 1 – Trucker: 4 Schläge lenken, dann zweimal an der Hupe ziehen
+def trucker(f,ph):
+  d=base(f,ph,bob=.035,tail=18)
+  if f<48:
+    w=math.sin(ph/2)                                            # Lenkrad hin und her
+    armpose(d,'L',75+18*w,10,55);armpose(d,'R',75-18*w,10,55)
+    d[('spine','rotation_euler')]=(R(6),R(-18*w),R(6*w))
+    d[('head','rotation_euler')]=(R(-4),R(10*w),0)
+  else:
+    g=f-48;pull=max(0,math.sin((g%24)/24*math.pi*2))         # zweimal kräftig ziehen
+    up=ss(0,6,g)
+    d[('arm.R','rotation_euler')]=(R(75+(165-75)*up-50*pull),0,R(-10));d[('fore.R','rotation_euler')]=(R(55*(1-up)+15*pull),0,0)
+    armpose(d,'L',40,20,70)
+    d[('root','location')]=(0,-.03*pull,0);d[('head','rotation_euler')]=(R(-14*pull),0,0)
+    d[('spine','rotation_euler')]=(R(10*pull),0,0)
+  key(f,d);keyobj(f)
+acts.append(dance('trucker',96,trucker))
+# SPEZIAL 2 – Propeller: Pfoten in die Hüften, der Schwanz dreht Kreise
+def propeller(f,ph):
+  d=base(f,ph,bob=.03,tail=0)
+  for s in 'LR':armpose(d,s,25,40,110)
+  a2=ph*2
+  d[('tail1','rotation_euler')]=(R(-35)+R(25)*math.cos(a2),0,R(35)*math.sin(a2))
+  d[('tail2','rotation_euler')]=(R(15)*math.cos(a2-.5),0,R(30)*math.sin(a2-.5))
+  d[('tail3','rotation_euler')]=(R(15)*math.cos(a2-1),0,R(30)*math.sin(a2-1))
+  d[('root','rotation_euler')]=(R(4),0,R(5)*math.sin(a2))
+  d[('head','rotation_euler')]=(R(-6),R(20)*math.sin(ph/2),0)
+  key(f,d);keyobj(f)
+acts.append(dance('propeller',96,propeller))
 # Ruhe-Haltung als Standard
 rig.animation_data.action=acts[0]
 bpy.ops.wm.save_as_mainfile(filepath='/home/claude/wiesel/wiesel.blend')
