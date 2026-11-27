@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - index.html
+      - kino/**
       - native/**
       - icon/**
       - .github/workflows/android.yml
@@ -36,7 +37,7 @@ jobs:
           RUN_NUMBER: ${{ github.run_number }}
         run: |
           set -euo pipefail
-          mkdir -p www && cp index.html www/index.html
+          mkdir -p www && cp index.html www/index.html && mkdir -p www/kino && cp kino/three.min.js kino/GLTFLoader.js kino/wiesel.js www/kino/
           npm init -y >/dev/null
           npm i --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/app@6 @capacitor/browser@6 pdfjs-dist@4.10.38
           # PDF-Anzeige fuer den Zeitungs-Reiter (als .js, damit die App sie als JavaScript ausliefert)

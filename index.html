@@ -785,6 +785,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 #kino .kt{position:absolute;left:16px;top:calc(var(--safe-t) + 14px);right:70px;color:#fff;font:700 15px system-ui;text-shadow:0 1px 4px #000;pointer-events:none}
 #kino .kt small{display:block;font-weight:500;opacity:.75}
 #kino .kx{position:absolute;right:14px;top:calc(var(--safe-t) + 12px);width:44px;height:44px;border-radius:50%;border:0;background:#ffffff22;color:#fff;display:grid;place-items:center;z-index:2}
+#kino .kd{position:absolute;right:68px;top:calc(var(--safe-t) + 16px);height:36px;padding:0 14px;border-radius:18px;border:0;background:#ffffff22;color:#fff;font:600 13px system-ui;z-index:2}
 #kino .kh{position:absolute;left:12px;right:12px;bottom:calc(var(--safe-b) + 20px);text-align:center;color:#ffffffb0;font-size:13px;transition:opacity 1s;pointer-events:none}
 </style>
 </head>
@@ -1056,8 +1057,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   <div class="cv-hint">Wischen zum Durchblättern · Tippen zum Auflegen</div>
 </div>
 <div id="kino"><canvas id="kinoC"></canvas><div class="kt" id="kinoT"></div>
-  <button class="kx" id="kinoX" aria-label="Kino schließen"><svg class="i"><use href="#i-x"/></svg></button>
-  <div class="kh" id="kinoH">Finger bewegen: Scheinwerfer folgen · Tippen: Blitz · schnell wischen: andere Farben</div></div>
+  <button class="kd" id="kinoD">Wiesel aus</button><button class="kx" id="kinoX" aria-label="Kino schließen"><svg class="i"><use href="#i-x"/></svg></button>
+  <div class="kh" id="kinoH">Finger bewegen: Scheinwerfer folgen und Wiesel drehen · Tippen: Blitz · schnell wischen: andere Farben</div></div>
 <div class="pileov" id="pileOv">
   <div class="pl-top"><h2><span id="plTitle">Kassettenhaufen</span><small id="plSub">Wühlen, schieben, eine rausziehen</small></h2>
     <button class="ibtn" id="plClose" aria-label="Haufen schließen"><svg class="i"><use href="#i-x"/></svg></button></div>
@@ -5034,11 +5035,89 @@ async function loPalette(){
 }
 /* ---------- Kino-Modus ---------- */
 const KC={aim:[0,0,0,0],spark:[],fx:null,fy:null,flash:0,mv:null,g:null};
+/* ---------- Tanzendes Wiesel im Kino-Modus (in Blender gebaut, mit three.js gezeigt) ---------- */
+const DN={on:store.get('kinoWiesel',true),ready:false,loading:null,yaw:0,yawV:0,act:null,acts:{},onsets:[],lastOn:0,bpm:120,beatN:0,prevBeat:0,lights:[]};
+function loScript(src){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>no(new Error('Datei fehlt: '+src));document.head.appendChild(s);});}
+async function dnInit(){
+  if(DN.ready||DN.loading)return DN.loading;
+  DN.loading=(async()=>{
+    if(!window.THREE)await loScript('kino/three.min.js');
+    if(!THREE.GLTFLoader)await loScript('kino/GLTFLoader.js');
+    if(!window.WIESEL_GLB)await loScript('kino/wiesel.js');
+    const cv=document.createElement('canvas');cv.id='kinoW';cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none';
+    $('#kino').insertBefore(cv,$('#kinoT'));
+    const r=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true,powerPreference:'high-performance'});r.outputEncoding=THREE.sRGBEncoding;r.setClearColor(0,0);
+    const scene=new THREE.Scene(),cam=new THREE.OrthographicCamera(0,1,1,0,-5000,5000);cam.position.z=10;
+    scene.add(new THREE.HemisphereLight(0xfff4e8,0x3a2a40,1.0));
+    const key=new THREE.DirectionalLight(0xffffff,1.1);key.position.set(.3,.8,1.5);scene.add(key);
+    for(let i=0;i<3;i++){const l=new THREE.PointLight(0xffffff,0,0,1.2);scene.add(l);DN.lights.push(l);}
+    const bin=atob(window.WIESEL_GLB),buf=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)buf[i]=bin.charCodeAt(i);
+    const gl=await new Promise((ok,no)=>new THREE.GLTFLoader().parse(buf.buffer,'',ok,no));
+    const fig=gl.scene;fig.traverse(o=>{if(o.isMesh){o.frustumCulled=false;if(o.material)o.material.roughness=.75;}});
+    const holder=new THREE.Group();holder.add(fig);scene.add(holder);
+    // weicher Schatten unter den Füßen
+    const sh=new THREE.Mesh(new THREE.CircleGeometry(.16,24),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.45,depthWrite:false}));
+    sh.rotation.x=-Math.PI/2;sh.position.y=.002;holder.add(sh);
+    const mixer=new THREE.AnimationMixer(fig);
+    for(const c of gl.animations)DN.acts[c.name]=mixer.clipAction(c);
+    Object.assign(DN,{r,scene,cam,holder,mixer,fig,shadow:sh,ready:true});
+    dnPlay('wippen',0);
+  })().catch(e=>{DN.loading=null;toast('Wiesel konnte nicht geladen werden: '+(e&&e.message||e));});
+  return DN.loading;
+}
+function dnPlay(name,fade=.45){
+  const a=DN.acts[name];if(!a||DN.act===a)return;
+  a.reset();a.setEffectiveWeight(1);a.play();
+  if(DN.act&&fade){a.time=DN.act.time%0.5;DN.act.crossFadeTo(a,fade,false);}else if(DN.act)DN.act.stop();
+  DN.act=a;DN.actName=name;
+}
+function dnSize(){if(!DN.ready)return;const d=Math.min(NATIVE?1.5:2,devicePixelRatio||1),W=innerWidth,H=innerHeight;let dd=d;if(W*dd>2560)dd=2560/W;
+  DN.r.setPixelRatio(dd);DN.r.setSize(W,H,false);Object.assign(DN.cam,{left:0,right:W,top:H,bottom:0});DN.cam.updateProjectionMatrix();}
+/* Takt schätzen und den passenden Tanz wählen */
+function dnBeat(now){
+  const isOn=LO.beat>=1&&DN.prevBeat<1&&now-DN.lastOn>260;DN.prevBeat=LO.beat;if(!isOn)return false;
+  if(DN.lastOn){const iv=now-DN.lastOn;if(iv>300&&iv<1400){DN.onsets.push(iv);if(DN.onsets.length>12)DN.onsets.shift();}}
+  DN.lastOn=now;DN.beatN++;
+  if(DN.onsets.length>=4){const s=[...DN.onsets].sort((a,b)=>a-b);let bpm=60000/s[s.length>>1];while(bpm<85)bpm*=2;while(bpm>170)bpm/=2;DN.bpm=DN.bpm*.8+bpm*.2;}
+  return true;
+}
+function dnPick(){
+  const vol=(LO.b+LO.lm+LO.hm+LO.t)/4;let n;
+  if(!S.playing||vol<.18)n='wippen';
+  else{const r=Math.random();
+    if(vol>.55&&LO.b>.6)n=r<.4?'huepfen':r<.6?'drehen':r<.8?'zeigen':'huefte';
+    else n=r<.45?'huefte':r<.8?'zeigen':'wippen';}
+  dnPlay(n);
+}
+function dnDraw(t){
+  if(!DN.on||!DN.ready)return;
+  const W=innerWidth,H=innerHeight,floorY=H*.76,cs=Math.min(H*.4,W*.42),land=W>H*1.1;
+  if(DN.r.domElement.width!==Math.round(W*DN.r.getPixelRatio()))dnSize();
+  const now=performance.now(),dt=Math.min(.05,(now-(DN.last||now))/1000);DN.last=now;
+  // Größe und Platz auf der Bühne: quer rechts neben dem Cover, hochkant vorne in der Mitte
+  const hpx=land?H*.42:H*.3,x=land?W/2+cs*.5+hpx*.45:W/2,y=H-(floorY+(H-floorY)*.06);
+  DN.holder.position.set(x,y,0);DN.holder.scale.setScalar(hpx/0.95);
+  // Drehen mit dem Finger, sonst langsam zurück nach vorn
+  DN.yaw+=DN.yawV;DN.yawV*=.92;if(Math.abs(DN.yawV)<.001)DN.yaw*=.97;
+  DN.holder.rotation.set(.12,DN.yaw-.25*(land?1:0),0);
+  // Tempo und Taktgefühl
+  if(dnBeat(now)&&DN.act){if(DN.beatN%8===0)dnPick();
+    const err=((DN.act.time-.25)%.5+.5)%.5;DN.act.time-= (err>.25?err-.5:err)*.35;}
+  if(DN.beatN===0&&!DN.picked){DN.picked=1;dnPick();}
+  DN.mixer.timeScale=S.playing?DN.bpm/120:.5;
+  DN.mixer.update(dt);
+  // Farbiges Bühnenlicht passend zu den Scheinwerfern
+  const lv=[LO.b,LO.lm,LO.hm];DN.lights.forEach((l,i)=>{l.color.set(LO.pal[i]);l.intensity=.4+lv[i]*1.6;l.position.set(x+(i-1)*hpx*.9,y+hpx*(.9+.2*i),hpx*1.2);l.distance=hpx*4;});
+  DN.r.render(DN.scene,DN.cam);
+}
+function dnToggle(){DN.on=!DN.on;store.set('kinoWiesel',DN.on);$('#kinoD').textContent=DN.on?'Wiesel aus':'Wiesel an';
+  if(DN.on)dnInit();const c=$('#kinoW');if(c)c.style.display=DN.on?'':'none';}
 function loKinoOpen(){
   LO.kino=true;$('#kino').classList.add('show');pushNav('kino');KC.tid=null;
   $('#kinoT').innerHTML='';
   const h=$('#kinoH');h.style.opacity=1;setTimeout(()=>h.style.opacity=0,4500);
   loKinoSize();loKinoTrack();loUpdate();
+  $('#kinoD').textContent=DN.on?'Wiesel aus':'Wiesel an';if(DN.on)dnInit();
 }
 function loKinoClose(){LO.kino=false;$('#kino').classList.remove('show');nav=nav.filter(x=>x!=='kino');loUpdate();}
 /* Auflösung: scharf am Handy, auf großen Monitoren (4K) begrenzt, damit es flüssig bleibt */
@@ -5141,6 +5220,7 @@ function loKinoDraw(t){
   g.globalAlpha=LO.beat*.3;const vg=g.createRadialGradient(cx,H/2,m*.35,cx,H/2,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,P[0]);g.fillStyle=vg;g.fillRect(0,0,W,H);
   if(KC.flash>0){g.globalCompositeOperation='source-over';g.globalAlpha=KC.flash*.85;g.fillStyle='#fff';g.fillRect(0,0,W,H);KC.flash*=.82;if(KC.flash<.02)KC.flash=0;}
   g.globalAlpha=1;g.globalCompositeOperation='source-over';
+  dnDraw(t);
 }
 (function loWire(){
   document.addEventListener('click',e=>{const b=e.target.closest('[data-lo]');if(!b)return;e.stopPropagation();
@@ -5154,7 +5234,8 @@ function loKinoDraw(t){
     if(v>2.2&&now-m.sw>600){LO.pi=(LO.pi+1)%LO.pals.length;LO.pal=LO.pals[LO.pi]||LO.pal;m.sw=now;}m.d+=d;m.x=e.clientX;m.y=e.clientY;m.t=now;});
   c.addEventListener('pointerup',e=>{const m=KC.mv;if(m&&m.d<12&&performance.now()-m.s<300)KC.flash=1;KC.mv=null;if(e.pointerType!=='mouse')KC.fx=KC.fy=null;});
   c.addEventListener('pointerleave',()=>{KC.fx=KC.fy=null;});
-  $('#kinoX').onclick=()=>back();
+  $('#kinoX').onclick=()=>back();$('#kinoD').onclick=dnToggle;
+  c.addEventListener('pointermove',e=>{if(KC.mv&&DN.ready&&e.movementX)DN.yawV=e.movementX*.004;});
   addEventListener('resize',()=>{if(LO.kino)loKinoSize();});
   document.addEventListener('visibilitychange',loUpdate);
   loSwitches();
