@@ -25,6 +25,8 @@ import java.util.List;
    mit Cover und Tasten, auch im Sperrbildschirm und für Bluetooth-Kopfhörer/Auto. */
 public class PlaybackService extends MediaSessionService {
     private MediaSession session;
+    /* Audio-Sitzung des Players, damit die Lichtorgel die Musik auswerten kann */
+    static volatile int audioSession = 0;
 
     @Override
     public void onCreate() {
@@ -36,6 +38,10 @@ public class PlaybackService extends MediaSessionService {
             .setHandleAudioBecomingNoisy(true)                            // Kopfhörer raus -> Pause
             .setWakeMode(C.WAKE_MODE_LOCAL)
             .build();
+        audioSession = player.getAudioSessionId();
+        player.addListener(new Player.Listener() {
+            @Override public void onAudioSessionIdChanged(int id) { audioSession = id; }
+        });
         Intent open = getPackageManager().getLaunchIntentForPackage(getPackageName());
         PendingIntent pi = PendingIntent.getActivity(this, 0, open,
             PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);

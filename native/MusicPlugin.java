@@ -360,6 +360,69 @@ public class MusicPlugin extends Plugin {
         } catch (Exception e) { call.reject("Speichern fehlgeschlagen: " + e.getMessage()); }
     }
 
+    /* Lichtorgel: wertet die laufende Musik aus (Android-Visualizer auf der Audio-Sitzung des Players).
+       Es wird nichts aufgenommen, Android verlangt dafür trotzdem die Mikrofon-Freigabe. */
+    private android.media.audiofx.Visualizer viz;
+    private int vizSession = 0;
+    private final float[] vizWave = new float[64];
+
+    @PluginMethod
+    public void vizStart(PluginCall call) {
+        if (!has(Manifest.permission.RECORD_AUDIO)) { requestPermissionForAlias("mic", call, "vizMic"); return; }
+        startViz(call);
+    }
+    @PermissionCallback
+    private void vizMic(PluginCall call) {
+        if (has(Manifest.permission.RECORD_AUDIO)) startViz(call); else call.reject("Ohne Mikrofon-Freigabe kann die Lichtorgel die Musik nicht auswerten");
+    }
+    private void startViz(PluginCall call) {
+        main.post(() -> {
+            JSObject r = new JSObject();
+            int sid = PlaybackService.audioSession;
+            if (sid == 0) { r.put("ok", false); call.resolve(r); return; }
+            if (viz != null && vizSession == sid) { r.put("ok", true); call.resolve(r); return; }
+            stopViz();
+            try {
+                android.media.audiofx.Visualizer v = new android.media.audiofx.Visualizer(sid);
+                v.setEnabled(false);
+                int[] rg = android.media.audiofx.Visualizer.getCaptureSizeRange();
+                v.setCaptureSize(Math.min(1024, rg[1]));
+                final int sr = v.getSamplingRate();        // in Millihertz
+                final int n = v.getCaptureSize();
+                v.setDataCaptureListener(new android.media.audiofx.Visualizer.OnDataCaptureListener() {
+                    @Override public void onWaveFormDataCapture(android.media.audiofx.Visualizer vv, byte[] w, int rate) {
+                        for (int i = 0; i < 64; i++) vizWave[i] = ((w[i * w.length / 64] & 0xff) - 128) / 128f;
+                    }
+                    @Override public void onFftDataCapture(android.media.audiofx.Visualizer vv, byte[] f, int rate) {
+                        JSArray b = new JSArray();
+                        double binHz = sr / 1000.0 / n;
+                        for (int i = 0; i < 16; i++) {
+                            double f0 = 40 * Math.pow(2, i * 0.58), f1 = f0 * 1.5;
+                            int k0 = Math.max(1, (int) Math.floor(f0 / binHz)), k1 = Math.min(n / 2 - 1, Math.max(k0, (int) Math.ceil(f1 / binHz)));
+                            double s = 0; int c = 0;
+                            for (int k = k0; k <= k1; k++) { double re = f[2 * k], im = f[2 * k + 1]; s += Math.hypot(re, im); c++; }
+                            try { b.put(c > 0 ? Math.round(s / c / 128.0 * 1000) / 1000.0 : 0); } catch (Exception ignore) {}
+                        }
+                        JSArray w = new JSArray();
+                        for (float x : vizWave) try { w.put(Math.round(x * 100) / 100.0); } catch (Exception ignore) {}
+                        JSObject o = new JSObject();
+                        o.put("b", b); o.put("w", w);
+                        notifyListeners("viz", o);
+                    }
+                }, Math.min(android.media.audiofx.Visualizer.getMaxCaptureRate(), 20000), true, true);
+                v.setEnabled(true);
+                viz = v; vizSession = sid;
+                r.put("ok", true);
+            } catch (Exception e) { r.put("ok", false); r.put("err", String.valueOf(e.getMessage())); }
+            call.resolve(r);
+        });
+    }
+    private void stopViz() {
+        if (viz != null) { try { viz.setEnabled(false); viz.release(); } catch (Exception ignore) {} viz = null; vizSession = 0; }
+    }
+    @PluginMethod
+    public void vizStop(PluginCall call) { main.post(() -> { stopViz(); call.resolve(); }); }
+
     /* Diktieren mit der Spracherkennung von Android. Läuft weiter, bis "Fertig" gedrückt wird. */
     private android.speech.SpeechRecognizer sr;
     private volatile boolean srOn = false;
