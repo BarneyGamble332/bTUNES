@@ -748,10 +748,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .lever{width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#eee,#888);box-shadow:0 2px 3px #0008;position:relative}
 .lever::after{content:"";position:absolute;left:7.5px;top:-9px;width:5px;height:15px;border-radius:3px;background:linear-gradient(90deg,#aaa,#fff,#aaa);transform-origin:2.5px 13px;transform:rotate(-35deg);transition:transform .15s}
 .lit .lever::after{transform:rotate(35deg)}
-.deck .losw{left:62%;top:87.6%;color:#d8c3a8}
+.deck .losw{left:46%;top:87.6%;color:#d8c3a8}
 .lokino{position:absolute;z-index:4;width:30px;height:24px;border-radius:7px;border:0;background:#0006;color:#d8c3a8;display:grid;place-items:center;cursor:pointer;box-shadow:inset 0 0 0 1px #ffffff22}
 .lokino svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.deck .lokino{left:70.5%;top:88.5%}
+.deck .lokino{left:55%;top:88.5%}
 /* Taschen-Player: Schiebeschalter oben auf dem Gehäuse */
 .tptop{position:absolute;left:6%;top:-15px;display:flex;align-items:flex-end;gap:10px;z-index:3}
 .tpsl{width:46px;height:15px;border-radius:5px 5px 0 0;background:linear-gradient(180deg,#b25a23,#8a4319);box-shadow:inset 0 1px 0 #ffffff40;position:relative;border:0;padding:0;cursor:pointer}
@@ -872,7 +872,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       <div class="knob" style="left:84.5%;top:79%"></div>
       <div class="rpm">33⅓</div>
       <div class="led"></div>
-      <div class="lobulbs" id="loBulbs"><i style="--c:#ff3b2f"><b></b></i><i style="--c:#ffb02e"><b></b></i><i style="--c:#5dff6a"><b></b></i><i style="--c:#3aa0ff"><b></b></i></div>
       <button class="losw" data-lo="sw" aria-label="Lichtorgel"><span class="lever"></span><small>LICHT</small></button><button class="lokino" data-lo="kino" aria-label="Kino-Modus"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
       <div class="scrub" id="scrub"></div>
     </div>
@@ -4997,7 +4996,7 @@ function loDraw(off){
   const lit=LO.light&&!off,lv=[LO.b,LO.lm,LO.hm,LO.t].map(x=>lit?x:0);
   if(!TP.on&&!KB.on){
     document.querySelectorAll('#loBulbs i').forEach((e,i)=>{e.style.opacity=(.22+lv[i]*.78).toFixed(2);e.firstChild.style.opacity=lv[i].toFixed(2);});
-    document.querySelectorAll('#loWall i').forEach((e,i)=>e.style.opacity=(lv[i]*.55).toFixed(2));
+    document.querySelectorAll('#loWall i').forEach((e,i)=>e.style.opacity=(lv[i]*.75).toFixed(2));
   }
   if(TP.on){
     $('#tpRing').style.opacity=(lit?LO.b*.9:0).toFixed(2);
@@ -5036,43 +5035,110 @@ async function loPalette(){
 /* ---------- Kino-Modus ---------- */
 const KC={aim:[0,0,0,0],spark:[],fx:null,fy:null,flash:0,mv:null,g:null};
 function loKinoOpen(){
-  LO.kino=true;$('#kino').classList.add('show');pushNav('kino');loPalette();
-  const t=curTrack();$('#kinoT').innerHTML=t?`${esc(t.title)}<small>${esc(t.artist)}</small>`:'Lichtorgel<small>bTUNES</small>';
+  LO.kino=true;$('#kino').classList.add('show');pushNav('kino');KC.tid=null;
+  $('#kinoT').innerHTML='';
   const h=$('#kinoH');h.style.opacity=1;setTimeout(()=>h.style.opacity=0,4500);
-  loKinoSize();loUpdate();
+  loKinoSize();loKinoTrack();loUpdate();
 }
 function loKinoClose(){LO.kino=false;$('#kino').classList.remove('show');nav=nav.filter(x=>x!=='kino');loUpdate();}
-function loKinoSize(){const c=$('#kinoC'),d=Math.min(NATIVE?1.5:2,devicePixelRatio||1);c.width=innerWidth*d;c.height=innerHeight*d;KC.g=c.getContext('2d');KC.g.setTransform(d,0,0,d,0,0);}
+/* Auflösung: scharf am Handy, auf großen Monitoren (4K) begrenzt, damit es flüssig bleibt */
+function loKinoSize(){
+  const c=$('#kinoC'),W=innerWidth,H=innerHeight;let d=Math.min(NATIVE?1.5:2,devicePixelRatio||1);
+  if(W*d>2560)d=2560/W;
+  c.width=Math.round(W*d);c.height=Math.round(H*d);KC.g=c.getContext('2d');KC.g.setTransform(d,0,0,d,0,0);KC.tid=null;
+}
+/* Titel, Band und Cover für die Bühne vorbereiten */
+async function loKinoTrack(){
+  const t=curTrack(),id=t?t.id:'-';if(KC.tid===id)return;KC.tid=id;
+  KC.title=t?t.title:'bTUNES';KC.band=(t?t.artist:'bTUNES').toUpperCase();KC.album=t?t.album:'';
+  KC.cover=null;KC.titleImg=null;loPalette();
+  if(t){try{const u=await art(t.albumId,600);if(u&&KC.tid===id){const im=new Image();if(/^https?:/.test(u)&&!u.startsWith(location.origin))im.crossOrigin='anonymous';
+    im.onload=()=>{if(KC.tid===id)KC.cover=im;};im.src=u;}}catch(e){}}
+}
+/* Neon-Schrift einmal vorzeichnen (Leuchten kostet sonst viel Rechenzeit) */
+function loNeon(text,sub,col,w){
+  const m=w,fs=Math.round(m*.055),c=document.createElement('canvas'),g=c.getContext('2d');
+  g.font=`800 ${fs}px system-ui,sans-serif`;let tw=g.measureText(text).width;const max=m*1.6;let f=fs;if(tw>max){f=Math.round(fs*max/tw);}
+  c.width=Math.ceil(Math.min(max,tw)+f*2);c.height=Math.ceil(f*2.6+(sub?f*.9:0));
+  g.font=`800 ${f}px system-ui,sans-serif`;g.textAlign='center';g.textBaseline='middle';
+  g.shadowColor=col;g.shadowBlur=f*.5;g.fillStyle=col;g.fillText(text,c.width/2,f*1.2);g.shadowBlur=f*.2;g.fillStyle='#fff';g.fillText(text,c.width/2,f*1.2);
+  if(sub){g.shadowBlur=f*.25;g.shadowColor=col;g.font=`600 ${Math.round(f*.42)}px system-ui,sans-serif`;g.fillStyle='rgba(255,255,255,.8)';g.fillText(sub,c.width/2,f*2.25);}
+  return c;
+}
 function loKinoDraw(t){
-  const g=KC.g;if(!g)return;const W=innerWidth,H=innerHeight,P=LO.pal,lv=[LO.b,LO.lm,LO.hm,LO.t];
-  g.globalCompositeOperation='source-over';g.globalAlpha=1;g.fillStyle='rgba(4,3,6,.35)';g.fillRect(0,0,W,H);
-  g.globalCompositeOperation='lighter';
-  for(let i=0;i<4;i++){
-    const sx=W*(.14+i*.24),auto=W*(.5+.42*Math.sin(t/1700+i*1.7));
-    const tx=KC.fx!=null?KC.fx+(i-1.5)*W*.06:auto,ty=KC.fy!=null?KC.fy:H*(.85+.1*Math.sin(t/900+i));
-    KC.aim[i]=KC.aim[i]?KC.aim[i]+(tx-KC.aim[i])*.08:tx;
-    const ax=KC.aim[i],x=lv[i],wd=W*(.05+x*.09);
-    const gr=g.createLinearGradient(sx,0,ax,ty);gr.addColorStop(0,P[i]);gr.addColorStop(1,'rgba(0,0,0,0)');
-    g.globalAlpha=Math.min(1,.06+x*.9);g.fillStyle=gr;
-    g.beginPath();g.moveTo(sx-6,-10);g.lineTo(sx+6,-10);g.lineTo(ax+wd,ty);g.lineTo(ax-wd,ty);g.closePath();g.fill();
-    const rg=g.createRadialGradient(ax,ty,0,ax,ty,wd*1.6);rg.addColorStop(0,P[i]);rg.addColorStop(1,'rgba(0,0,0,0)');
-    g.globalAlpha=x*.7;g.fillStyle=rg;g.beginPath();g.ellipse(ax,ty,wd*1.6,wd*.6,0,0,7);g.fill();
-    g.globalAlpha=.5+x*.5;g.fillStyle=P[i];g.beginPath();g.arc(sx,4,8+x*6,0,7);g.fill();
-  }
-  // Discokugel
-  const bx=W/2,by=Math.min(120,H*.17),br=Math.min(44,W*.08);
+  const g=KC.g;if(!g)return;loKinoTrack();
+  const W=innerWidth,H=innerHeight,m=Math.min(W,H),P=LO.pal,lv=[LO.b,LO.lm,LO.hm,LO.t],vol=(LO.b+LO.lm+LO.hm+LO.t)/4;
+  const floorY=H*.76,cs=Math.min(H*.4,W*.42),cx=W/2,cy=floorY-cs*.58;
+  // Rückwand
   g.globalCompositeOperation='source-over';g.globalAlpha=1;
-  const bg=g.createRadialGradient(bx-br*.3,by-br*.3,2,bx,by,br);bg.addColorStop(0,'#fff');bg.addColorStop(1,'#555');g.fillStyle=bg;g.beginPath();g.arc(bx,by,br,0,7);g.fill();
-  g.strokeStyle='rgba(0,0,0,.25)';g.lineWidth=1;for(let k=-3;k<=3;k++){g.beginPath();g.ellipse(bx,by,br*Math.abs(Math.cos(t/900+k*.45)),br,0,0,7);g.stroke();}
+  const wall=g.createLinearGradient(0,0,0,floorY);wall.addColorStop(0,'#05040a');wall.addColorStop(1,'#120d16');g.fillStyle=wall;g.fillRect(0,0,W,floorY);
+  // Bühnenboden mit Spiegelung
+  const fl=g.createLinearGradient(0,floorY,0,H);fl.addColorStop(0,'#1a1214');fl.addColorStop(1,'#050405');g.fillStyle=fl;g.fillRect(0,floorY,W,H-floorY);
+  // Albumcover als Leinwand hinten auf der Bühne, von den Scheinwerfern angestrahlt
+  const pulse=1+LO.beat*.015,s2=cs*pulse;
+  if(KC.cover){
+    g.save();g.translate(cx,cy);g.drawImage(KC.cover,-s2/2,-s2/2,s2,s2);
+    g.fillStyle=`rgba(0,0,0,${(.62-vol*.5).toFixed(3)})`;g.fillRect(-s2/2,-s2/2,s2,s2);
+    // Spiegelung im glänzenden Boden
+    g.restore();g.save();g.beginPath();g.rect(0,floorY,W,s2*.45);g.clip();
+    for(let k=0;k<3;k++){g.globalAlpha=.1-k*.03;const y=floorY+k*s2*.15;g.save();g.beginPath();g.rect(0,y,W,s2*.15);g.clip();
+      g.translate(cx,floorY);g.scale(1,-1);g.drawImage(KC.cover,-s2/2,(cy-floorY)-s2/2,s2,s2);g.restore();}
+    g.restore();g.globalAlpha=1;
+  }else{g.strokeStyle=P[0];g.globalAlpha=.4;g.lineWidth=m*.004;g.strokeRect(cx-cs/2,cy-cs/2,cs,cs);g.globalAlpha=1;}
+  // Rahmen-Leuchte um das Cover
+  g.globalCompositeOperation='lighter';g.globalAlpha=.25+LO.b*.6;g.strokeStyle=P[1];g.lineWidth=m*.005;g.strokeRect(cx-s2/2-m*.008,cy-s2/2-m*.008,s2+m*.016,s2+m*.016);
+  // Bühnenkante
+  g.globalAlpha=.5+LO.lm*.5;g.fillStyle=P[2];g.fillRect(0,floorY-m*.003,W,m*.004);
+  // Scheinwerfer
+  for(let i=0;i<4;i++){
+    const sx=W*(.12+i*.253),auto=cx+cs*.55*Math.sin(t/1700+i*1.7);
+    const tx=KC.fx!=null?KC.fx+(i-1.5)*m*.05:auto,ty=KC.fy!=null?KC.fy:floorY+(H-floorY)*.3*Math.sin(t/900+i)*.5;
+    KC.aim[i]=KC.aim[i]?KC.aim[i]+(tx-KC.aim[i])*.08:tx;KC.aimY=KC.aimY||[0,0,0,0];KC.aimY[i]=KC.aimY[i]?KC.aimY[i]+(ty-KC.aimY[i])*.08:ty;
+    const ax=KC.aim[i],ay=KC.aimY[i],x=lv[i],wd=m*(.05+x*.1);
+    const gr=g.createLinearGradient(sx,0,ax,ay);gr.addColorStop(0,P[i]);gr.addColorStop(1,'rgba(0,0,0,0)');
+    g.globalAlpha=Math.min(1,.05+x*.85);g.fillStyle=gr;
+    g.beginPath();g.moveTo(sx-m*.008,-5);g.lineTo(sx+m*.008,-5);g.lineTo(ax+wd,ay);g.lineTo(ax-wd,ay);g.closePath();g.fill();
+    const rg=g.createRadialGradient(ax,ay,0,ax,ay,wd*1.5);rg.addColorStop(0,P[i]);rg.addColorStop(1,'rgba(0,0,0,0)');
+    g.globalAlpha=x*.75;g.fillStyle=rg;g.beginPath();g.ellipse(ax,ay,wd*1.5,wd*.55,0,0,7);g.fill();
+    g.globalAlpha=.55+x*.45;g.fillStyle=P[i];g.beginPath();g.arc(sx,m*.012,m*(.012+x*.01),0,7);g.fill();
+  }
+  // Discokugel mit Spiegelplättchen und dem Bandnamen, der sich rundherum dreht
+  const br=m*.09,bx=cx,by=Math.max(br*1.2,H*.13),rot=t/2600;
+  g.globalCompositeOperation='source-over';g.globalAlpha=1;
+  g.strokeStyle='#777';g.lineWidth=m*.002;g.beginPath();g.moveTo(bx,0);g.lineTo(bx,by-br);g.stroke();
+  g.save();g.beginPath();g.arc(bx,by,br,0,7);g.clip();
+  const base=g.createRadialGradient(bx-br*.35,by-br*.4,br*.1,bx,by,br);base.addColorStop(0,'#9a9aa2');base.addColorStop(1,'#1c1c22');g.fillStyle=base;g.fillRect(bx-br,by-br,br*2,br*2);
+  const rows=12,cols=24;
+  for(let r=0;r<rows;r++){const la0=-Math.PI/2+r*Math.PI/rows,la1=la0+Math.PI/rows,y0=by+Math.sin(la0)*br,y1=by+Math.sin(la1)*br,rr=Math.cos((la0+la1)/2)*br;
+    for(let c=0;c<cols;c++){const lo0=c/cols*Math.PI*2+rot,lo1=lo0+Math.PI*2/cols,cm=Math.cos((lo0+lo1)/2);if(cm<=0)continue;
+      const x0=bx+Math.sin(lo0)*rr,x1=bx+Math.sin(lo1)*rr;
+      const seed=Math.sin((r*31+c*17)*12.9898)*43758.5,fl=seed-Math.floor(seed),tw=Math.max(0,Math.sin(t/180+fl*40))*LO.t;
+      const lum=Math.round(60+cm*120+fl*40+tw*90);g.fillStyle=tw>.6?P[(r+c)%4]:`rgb(${lum},${lum},${lum+8})`;
+      g.fillRect(Math.min(x0,x1)+.5,y0+.5,Math.abs(x1-x0)-1,y1-y0-1);}}
+  g.restore();
+  // Bandname auf dem Äquator
+  const one=(KC.band||'')+'  ✦  ';let band=one;while(band.length<26)band+=one;   // rundherum, damit immer etwas lesbar ist
+  const fs=br*.3;g.font=`900 ${fs}px system-ui,sans-serif`;g.textAlign='center';g.textBaseline='middle';
+  const step=Math.PI*2/band.length;
+  for(let i=0;i<band.length;i++){const a=(i-band.length/2)*step-rot*1.6;let aa=((a%(Math.PI*2))+Math.PI*3)%(Math.PI*2)-Math.PI;const ca=Math.cos(aa);if(ca<=.08)continue;
+    g.save();g.translate(bx+Math.sin(aa)*br*.98,by);g.scale(ca,1);g.globalAlpha=Math.min(1,ca*1.4);
+    g.lineWidth=fs*.14;g.strokeStyle='#000';g.strokeText(band[i],0,0);g.fillStyle='#fff';g.fillText(band[i],0,0);g.restore();}
+  g.globalAlpha=1;
+  // Glitzerpunkte der Kugel an Wand und Boden
   g.globalCompositeOperation='lighter';
-  const nNew=Math.floor(LO.t*5+LO.beat*9);for(let k=0;k<nNew;k++){const a=Math.random()*6.28,d=br+Math.random()*Math.max(W,H)*.7;KC.spark.push({x:bx+Math.cos(a)*d,y:by+Math.abs(Math.sin(a))*d,l:1,c:P[k%4]});}
-  KC.spark=KC.spark.filter(s=>(s.l-=.04)>0).slice(-240);
-  for(const s of KC.spark){g.globalAlpha=s.l;g.fillStyle=s.c;g.fillRect(s.x-1.5,s.y-1.5,3,3);}
-  // Oszilloskop-Linie
-  g.globalAlpha=.9;g.strokeStyle=P[Math.floor(t/2000)%4];g.lineWidth=2.5;g.beginPath();
-  const y0=H*.92;for(let i=0;i<64;i++){const x=i/63*W,y=y0+LO.wave[i]*H*.07;i?g.lineTo(x,y):g.moveTo(x,y);}g.stroke();
-  // Rand pulsiert im Bass, Blitz beim Antippen
-  g.globalAlpha=LO.beat*.35;const vg=g.createRadialGradient(W/2,H/2,Math.min(W,H)*.3,W/2,H/2,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,P[0]);g.fillStyle=vg;g.fillRect(0,0,W,H);
+  const nNew=Math.floor(LO.t*7+LO.beat*12);for(let k=0;k<nNew;k++){const a=Math.random()*6.28,d=br+Math.random()*Math.max(W,H)*.75;KC.spark.push({x:bx+Math.cos(a)*d,y:by+Math.abs(Math.sin(a))*d,l:1,c:P[k%4]});}
+  KC.spark=KC.spark.filter(s=>(s.l-=.035)>0).slice(-400);const sp=Math.max(3,m*.005);
+  for(const s of KC.spark){g.globalAlpha=s.l;g.fillStyle=s.c;g.fillRect(s.x-sp/2,s.y-sp/2,sp,sp);}
+  // Liedtitel als Leuchtschrift vorne auf der Bühne
+  if(!KC.titleImg||KC.titleCol!==P[1]||KC.titleW!==m){KC.titleImg=loNeon(KC.title,KC.album,P[1],m);KC.titleCol=P[1];KC.titleW=m;}
+  const ti=KC.titleImg,tsc=Math.min(1,(W*.92)/ti.width);
+  g.globalCompositeOperation='source-over';g.globalAlpha=.75+LO.lm*.25;
+  g.drawImage(ti,cx-ti.width*tsc/2,floorY+(H-floorY)*.12,ti.width*tsc,ti.height*tsc);
+  // Oszilloskop ganz unten
+  g.globalCompositeOperation='lighter';g.globalAlpha=.8;g.strokeStyle=P[(Math.floor(t/2000))%4];g.lineWidth=Math.max(2,m*.004);g.beginPath();
+  const y0=H*.955;for(let i=0;i<64;i++){const x=i/63*W,y=y0+LO.wave[i]*H*.035;i?g.lineTo(x,y):g.moveTo(x,y);}g.stroke();
+  // Bass-Pulsieren am Rand und Blitz
+  g.globalAlpha=LO.beat*.3;const vg=g.createRadialGradient(cx,H/2,m*.35,cx,H/2,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,P[0]);g.fillStyle=vg;g.fillRect(0,0,W,H);
   if(KC.flash>0){g.globalCompositeOperation='source-over';g.globalAlpha=KC.flash*.85;g.fillStyle='#fff';g.fillRect(0,0,W,H);KC.flash*=.82;if(KC.flash<.02)KC.flash=0;}
   g.globalAlpha=1;g.globalCompositeOperation='source-over';
 }
