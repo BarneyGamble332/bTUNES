@@ -26,11 +26,11 @@ def ball(name,loc,scale,rot=(0,0,0),seg=10,kind=None,grp=None):
   o['kind']=kind or name.rstrip('LR')
   g=o.vertex_groups.new(name=grp or 'P_'+o['kind']);g.add(list(range(len(o.data.vertices))),1.0,'REPLACE');return o
 # ---------- Rumpf mit Hals, Kopf und Schwanz ----------
-T={'bot':((0,0.02,0.235),(.062,.058)),'pel':((0,0.012,0.30),(.09,.084)),'bel':((0,-0.004,0.42),(.086,.09)),'wa':((0,-0.01,0.51),(.076,.08)),'che':((0,-0.016,0.6),(.078,.072)),
+T={'bot2':((0,0.03,0.2),.028),'bot':((0,0.022,0.24),(.07,.064)),'pel':((0,0.012,0.30),(.09,.084)),'bel':((0,-0.004,0.42),(.086,.09)),'wa':((0,-0.01,0.51),(.076,.08)),'che':((0,-0.016,0.6),(.078,.072)),
    'nb':((0,-0.022,0.685),.06),'nk':((0,-0.036,0.775),.049),'hd':((0,-0.06,0.868),(.074,.062)),'sn':((0,-0.148,0.855),.037),'tip':((0,-0.19,0.85),.019),
    't0':((0,0.07,0.255),.038),'t1':((0,0.16,0.2),.033),'t2':((0,0.26,0.205),.029),'t3':((0,0.33,0.27),.024),'t4':((0,0.36,0.35),.017),'t5':((0,0.365,0.4),.01)}
-TE=[('bot','pel'),('pel','bel'),('bel','wa'),('wa','che'),('che','nb'),('nb','nk'),('nk','hd'),('hd','sn'),('sn','tip'),('pel','t0'),('t0','t1'),('t1','t2'),('t2','t3'),('t3','t4'),('t4','t5')]
-TB={('bot','pel'):'root',('pel','bel'):'root',('bel','wa'):'spine',('wa','che'):'spine',('che','nb'):'spine',('nb','nk'):'neck',('nk','hd'):'neck',('hd','sn'):'head',('sn','tip'):'head',
+TE=[('bot2','bot'),('bot','pel'),('pel','bel'),('bel','wa'),('wa','che'),('che','nb'),('nb','nk'),('nk','hd'),('hd','sn'),('sn','tip'),('pel','t0'),('t0','t1'),('t1','t2'),('t2','t3'),('t3','t4'),('t4','t5')]
+TB={('bot2','bot'):'root',('bot','pel'):'root',('pel','bel'):'root',('bel','wa'):'spine',('wa','che'):'spine',('che','nb'):'spine',('nb','nk'):'neck',('nk','hd'):'neck',('hd','sn'):'head',('sn','tip'):'head',
     ('pel','t0'):'root',('t0','t1'):'tail1',('t1','t2'):'tail2',('t2','t3'):'tail3',('t3','t4'):'tail3',('t4','t5'):'tail3'}
 objs=[skinpart('rumpf',T,TE,'pel')]
 SEG={'rumpf':[(V(T[a][0]),V(T[b][0]),TB[(a,b)]) for a,b in TE]}
@@ -41,15 +41,21 @@ for s,x in (('L',1),('R',-1)):
   AE=[('sh','el'),('el','wr'),('wr','pw')]
   objs.append(skinpart('arm'+s,A,AE,'sh'))
   SEG['arm'+s]=[(V(A['sh'][0]),V(A['el'][0]),'arm.'+s),(V(A['el'][0]),V(A['wr'][0]),'fore.'+s),(V(A['wr'][0]),V(A['pw'][0]),'fore.'+s)]
-  Lg={'hip':((x*0.045,0.02,0.32),(.058,.064)),'kn':((x*0.072,-0.045,0.172),.046),'an':((x*0.07,0.032,0.048),.026),'he':((x*0.071,0.0,0.026),.024),'to':((x*0.073,-0.082,0.02),(.027,.02))}
-  LE=[('hip','kn'),('kn','an'),('an','he'),('he','to')]
+  # Hinterbein: kräftige Keule, die in den Po übergeht, Knie nach vorn, Ferse nach hinten, langer flacher Fuß
+  # Hinterbein bis zum Knöchel; der Fuß ist ein eigenes Teil, in dem das Bein-Ende verschwindet
+  Lg={'hip':((x*0.032,0.02,0.31),.045),'th':((x*0.058,0.005,0.235),(.056,.058)),'kn':((x*0.067,-0.03,0.165),.043),
+      'sm':((x*0.068,-0.006,0.105),.038),'an':((x*0.07,0.012,0.045),.033)}
+  LE=[('hip','th'),('th','kn'),('kn','sm'),('sm','an')]
   objs.append(skinpart('bein'+s,Lg,LE,'hip'))
-  SEG['bein'+s]=[(V(Lg['hip'][0]),V(Lg['kn'][0]),'thigh.'+s),(V(Lg['kn'][0]),V(Lg['an'][0]),'shin.'+s),(V(Lg['an'][0]),V(Lg['he'][0]),'foot.'+s),(V(Lg['he'][0]),V(Lg['to'][0]),'foot.'+s)]
+  Fu={'up':((x*0.07,0.015,0.065),.032),'he':((x*0.07,0.03,0.032),(.034,.03)),'mf':((x*0.071,-0.025,0.024),(.033,.024)),'to':((x*0.072,-0.08,0.02),(.031,.02))}
+  objs.append(skinpart('fuss'+s,Fu,[('up','he'),('he','mf'),('mf','to')],'up'))
+  Lg['to']=Fu['to']
+  SEG['bein'+s]=[(V(Lg['hip'][0]),V(Lg['th'][0]),'root'),(V(Lg['th'][0]),V(Lg['kn'][0]),'thigh.'+s),(V(Lg['kn'][0]),V(Lg['sm'][0]),'shin.'+s),(V(Lg['sm'][0]),V(Lg['an'][0]),'shin.'+s)]
   LIMB[s]=(A,Lg)
   # kleine Zehen an Vorder- und Hinterpfoten
   for k in (-1,0,1):
     objs.append(ball('zeheA'+s,(x*0.088+k*0.013,-0.163,0.478),(.011,.012,.009),seg=6,kind='zehe',grp='P_zeheA'+s))
-    objs.append(ball('zeheB'+s,(x*0.073+k*0.014,-0.096,0.017),(.012,.013,.009),seg=6,kind='zehe',grp='P_zeheB'+s))
+    objs.append(ball('zeheB'+s,(x*0.072+k*0.015,-0.1,0.017),(.012,.013,.009),seg=6,kind='zehe',grp='P_zeheB'+s))
 # ---------- Ohren, Augen, Nase ----------
 for s,x in (('L',1),('R',-1)):
   objs.append(ball('ohr'+s,(x*0.062,-0.025,0.905),(.024,.008,.018),(math.radians(-5),math.radians(x*20),x*math.radians(55))))
@@ -76,7 +82,8 @@ for o in objs:
       if c.z>0.78 and c.y<-0.06:k=max(k,ss(-0.1,-0.6,n.z)*ss(0.07,0.05,abs(c.x)))
       col=mix(BR,CR,k);col=mix(col,DK,ss(0.31,0.36,c.y)*ss(0.26,0.32,c.z))
     elif nm=='arm':col=mix(BR,CR,ss(0.52,0.49,c.z)*.85+ss(-0.4,-0.8,n.y)*.25)      # helle Pfoten
-    elif nm=='bein':col=mix(BR,CR,ss(0.06,0.025,c.z)*ss(-0.0,-0.06,c.y)*.8)
+    elif nm=='bein':col=BR
+    elif nm=='fuss':col=mix(BR,CR,ss(-0.045,-0.085,c.y)*.85)
     elif nm=='zehe':col=CR
     else:col=(1,1,1)
     ca.data[v.index].color=(*col,1)
@@ -102,7 +109,7 @@ bone('tail1',(0,0.07,0.255),(0,0.16,0.2),'root');bone('tail2',(0,0.16,0.2),(0,0.
 for s,x in (('L',1),('R',-1)):
   A,Lg=LIMB[s]
   bone('arm.'+s,A['sh'][0],A['el'][0],'spine');bone('fore.'+s,A['el'][0],A['pw'][0],'arm.'+s)
-  bone('thigh.'+s,Lg['hip'][0],Lg['kn'][0],'root');bone('shin.'+s,Lg['kn'][0],Lg['an'][0],'thigh.'+s)
+  bone('thigh.'+s,Lg['th'][0],Lg['kn'][0],'root');bone('shin.'+s,Lg['kn'][0],Lg['an'][0],'thigh.'+s)
   bone('foot.'+s,Lg['an'][0],Lg['to'][0],'shin.'+s)
   bone('ik.'+s,Lg['an'][0],(Lg['an'][0][0],Lg['an'][0][1],0.0),None,False)
   bone('pole.'+s,(x*0.09,-0.35,0.17),(x*0.09,-0.35,0.12),None,False)
@@ -120,7 +127,7 @@ def segd(p,a,b):
   ab=b-a;t=max(0,min(1,(p-a).dot(ab)/ab.length_squared));return (p-(a+ab*t)).length
 for b in arm.bones:
   if b.use_deform:body.vertex_groups.new(name=b.name)
-fixed={'P_ohr':'head','P_auge':'head','P_glanz':'head','P_nase':'head','P_zeheAL':'fore.L','P_zeheAR':'fore.R','P_zeheBL':'foot.L','P_zeheBR':'foot.R'}
+fixed={'P_fussL':'foot.L','P_fussR':'foot.R','P_ohr':'head','P_auge':'head','P_glanz':'head','P_nase':'head','P_zeheAL':'fore.L','P_zeheAR':'fore.R','P_zeheBL':'foot.L','P_zeheBR':'foot.R'}
 gname={g.index:g.name for g in body.vertex_groups}
 for v in body.data.vertices:
   part=None
@@ -130,7 +137,7 @@ for v in body.data.vertices:
   if part in fixed:ws={fixed[part]:1.0}
   elif part and part[2:] in SEG:
     ds=sorted(((segd(v.co,a,b),n) for a,b,n in SEG[part[2:]]))[:3];ws={}
-    for d,n in ds:ws[n]=ws.get(n,0)+1/(d+2e-3)**4
+    for d,n in ds:ws[n]=ws.get(n,0)+1/(d+6e-3)**3
     tot=sum(ws.values());ws={n:w/tot for n,w in ws.items()}
   else:ws={'head':1.0}
   for n,w in ws.items():
@@ -205,6 +212,14 @@ def huepfen(f,ph):
   d[('tail1','rotation_euler')]=(R(-10+25*j/.08),0,0)
   key(f,d);keyobj(f)
 acts.append(dance('huepfen',24,huepfen))
+def druecken(f,ph):
+  k=ss(0,10,f)*ss(24,14,f)                       # 0 -> 1 (gedrückt, Bild 10-14) -> 0
+  d=base(f,ph,bob=0,tail=10,nod=0)
+  d[('root','rotation_euler')]=(R(4+22*k),0,0);d[('spine','rotation_euler')]=(R(22*k),0,0);d[('neck','rotation_euler')]=(R(-18*k),0,0)
+  d[('head','rotation_euler')]=(R(-10*k),0,0)
+  for s,x in (('L',1),('R',-1)):d[('arm.'+s,'rotation_euler')]=(R(30+45*k),0,R(x*-8*k));d[('fore.'+s,'rotation_euler')]=(R(55-45*k),0,0)
+  key(f,d);keyobj(f)
+acts.append(dance('druecken',24,druecken))
 # Ruhe-Haltung als Standard
 rig.animation_data.action=acts[0]
 bpy.ops.wm.save_as_mainfile(filepath='/home/claude/wiesel/wiesel.blend')

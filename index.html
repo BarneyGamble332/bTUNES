@@ -1058,7 +1058,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 </div>
 <div id="kino"><canvas id="kinoC"></canvas><div class="kt" id="kinoT"></div>
   <button class="kd" id="kinoD">Wiesel aus</button><button class="kx" id="kinoX" aria-label="Kino schließen"><svg class="i"><use href="#i-x"/></svg></button>
-  <div class="kh" id="kinoH">Finger bewegen: Scheinwerfer folgen und Wiesel drehen · Tippen: Blitz · schnell wischen: andere Farben</div></div>
+  <div class="kh" id="kinoH">Knöpfe ◀◀ ▶▶ antippen: Lied zurück/weiter · Finger bewegen: Scheinwerfer und Wiesel drehen · Tippen: Blitz · wischen: Farben</div></div>
 <div class="pileov" id="pileOv">
   <div class="pl-top"><h2><span id="plTitle">Kassettenhaufen</span><small id="plSub">Wühlen, schieben, eine rausziehen</small></h2>
     <button class="ibtn" id="plClose" aria-label="Haufen schließen"><svg class="i"><use href="#i-x"/></svg></button></div>
@@ -5058,6 +5058,18 @@ async function dnInit(){
     // weicher Schatten unter den Füßen
     const sh=new THREE.Mesh(new THREE.CircleGeometry(.16,24),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.45,depthWrite:false}));
     sh.rotation.x=-Math.PI/2;sh.position.y=.002;holder.add(sh);
+    // zwei Arcade-Knöpfe auf der Bühne: links zurück, rechts weiter
+    const stage=new THREE.Group();scene.add(stage);DN.btn={};
+    const lab=(t)=>{const c=document.createElement('canvas');c.width=128;c.height=64;const g=c.getContext('2d');g.fillStyle='#e9e9ee';g.font='900 40px system-ui';g.textAlign='center';g.textBaseline='middle';g.fillText(t,64,34);const tx=new THREE.CanvasTexture(c);tx.encoding=THREE.sRGBEncoding;return tx;};
+    for(const [dir,col,sym] of [[-1,0x2ad4ff,'◀◀'],[1,0xff2a8a,'▶▶']]){
+      const b=new THREE.Group();b.position.set(dir*.5,0,.14);stage.add(b);
+      const ped=new THREE.Mesh(new THREE.CylinderGeometry(.068,.085,.26,28),new THREE.MeshStandardMaterial({color:0x26262c,metalness:.6,roughness:.35}));ped.position.y=.13;b.add(ped);
+      const ring=new THREE.Mesh(new THREE.CylinderGeometry(.074,.074,.022,28),new THREE.MeshStandardMaterial({color:0xd8d8e0,metalness:.9,roughness:.2}));ring.position.y=.265;b.add(ring);
+      const cap=new THREE.Mesh(new THREE.SphereGeometry(.058,28,12,0,Math.PI*2,0,Math.PI/2),new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:.35,roughness:.3}));cap.position.y=.27;cap.scale.y=.7;b.add(cap);
+      const pl=new THREE.Mesh(new THREE.PlaneGeometry(.11,.055),new THREE.MeshBasicMaterial({map:lab(sym),transparent:true}));pl.position.set(0,.16,.079);b.add(pl);
+      DN.btn[dir]={g:b,cap,down:0};
+    }
+    DN.stage=stage;
     const mixer=new THREE.AnimationMixer(fig);
     for(const c of gl.animations)DN.acts[c.name]=mixer.clipAction(c);
     Object.assign(DN,{r,scene,cam,holder,mixer,fig,shadow:sh,ready:true});
@@ -5065,9 +5077,11 @@ async function dnInit(){
   })().catch(e=>{DN.loading=null;toast('Wiesel konnte nicht geladen werden: '+(e&&e.message||e));});
   return DN.loading;
 }
-function dnPlay(name,fade=.45){
+function dnPlay(name,fade=.45,once=false){
   const a=DN.acts[name];if(!a||DN.act===a)return;
-  a.reset();a.setEffectiveWeight(1);a.play();
+  a.reset();a.setEffectiveWeight(1);
+  if(once){a.setLoop(THREE.LoopOnce,1);a.clampWhenFinished=true;}else a.setLoop(THREE.LoopRepeat,Infinity);
+  a.play();
   if(DN.act&&fade){a.time=DN.act.time%0.5;DN.act.crossFadeTo(a,fade,false);}else if(DN.act)DN.act.stop();
   DN.act=a;DN.actName=name;
 }
@@ -5090,34 +5104,58 @@ function dnPick(){
   dnPlay(n);
 }
 function dnDraw(t){
-  if(!DN.on||!DN.ready)return;
+  if(!DN.ready)return;DN.holder.visible=DN.on;
   const W=innerWidth,H=innerHeight,floorY=H*.76,cs=Math.min(H*.4,W*.42),land=W>H*1.1;
   if(DN.r.domElement.width!==Math.round(W*DN.r.getPixelRatio()))dnSize();
   const now=performance.now(),dt=Math.min(.05,(now-(DN.last||now))/1000);DN.last=now;
   // Größe und Platz auf der Bühne: quer rechts neben dem Cover, hochkant vorne in der Mitte
   const hpx=land?H*.42:H*.3,x=land?W/2+cs*.5+hpx*.45:W/2,y=H-(floorY+(H-floorY)*.06);
-  DN.holder.position.set(x,y,0);DN.holder.scale.setScalar(hpx/0.95);
+  const sc2=hpx/0.95;DN.sc=sc2;DN.home={x,y};
+  DN.stage.position.set(x,y,0);DN.stage.scale.setScalar(sc2);DN.stage.rotation.set(.12,0,0);
+  let offX=0,hop=0,turn=0;
+  if(DN.seq){const q=DN.seq,e=now-q.t0,tgt=q.dir*.5,ease=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+    if(e<520){const p=e/520;offX=tgt*ease(p);hop=Math.abs(Math.sin(p*Math.PI*2))*.05;turn=q.dir*.7*Math.sin(p*Math.PI);if(!q.w){q.w=1;dnPlay('huepfen',.2);}}
+    else if(e<1200){offX=tgt;if(!q.p){q.p=1;dnPlay('druecken',.15,true);}
+      if(e>930&&!q.hit){q.hit=1;dnHitBtn(q.dir);}}
+    else if(e<1720){const p=(e-1200)/520;offX=tgt*(1-ease(p));hop=Math.abs(Math.sin(p*Math.PI*2))*.05;turn=-q.dir*.7*Math.sin(p*Math.PI);if(!q.b){q.b=1;dnPlay('huepfen',.25);}}
+    else{DN.seq=null;DN.busy=false;dnPick();}}
+  DN.holder.position.set(x+offX*sc2,y+hop*sc2,0);DN.holder.scale.setScalar(sc2);
+  for(const k of [-1,1]){const b=DN.btn[k];b.down=Math.max(0,b.down-dt*4);b.cap.position.y=.27-.03*Math.min(1,b.down*2);b.cap.material.emissiveIntensity=.3+LO.beat*.5+b.down*1.2;}
   // Drehen mit dem Finger, sonst langsam zurück nach vorn
   DN.yaw+=DN.yawV;DN.yawV*=.92;if(Math.abs(DN.yawV)<.001)DN.yaw*=.97;
-  DN.holder.rotation.set(.12,DN.yaw-.25*(land?1:0),0);
+  DN.holder.rotation.set(.12,DN.yaw-.25*(land&&!DN.seq?1:0)+turn,0);
   // Tempo und Taktgefühl
-  if(dnBeat(now)&&DN.act){if(DN.beatN%8===0)dnPick();
+  if(dnBeat(now)&&DN.act&&!DN.busy){if(DN.beatN%8===0)dnPick();
     const err=((DN.act.time-.25)%.5+.5)%.5;DN.act.time-= (err>.25?err-.5:err)*.35;}
   if(DN.beatN===0&&!DN.picked){DN.picked=1;dnPick();}
-  DN.mixer.timeScale=S.playing?DN.bpm/120:.5;
+  DN.mixer.timeScale=DN.busy?1:S.playing?DN.bpm/120:.5;
   DN.mixer.update(dt);
   // Farbiges Bühnenlicht passend zu den Scheinwerfern
   const lv=[LO.b,LO.lm,LO.hm];DN.lights.forEach((l,i)=>{l.color.set(LO.pal[i]);l.intensity=.4+lv[i]*1.6;l.position.set(x+(i-1)*hpx*.9,y+hpx*(.9+.2*i),hpx*1.2);l.distance=hpx*4;});
   DN.r.render(DN.scene,DN.cam);
 }
+/* Knopf: das Wiesel hüpft hin, drückt mit beiden Pfoten und hüpft zurück */
+function dnHitBtn(dir){const b=DN.btn&&DN.btn[dir];if(b)b.down=1;kbNoise(.05,1400,.5);setTimeout(()=>kbNoise(.03,700,.4),40);KC.flash=.35;
+  ctl(dir>0?'next':'prev');setTimeout(()=>{KC.tid=null;},400);}
+function dnPress(dir){
+  if(DN.busy)return;
+  if(DN.ready&&DN.on){DN.busy=true;DN.seq={t0:performance.now(),dir};}
+  else dnHitBtn(dir);
+}
+function dnHitTest(cx,cy){
+  if(!DN.ready||!DN.home)return 0;const H=innerHeight;
+  for(const k of [-1,1]){const bx=DN.home.x+k*.5*DN.sc,by=H-(DN.home.y+.2*DN.sc),r=Math.max(34,.13*DN.sc);
+    if(Math.hypot(cx-bx,cy-by)<r)return k;}
+  return 0;
+}
 function dnToggle(){DN.on=!DN.on;store.set('kinoWiesel',DN.on);$('#kinoD').textContent=DN.on?'Wiesel aus':'Wiesel an';
-  if(DN.on)dnInit();const c=$('#kinoW');if(c)c.style.display=DN.on?'':'none';}
+  dnInit();}
 function loKinoOpen(){
   LO.kino=true;$('#kino').classList.add('show');pushNav('kino');KC.tid=null;
   $('#kinoT').innerHTML='';
   const h=$('#kinoH');h.style.opacity=1;setTimeout(()=>h.style.opacity=0,4500);
   loKinoSize();loKinoTrack();loUpdate();
-  $('#kinoD').textContent=DN.on?'Wiesel aus':'Wiesel an';if(DN.on)dnInit();
+  $('#kinoD').textContent=DN.on?'Wiesel aus':'Wiesel an';dnInit();
 }
 function loKinoClose(){LO.kino=false;$('#kino').classList.remove('show');nav=nav.filter(x=>x!=='kino');loUpdate();}
 /* Auflösung: scharf am Handy, auf großen Monitoren (4K) begrenzt, damit es flüssig bleibt */
@@ -5232,9 +5270,10 @@ function loKinoDraw(t){
   c.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'||KC.mv){KC.fx=e.clientX;KC.fy=e.clientY;}
     const m=KC.mv;if(!m)return;const now=performance.now(),d=Math.hypot(e.clientX-m.x,e.clientY-m.y),v=d/Math.max(1,now-m.t);
     if(v>2.2&&now-m.sw>600){LO.pi=(LO.pi+1)%LO.pals.length;LO.pal=LO.pals[LO.pi]||LO.pal;m.sw=now;}m.d+=d;m.x=e.clientX;m.y=e.clientY;m.t=now;});
-  c.addEventListener('pointerup',e=>{const m=KC.mv;if(m&&m.d<12&&performance.now()-m.s<300)KC.flash=1;KC.mv=null;if(e.pointerType!=='mouse')KC.fx=KC.fy=null;});
+  c.addEventListener('pointerup',e=>{const m=KC.mv;if(m&&m.d<12&&performance.now()-m.s<300){const k=dnHitTest(e.clientX,e.clientY);if(k)dnPress(k);else KC.flash=1;}KC.mv=null;if(e.pointerType!=='mouse')KC.fx=KC.fy=null;});
   c.addEventListener('pointerleave',()=>{KC.fx=KC.fy=null;});
-  $('#kinoX').onclick=()=>back();$('#kinoD').onclick=dnToggle;
+  $('#kinoX').onclick=()=>back();
+  document.addEventListener('keydown',e=>{if(!LO.kino)return;if(e.key==='ArrowRight'){dnPress(1);e.preventDefault();}else if(e.key==='ArrowLeft'){dnPress(-1);e.preventDefault();}});$('#kinoD').onclick=dnToggle;
   c.addEventListener('pointermove',e=>{if(KC.mv&&DN.ready&&e.movementX)DN.yawV=e.movementX*.004;});
   addEventListener('resize',()=>{if(LO.kino)loKinoSize();});
   document.addEventListener('visibilitychange',loUpdate);
