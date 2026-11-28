@@ -1123,10 +1123,23 @@ function desktopPlugin(){
     navigator.mediaSession.metadata=new MediaMetadata(md);
     if(!it.art&&it.id){try{const u=await D.art(Number(it.id),512);if(u&&cur()===it)navigator.mediaSession.metadata=new MediaMetadata({...md,artwork:[{src:u,sizes:'512x512',type:'image/jpeg'}]});}catch(e){}}
   }
+  /* HLS-Sender (.m3u8) spielt Chromium nicht selbst ab: dafür hls.js */
+  let hls=null;
+  const loadHls=()=>window.Hls?Promise.resolve():new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='lib/hls.min.js';sc.onload=ok;sc.onerror=no;document.head.appendChild(sc);});
+  function setSrc(src){
+    if(hls){try{hls.destroy();}catch(e){}hls=null;}
+    au.crossOrigin=/^https?:/i.test(src)?'anonymous':null;   // fremde Server: mit CORS-Freigabe aus main.mjs
+    if(/\.m3u8(\?|$)/i.test(src)){
+      au.removeAttribute('src');
+      return loadHls().then(()=>{if(!window.Hls||!Hls.isSupported())throw new Error('HLS');hls=new Hls({enableWorker:false});hls.loadSource(src);hls.attachMedia(au);})
+        .catch(()=>{au.src=src;});
+    }
+    au.src=src;return Promise.resolve();
+  }
   function load(startMs){const it=cur();if(!it)return;ended=false;
-    au.src=it.uri||fileUrl(paths.get(Number(it.id))||'');au.playbackRate=speed;
+    const p=setSrc(it.uri||fileUrl(paths.get(Number(it.id))||''));au.playbackRate=speed;
     if(startMs)au.addEventListener('loadedmetadata',()=>{au.currentTime=startMs/1000;},{once:true});
-    au.play().catch(()=>{});meta(it);send();}
+    p.then(()=>au.play().catch(()=>{}));meta(it);send();}
   function next(auto){
     if(oi<order.length-1){oi++;load();}
     else if(repeat===2&&order.length){oi=0;load();}
@@ -1134,6 +1147,13 @@ function desktopPlugin(){
   }
   au.addEventListener('ended',()=>{if(repeat===1){au.currentTime=0;au.play();}else next(true);});
   ['play','pause','loadedmetadata','seeked','ratechange','durationchange'].forEach(ev=>au.addEventListener(ev,send));
+  let triedHls='';
+  au.addEventListener('error',e=>{const src=au.currentSrc||au.src||'';
+    // manche Sender liefern HLS ohne .m3u8 im Namen: dann noch einmal mit hls.js versuchen
+    if(!hls&&/^https?:/i.test(src)&&triedHls!==src){triedHls=src;e.stopImmediatePropagation();
+      loadHls().then(()=>{if(!window.Hls||!Hls.isSupported())throw 0;hls=new Hls({enableWorker:false});hls.on(Hls.Events.ERROR,(_,d)=>{if(d.fatal)toast('Sender lässt sich nicht abspielen');});
+        hls.loadSource(src);hls.attachMedia(au);au.play().catch(()=>{});}).catch(()=>toast('Sender lässt sich nicht abspielen'));return;}
+  });
   au.addEventListener('error',()=>{toast(String(cur()&&cur().key||'').startsWith('r:')?'Sender lässt sich nicht abspielen':'Datei konnte nicht abgespielt werden');});
   if('mediaSession' in navigator){const ms=navigator.mediaSession;
     ms.setActionHandler('play',()=>au.play());ms.setActionHandler('pause',()=>au.pause());

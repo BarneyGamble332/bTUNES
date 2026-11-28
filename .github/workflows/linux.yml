@@ -6,6 +6,7 @@ on:
     paths:
       - index.html
       - kino/**
+      - lib/**
       - desktop/**
       - .github/workflows/linux.yml
 
@@ -31,7 +32,7 @@ jobs:
           RUN_NUMBER: ${{ github.run_number }}
         run: |
           set -euo pipefail
-          mkdir -p app && cp ../index.html app/index.html && mkdir -p app/kino && cp ../kino/three.min.js ../kino/GLTFLoader.js ../kino/wiesel.js app/kino/
+          mkdir -p app && cp ../index.html app/index.html && mkdir -p app/kino && cp ../kino/three.min.js ../kino/GLTFLoader.js ../kino/wiesel.js app/kino/ && mkdir -p app/lib && cp ../lib/hls.min.js app/lib/
           # Spracherkennung (Whisper) für das Diktieren: nur die zwei benötigten Programmteile mitnehmen
           mkdir -p app/asr /tmp/asr
           npm i --prefix /tmp/asr --ignore-scripts --no-audit --no-fund @huggingface/transformers@4.3.2

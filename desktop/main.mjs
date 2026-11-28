@@ -1,6 +1,6 @@
 // bTUNES für Linux: Fenster, Zugriff auf Musikordner, Cover, Podcast-Downloads.
 // Die Oberfläche ist dieselbe index.html wie in der Android-App.
-import { app, BrowserWindow, ipcMain, dialog, shell, nativeImage } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell, nativeImage, session } from 'electron';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -53,7 +53,20 @@ function createWindow() {
 }
 
 app.on('second-instance', () => { if (win) { if (win.isMinimized()) win.restore(); win.focus(); } });
-app.whenReady().then(createWindow);
+/* Podcasts und Radiosender liegen auf fremden Servern. Damit die Lichtorgel deren Ton auswerten darf
+   (sonst schaltet Chromium den Ton stumm, sobald er durch die Klanganalyse läuft), bekommt jede Antwort
+   eine CORS-Freigabe. */
+function allowCors() {
+  session.defaultSession.webRequest.onHeadersReceived({ urls: ['http://*/*', 'https://*/*'] }, (d, cb) => {
+    const h = {};
+    for (const [k, v] of Object.entries(d.responseHeaders || {})) if (!/^access-control-allow-(origin|headers|methods)$/i.test(k)) h[k] = v;
+    h['Access-Control-Allow-Origin'] = ['*'];
+    h['Access-Control-Allow-Headers'] = ['*'];
+    h['Access-Control-Allow-Methods'] = ['GET, HEAD, OPTIONS'];
+    cb({ responseHeaders: h });
+  });
+}
+app.whenReady().then(() => { allowCors(); createWindow(); });
 app.on('window-all-closed', () => app.quit());
 
 ipcMain.handle('getFolders', () => getFolders());
